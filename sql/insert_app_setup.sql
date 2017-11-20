@@ -1,0 +1,1 @@
+insert into app_setups (app_setup, app) values ($1, $2) returning *

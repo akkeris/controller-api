@@ -1,0 +1,1 @@
+select max(now()) as end, min(created) as start from apps

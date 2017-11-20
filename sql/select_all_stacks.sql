@@ -1,0 +1,1 @@
+select distinct stacks.name as stack_name from stacks where deleted = false

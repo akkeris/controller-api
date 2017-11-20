@@ -1,0 +1,1 @@
+insert into certificate_domain_names (certificate_domain_name, certificate, name, common_name) values ($1, $2, $3, $4)

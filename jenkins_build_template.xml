@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.6">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>20</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>sources</name>
+          <description>The sources URL for the code or image to build</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>org</name>
+          <description>The organization name</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>app</name>
+          <description>The app name without a space indicator</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>app_uuid</name>
+          <description>The apps uuid</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sha</name>
+          <description>The SHA value of the commit</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>repo</name>
+          <description>The repo of the commit</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>branch</name>
+          <description>The branch of the commit</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>space</name>
+          <description>The space this build is for</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>build_uuid</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>docker_registry</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>gm_registry_host</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>gm_registry_repo</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>docker_login</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>docker_password</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>build_options</name>
+          <description>Dockerfile commands to add after FROM.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <hudson.plugins.throttleconcurrents.ThrottleJobProperty plugin="throttle-concurrents@1.9.0">
+      <maxConcurrentPerNode>1</maxConcurrentPerNode>
+      <maxConcurrentTotal>1</maxConcurrentTotal>
+      <categories class="java.util.concurrent.CopyOnWriteArrayList"/>
+      <throttleEnabled>true</throttleEnabled>
+      <throttleOption>project</throttleOption>
+      <limitOneJobWithMatchingParams>false</limitOneJobWithMatchingParams>
+      <paramsToUseForLimit></paramsToUseForLimit>
+    </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers/>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.13">
+    <script>node(&apos;docker&apos;) {
+  def imageTag = &quot;${gm_registry_repo}/${app}-${app_uuid}:0.${env.BUILD_NUMBER}&quot;
+  if(docker_registry == &quot;&quot;) {
+     stage &apos;Retrieving source code&apos;
+     writeFile file:&quot;code_url&quot;, text:sources
+     writeFile file:&quot;config_vars&quot;, text:build_options
+     sh &quot;rm -rf build&quot;
+     sh &quot;if grep -q -x \&quot;^data:.*\&quot; code_url; then cat code_url | sed \&quot;s/data:.*,//g\&quot; | base64 --decode &gt; sources; else wget -i code_url -O sources; fi&quot;
+     sh &quot;tar zxf sources -C build || unzip sources -d build&quot;
+     sh &quot;cd build; if [ `ls -d */ | wc -l` = \&quot;1\&quot; ]; then if [ `ls . | wc -l` = \&quot;1\&quot; ]; then mv */.[!.]* . || true; mv */* . || true; fi fi&quot;
+     
+     stage &apos;Building slug&apos;
+     dir(&apos;build&apos;) {
+         sh &quot;sed -i -e &apos;/FROM/r ../config_vars&apos; Dockerfile&quot;
+         sh &quot;echo -n \&quot;Generating build for ${app} for space ${space} build uuid ${build_uuid}\&quot;&quot;
+         sh &quot;echo -n \&quot;Getting source code for ${repo}/${branch} SHA ${sha}... \&quot;&quot;
+      
+         docker.withRegistry(&apos;https://${gm_registry_host}&apos;, &apos;akkeris-build-bot&apos;) {
+             def builder = docker.build(&quot;${imageTag}&quot;)
+             builder.push()
+         }
+         sh &quot;docker rmi ${imageTag}&quot;
+      }
+  } else {
+      stage &apos;Pulling docker image&apos;
+      if (docker_login) {
+        sh &quot;docker login -u ${docker_login} -p ${docker_password}&quot;
+      }
+      
+      docker.withRegistry(&apos;https://${gm_registry_host}&apos;, &apos;akkeris-build-bot&apos;) {
+        sh &quot;docker pull ${docker_registry}&quot;
+        sh &quot;docker tag ${docker_registry} ${imageTag}&quot;
+        def newImg = docker.image(&quot;${imageTag}&quot;)
+        newImg.push()
+      }
+      sh &quot;docker rmi ${imageTag}&quot;
+  }
+
+  step([$class: &apos;WsCleanup&apos;])
+}
+</script>
+    <sandbox>false</sandbox>
+  </definition>
+  <triggers/>
+</flow-definition>

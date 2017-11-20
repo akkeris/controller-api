@@ -1,9 +1,4 @@
-# Alamo Application Controller and API #
-
-
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7f8275a08a9b44b39a2e2cf34e9c5daa)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=octanner/alamo-app-controller&amp;utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/7f8275a08a9b44b39a2e2cf34e9c5daa)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=octanner/alamo-app-controller&amp;utm_campaign=Badge_Coverage)
-
+# Akkeris Controller API #
 
 ## Setting Up ##
 

@@ -8,9 +8,9 @@ const user_alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"
 const http = require('http');
 const expect = require("chai").expect;
 
+const init = require('./support/init.js');
 describe("regions: list and get available regions", function() {
   this.timeout(100000);
-  const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
 
   let validate_us_region = function(obj) {

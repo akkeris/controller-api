@@ -1,12 +1,12 @@
 "use strict"
 
+const init = require('./support/init.js');
 describe("app-setups:", function() {
   this.timeout(10 * 60 * 1000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
   process.env.DEFAULT_PORT = "5000";
 
-  const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
   const alamo_headers = {"Authorization":process.env.AUTH_KEY};

@@ -1,15 +1,16 @@
 "use strict"
 
+process.env.DEFAULT_PORT = "5000";
+process.env.PORT = 5000;
+process.env.AUTH_KEY = 'hello';
+const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+const init = require('./support/init.js')
+
 describe("addon services: plans, services listing and getting.", function() {  
   this.timeout(10000);
-  process.env.DEFAULT_PORT = "5000";
-  process.env.PORT = 5000;
-  process.env.AUTH_KEY = 'hello';
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
-  const running_app = require('../index.js');
+
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
-
 
   function validate_service(obj) {
     expect(obj.actions).to.be.an('array')

@@ -7,7 +7,6 @@ describe("health checks n such.", function() {
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
   const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
-  const builds = require('../lib/builds.js');
   const expect = require("chai").expect;
 
   it("covers health check", (done) => {

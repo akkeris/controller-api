@@ -3,7 +3,7 @@
 process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
 
-const running_app = require('../index.js');
+const init = require('./support/init.js')
 const httph = require('../lib/http_helper.js');
 const expect = require("chai").expect;
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
@@ -44,7 +44,7 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
       callback(err, null);
     } else {
       let build_info = JSON.parse(data);
-      if(build_info.status === 'pending') {
+      if(build_info.status === 'pending' || build_info.status === 'queued') {
         process.stdout.write(".");
         setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
       } else {
@@ -179,6 +179,9 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
   it("get info on a specific dyno type.", (done) => {
     expect(dyno_name).to.be.a.string;
     httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos/' + dyno_name, alamo_headers, null, (err, data) => {
+      if(err) {
+        console.log(err);
+      }
       expect(err).to.be.null;
       expect(data).to.be.a('string');
       data = JSON.parse(data);

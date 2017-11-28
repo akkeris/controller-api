@@ -36,7 +36,7 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
       callback(err, null);
     } else {
       let build_info = JSON.parse(data);
-      if(build_info.status === 'pending') {
+      if(build_info.status === 'pending' || build_info.status === 'queued') {
         process.stdout.write(".");
         setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
       } else {
@@ -47,13 +47,14 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
   });
 }
 
+const callback = require('./support/init.js')
+
 describe("builds: conversion between payload, response and database", function() {  
   this.timeout(300000);
-  const running_app = require('../index.js');
-  const httph = require('../lib/http_helper.js');
-  const builds = require('../lib/builds.js');
-  const expect = require("chai").expect;
 
+  //let builds = require('../lib/builds.js')
+  const httph = require('../lib/http_helper.js')
+  const expect = require("chai").expect
   it("covers listing builds", (done) => {
     httph.request('get', 'http://localhost:5000/apps/api-default/builds', alamo_headers, null, 
       (err, data) => {
@@ -181,19 +182,24 @@ describe("builds: conversion between payload, response and database", function()
         expect(build_info).to.be.a('string');
         let build_obj = JSON.parse(build_info);
         expect(build_obj.id).to.be.a('string');
-        httph.request('delete', 'http://localhost:5000/apps/' + random_name + '-default/builds/' + build_obj.id, alamo_headers, null, function(err, build_stop_info) {
-          if(err) {
-            console.error("Error trying to stop build:", err);
-          }
-          expect(err).to.be.null;
-          expect(build_stop_info).to.be.a('string');
-          build_stop_info = JSON.parse(build_stop_info);
-          expect(build_stop_info.status).to.equal("failed");
-          expect(build_stop_info.id).to.equal(build_obj.id);
-          setTimeout(function() {
-            done();
-          },1000);
-        });
+        
+        // Give it a second to wait for the build to go from queued to running..
+        setTimeout(() => {
+
+          httph.request('delete', 'http://localhost:5000/apps/' + random_name + '-default/builds/' + build_obj.id, alamo_headers, null, function(err, build_stop_info) {
+            if(err) {
+              console.error("Error trying to stop build:", err);
+            }
+            expect(err).to.be.null;
+            expect(build_stop_info).to.be.a('string');
+            build_stop_info = JSON.parse(build_stop_info);
+            expect(build_stop_info.status).to.equal("failed");
+            expect(build_stop_info.id).to.equal(build_obj.id);
+            setTimeout(function() {
+              done();
+            },1000);
+          });
+        }, 2000)
       });
     });
   });
@@ -202,7 +208,7 @@ describe("builds: conversion between payload, response and database", function()
     httph.request('delete', 'http://localhost:5000/apps/' + random_name + '-default', alamo_headers, null, (err, data) => {
       expect(err).to.be.null;
       expect(data).to.be.a('string');
-      done();
+      done()
     });
   });
 })

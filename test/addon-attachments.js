@@ -1,34 +1,12 @@
 "use strict"
 
-  process.env.DEFAULT_PORT = "5000";
-  process.env.PORT = 5000;
-  process.env.AUTH_KEY = 'hello';
-  const running_app = require('../index.js');
-  const httph = require('../lib/http_helper.js');
-  const builds = require('../lib/builds.js');
-  const expect = require("chai").expect;
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
-
-function wait_for_app(httph, app, callback, iteration) {
-  iteration = iteration || 1;
-  if(iteration === 1) {
-    process.stdout.write("    ~ Waiting for app to turn up");
-  }
-  if(iteration === 30) {
-    process.stdout.write("\n");
-    callback({code:0, message:"Timeout waiting for app to turn up."});
-  }
-  httph.request('get', 'https://' + app + process.env.ALAMO_BASE_DOMAIN, {'X-Timeout':500}, null, (err, data) => {
-    if(err) {
-      process.stdout.write(".");
-      setTimeout(wait_for_app.bind(null, httph, app, callback, (iteration + 1)), 500);
-      //callback(err, null);
-    } else {
-      process.stdout.write("\n");
-      callback(null, data);
-    }
-  });
-}
+process.env.DEFAULT_PORT = "5000";
+process.env.PORT = 5000;
+process.env.AUTH_KEY = 'hello';
+const running_app = require('../index.js');
+const httph = require('../lib/http_helper.js')
+const expect = require("chai").expect;
+const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
 
 function wait_for_build(httph, app, build_id, callback, iteration) {
   iteration = iteration || 1;
@@ -64,6 +42,8 @@ describe("addons attachments:", function() {
       (err, data) => {
         expect(err).to.be.null;
         expect(data).to.be.a('string');
+        let app_url = JSON.parse(data).web_url;
+        expect(app_url).to.be.a('string');
         httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers,
           JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}),
           (err, data) => {

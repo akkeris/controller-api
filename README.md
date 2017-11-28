@@ -49,9 +49,11 @@ Prior to running, ensure all of the prior environment variables are properly set
 
 ## Testing ##
 
-Tests need the addition env ALAMO_BASE_DOMAIN, or the base domain for which apps will turn up on by default (e.g., .apps.company.io)
+Set above env, in addition you'll need to set TEST_MODE=true, ALAMO_BASE_DOMAIN=.domain.io, and CODACY_PROJECT_TOKEN if you want code coverage.  Then run:
 
-Prior to running tests, ensure all of the prior environment variables are properly setup in the ENV.  In addition you'll need to set the env variable ``CODACY_PROJECT_TOKEN`` (that can be generated from codacy's web site on the alamo app controller project).  Youll also need to run `create.sql` AND `create_testing.sql` in the sql folder on the database to create the test records. Once you're ready run:
+```
+cat sql/create_testing.sql | psql $DATABASE_URL
+```
 
 ```npm test```
 

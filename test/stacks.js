@@ -9,12 +9,12 @@ process.env.FUGAZI_STACK_API = process.env.MARU_STACK_API || process.env.DS1_STA
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
 const user_alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"this-is-me"};
 const http = require('http');
+const init = require('./support/init.js');
 const expect = require("chai").expect;
-const default_stack_name = process.env.DEFAULT_STACK_NAME || "maru"
+let default_stack_name = null
 
 describe("stacks: list and get available stacks", function() {
   this.timeout(100000);
-  const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
 
   let validate_us_stack = function(obj) {
@@ -34,7 +34,9 @@ describe("stacks: list and get available stacks", function() {
       expect(data).to.be.a('string');
       data = JSON.parse(data);
       expect(data).to.be.an('array');
+      expect(data[0]).to.be.an('object')
       data.forEach(validate_us_stack)
+      default_stack_name = data[0].name
       done();
     });
   });

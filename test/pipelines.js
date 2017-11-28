@@ -42,7 +42,7 @@ function wait_for_pipeline_build(httph, app, build_id, callback, iteration) {
       callback(err, null);
     } else {
       let build_info = JSON.parse(data);
-      if(build_info.status === 'pending') {
+      if(build_info.status === 'pending' || build_info.status === 'queued') {
         process.stdout.write(".");
         setTimeout(wait_for_pipeline_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
       } else {
@@ -59,9 +59,10 @@ const pipeline1_sources =    {"sha":"123456","org":"ocatnner","repo":"https://gi
 const pipeline2_sources =    {"sha":"123456","org":"ocatnner","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:7e5bfcb419ba312f8c8c9b26109d4bfa3da3a8579cf60eeed689b6f405102291","url":"docker://docker.io/akkeris/test-pipelines3:latest","docker_registry":"","docker_login":"","docker_password":""};
 const pipeline3_sources =    {"sha":"123456","org":"ocatnner","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:3ba47b4dea485b1d5b362c453fd676c994ee3455f1848e203b7fa9cf8db79274","url":"docker://docker.io/akkeris/test-pipelines4:latest","docker_registry":"","docker_login":"","docker_password":""};
 
+const init = require('./support/init.js');
+
 describe("pipelines", function() {
   this.timeout(300000);
-  const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
 

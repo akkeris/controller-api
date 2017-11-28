@@ -42,7 +42,7 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
       callback(err, null);
     } else {
       let build_info = JSON.parse(data);
-      if(build_info.status === 'pending') {
+      if(build_info.status === 'pending' || build_info.status === 'queued') {
         process.stdout.write(".");
         setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
       } else {
@@ -54,12 +54,11 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
 }
 
 
+const init = require('./support/init.js');
 
 describe("releases: list, get, create a release", function() {
   this.timeout(200000);
-  const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
-  const builds = require('../lib/builds.js');
   const expect = require("chai").expect;
 
   function validate_release_object(obj) {

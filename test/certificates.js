@@ -1,16 +1,14 @@
 "use strict"
 
+const init = require('./support/init.js');
 describe("certificates: ensure we can pull and list certificates and orders", function() {  
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.TEST_MODE = "true"; // prevents creating actual spaces.  Since we cant delete them, we bail out before committing.
   process.env.AUTH_KEY = 'hello';
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
-  const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
-  const builds = require('../lib/builds.js');
   const expect = require("chai").expect;
-  const default_stack_name = process.env.DEFAULT_STACK_NAME || "maru"
   function validate_certificate(obj) {
     expect(obj.created_at).to.be.a('string')
     expect(obj.id).to.be.a('string')
@@ -100,7 +98,7 @@ describe("certificates: ensure we can pull and list certificates and orders", fu
       expect(obj.issued).to.be.null
       expect(obj.organization.id).to.equal("0b26ccb5-83cc-4d33-a01f-100c383e0065")
       expect(obj.organization.name).to.equal("test")
-      expect(obj.region.name).to.equal(default_stack_name)
+      //expect(obj.region.name).to.equal(default_stack_name)
       expect(obj.region.id).to.equal("f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3")
       expect(obj.type).to.equal("ssl_plus")
       done();

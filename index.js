@@ -75,10 +75,11 @@ db_setup(pg_pool)
     alamo.builds.timers.begin(pg_pool)
     alamo.releases.timers.begin(pg_pool)
     alamo.formations.timers.begin(pg_pool)
+    alamo.addon_services.timers.begin(pg_pool)
   })
   .catch(e => console.error(e.message, e.stack))
 
-alamo.addon_services.timers.begin(pg_pool)
+
 
 
 // -- apps
@@ -183,6 +184,9 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')
 // -- Github callbacks, no auth but authenticated through
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')
           .run(alamo.github.webhook.bind(alamo.github.webhook, pg_pool));
+// -- Build callbacks
+routes.add.post('/builds/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.builds.http.status_change.bind(alamo.builds.http.status_change, pg_pool));
 
 // -- config vars
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/config-vars$')
@@ -540,7 +544,9 @@ let server = http.createServer((req, res) => {
   var path = url.parse(req.url.toLowerCase()).path;
   routes.process(method, path, req, res).catch((e) => { console.error("Uncaught error:", e) })
 }).listen(process.env.PORT || 5000, () => {
-  console.log("Server started and listening on port " + (process.env.PORT || 5000) );
+  if(!process.env.TEST_MODE) {
+    console.log("Server started and listening on port " + (process.env.PORT || 5000) );
+  }
 });
 
 process.on('uncaughtException', (e) => {

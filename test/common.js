@@ -1,6 +1,6 @@
 "use strict"
 
-const running_app = require('../index.js');
+const init = require('./support/init.js');
 const expect = require("chai").expect;
 const assert = require("chai").assert;
 const httph = require('../lib/http_helper.js');

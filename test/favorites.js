@@ -5,9 +5,9 @@ process.env.DEFAULT_PORT = "5000";
 process.env.TEST_MODE = "true"; // prevents creating actual spaces.  Since we cant delete them, we bail out before committing.
 process.env.AUTH_KEY = 'hello';
 const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello"};
-const running_app = require('../index.js');
+
+const init = require('./support/init.js');
 const httph = require('../lib/http_helper.js');
-const builds = require('../lib/builds.js');
 const expect = require("chai").expect;
 const uuid = require('uuid');
 const app_id = 'fa2b535d-de4d-4a14-be36-d44af53b59e3'; // default app populated in the DB

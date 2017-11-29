@@ -3,10 +3,33 @@
 process.env.DEFAULT_PORT = "5000";
 process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
-const running_app = require('../index.js');
+const init = require('./support/init.js');
 const httph = require('../lib/http_helper.js')
 const expect = require("chai").expect;
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+
+function wait_for_app_content(httph, app, path, content, callback, iteration) {
+  iteration = iteration || 1;
+  if(iteration === 1) {
+    process.stdout.write("    ~ Waiting for app to turn up");
+  }
+  if(iteration === 60) {
+    process.stdout.write("\n");
+    callback({code:0, message:"Timeout waiting for app to turn up."});
+  }
+  setTimeout(function() {
+    httph.request('get', 'https://' + app + process.env.ALAMO_BASE_DOMAIN + '/' + path, {'X-Timeout':1500}, null, (err, data) => {
+      if(err || data.indexOf(content) === -1) {
+        process.stdout.write(".");
+        setTimeout(wait_for_app_content.bind(null, httph, app, path, content, callback, (iteration + 1)), 250);
+        //callback(err, null);
+      } else {
+        process.stdout.write("\n");
+        callback(null, data);
+      }
+    });
+  },1000);
+}
 
 function wait_for_build(httph, app, build_id, callback, iteration) {
   iteration = iteration || 1;
@@ -21,7 +44,7 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
       callback(err, null);
     } else {
       let build_info = JSON.parse(data);
-      if(build_info.status === 'pending') {
+      if(build_info.status === 'pending' || build_info.status === 'queued') {
         process.stdout.write(".");
         setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
       } else {
@@ -94,6 +117,29 @@ describe("addons attachments:", function() {
     });
   });
 
+  it("covers creating dependent build for first test app", (done) => {
+    let build_payload = {"sha":"123456","org":"test","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756","url":"docker://docker.io/akkeris/test-attach:v3"};
+    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/builds', alamo_headers, JSON.stringify(build_payload), (err, info) => {
+      expect(err).to.be.null;
+      expect(info).to.be.a('string');
+      let build_info = JSON.parse(info);
+      wait_for_build(httph, appname_brand_new + '-default', build_info.id, (wait_err, building_info) => {
+        if(wait_err) {
+          console.error("Error waiting for build:", wait_err);
+          return expect(true).to.equal(false);
+        }
+        httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/releases', alamo_headers, JSON.stringify({"slug":build_info.id,"description":"Deploy " + build_info.id}), (err, release_info) => {
+          if(err) {
+            console.log('release error:', err);
+          }
+          expect(err).to.be.null;
+          expect(release_info).to.be.a('string');
+          done();
+        });
+      });
+    });
+  })
+
   it("covers getting info on a running memcached service", (done) => {
     expect(memcached_response).to.be.an('object');
     expect(memcached_plan).to.be.an('object');
@@ -112,6 +158,39 @@ describe("addons attachments:", function() {
       done();
     });
   });
+
+  it("covers ensuring owned addon MEMCACHED_URL is returned from first app", (done) => {
+    setTimeout(function() {
+      wait_for_app_content(httph, appname_brand_new, 'MEMCACHED_URL', memcached_response.config_vars.MEMCACHED_URL, function(wait_app_err, resp) {
+        if(wait_app_err) {
+          console.log(wait_app_err);
+        }
+        expect(wait_app_err).to.be.null;
+        expect(resp).to.equal(memcached_response.config_vars.MEMCACHED_URL);
+        done();
+      });
+    }, 1000);
+  });
+
+  it("covers getting info on a running memcached service by name", (done) => {
+    expect(memcached_response).to.be.an('object');
+    expect(memcached_plan).to.be.an('object');
+    expect(memcached_plan.id).to.be.a('string');
+    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons/' + memcached_response.name, alamo_headers, null,
+    (err, data) => {
+      if(err) {
+        console.error(err);
+        console.error(err.message);
+      }
+      expect(err).to.be.null;
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('object');
+      expect(obj.id).to.equal(memcached_response.id);
+      done();
+    });
+  });
+
 
   it("covers getting stats on running memcached", (done) => {
     expect(memcached_response).to.be.an('object');
@@ -215,11 +294,35 @@ describe("addons attachments:", function() {
     });
   });
 
+
+  it("covers creating dependent build for second test app", (done) => {
+    let build_payload = {"sha":"123456","org":"test","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756","url":"docker://docker.io/akkeris/test-attach:v3"};
+    httph.request('post', 'http://localhost:5000/apps/' + appname_second_new + '-default/builds', alamo_headers, JSON.stringify(build_payload), (err, info) => {
+      expect(err).to.be.null;
+      expect(info).to.be.a('string');
+      let build_info = JSON.parse(info);
+      wait_for_build(httph, appname_second_new + '-default', build_info.id, (wait_err, building_info) => {
+        if(wait_err) {
+          console.error("Error waiting for build:", wait_err);
+          return expect(true).to.equal(false);
+        }
+        httph.request('post', 'http://localhost:5000/apps/' + appname_second_new + '-default/releases', alamo_headers, JSON.stringify({"slug":build_info.id,"description":"Deploy " + build_info.id}), (err, release_info) => {
+          if(err) {
+            console.log('release error:', err);
+          }
+          expect(err).to.be.null;
+          expect(release_info).to.be.a('string');
+          done();
+        });
+      });
+    });
+  })
+
   let memcached_addon_attachment_id = null;
-  it("covers attaching memcachier to the second test app", (done) => {
+  it("covers attaching memcachier to the second test app by name", (done) => {
     expect(appname_second_id).to.be.a("string");
     httph.request('post', 'http://localhost:5000/addon-attachments', alamo_headers,
-      JSON.stringify({"addon":memcached_response.id, "app":appname_second_id, "force":true, "name":"memcachier"}),
+      JSON.stringify({"addon":memcached_response.name, "app":appname_second_id, "force":true, "name":"memcachier"}),
       (err, data) => {
         if(err) {
           console.error(err);
@@ -237,6 +340,22 @@ describe("addons attachments:", function() {
         done();
       });
   });
+
+
+  it("covers ensuring attached addon MEMCACHED_URL is returned from second app", (done) => {
+    setTimeout(function() {
+      wait_for_app_content(httph, appname_second_new, 'MEMCACHED_URL', memcached_response.config_vars.MEMCACHED_URL, function(wait_app_err, resp) {
+        if(wait_app_err) {
+          console.log(wait_app_err);
+        }
+        expect(wait_app_err).to.be.null;
+        expect(resp).to.equal(memcached_response.config_vars.MEMCACHED_URL);
+        done();
+      });
+    }, 1000);
+  });
+
+
   it("covers listing addon attachments by apps", (done) => {
     expect(appname_second_id).to.be.a("string");
     httph.request('get', 'http://localhost:5000/apps/' + appname_second_new + '-default/addon-attachments', alamo_headers,
@@ -269,7 +388,7 @@ describe("addons attachments:", function() {
       });
   });
 
-  it("covers ensuring we cant attach memcachier to the same test app", (done) => {
+  it("covers ensuring we cannot attach memcachier to the same test app", (done) => {
     expect(appname_second_id).to.be.a("string");
     httph.request('post', 'http://localhost:5000/addon-attachments', alamo_headers,
       JSON.stringify({"addon":memcached_response.id, "app":appname_second_id, "force":true, "name":"memcachier"}),

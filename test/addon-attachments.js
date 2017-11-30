@@ -355,6 +355,22 @@ describe("addons attachments:", function() {
     }, 1000);
   });
 
+  it("covers ensuring addon attachment config vars are returned", (done) => {
+    expect(appname_second_id).to.be.a("string");
+    httph.request('get', 'http://localhost:5000/apps/' + appname_second_new + '-default/config-vars', alamo_headers,
+      null, (err, data) => {
+        if(err) {
+          console.error('listing addon', err);
+          console.error(err.message);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        data = JSON.parse(data);
+        expect(data.MEMCACHED_URL).to.equal(memcached_response.config_vars.MEMCACHED_URL);
+        done();
+      });
+  });
+
 
   it("covers listing addon attachments by apps", (done) => {
     expect(appname_second_id).to.be.a("string");

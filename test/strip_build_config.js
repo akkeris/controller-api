@@ -5,12 +5,12 @@ process.env.PORT = 5000;
 process.env.ALAMO_API_URL = 'http://nope.com'
 process.env.AUTH_KEY = 'hello';
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
-let builds = require('../lib/builds.js')
 
 describe("builds: ensure logs are properly tripped", function() {  
   const expect = require("chai").expect;
 
   it("covers removing test app for builds", (done) => {
+    let builds = require('../lib/builds.js')
     let result = builds.strip_build_results(`
 Started by user ss-dd-aapp
 [Pipeline] node

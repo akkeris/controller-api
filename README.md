@@ -2,8 +2,6 @@
 
 ## Setting Up ##
 
-Requires a jenkins build server with a service account, in addition the jenkins instance must have a user named `akkeris-build-bot` capable of writing to the DOCKER_REGISTRY_HOST and DOCKER_REPO where gold master images will be changed.
-
 ### Storage 
 * **DATABASE_URL** - The database url to store build, release information.  This has no default.  Must be a postgres 9.5+ instance. See create.sql in sql folder for creating the tables and schema.
 
@@ -14,8 +12,7 @@ Requires a jenkins build server with a service account, in addition the jenkins 
 * APPKIT_API_URL - Public URI (https://somehost/) for this api, generally appkit api url that handles user account/authorization (defaults to http://localhost:5000)
 
 ### Build Information
-* JENKINS_URL - The URL for jenkins build server, e.g., https://my.jenkins.com, note that if JENKINS requires auth add a username (or as jenkins calls it, a user id) and api token to the URI, e.g., https://myusername@apitoken@my.jenkins.com. This has no default.
-* BUILD_SHUTTLE_URL - The build shuttle system which caches results and intermediates between jenkins and alamo app controller (see https://github.com/akkeris/buildshuttle).  This has no default.
+* BUILD_SHUTTLE_URL - The build shuttle is a small footprint API that manages specific build system such as jenkins. (see https://github.com/akkeris/buildshuttle).  This has no default.
 
 
 ### Deployment Information
@@ -31,11 +28,11 @@ Requires a jenkins build server with a service account, in addition the jenkins 
 * LOG_SHUTTLE_URL - The log shuttle url for log drains (https://github.com/akkeris/logshuttle). This has no default.
 * LOG_SESSION_URL - The log session url for log sessions (https://github.com/akkeris/logshuttle). This has no default.
 * INFLUXDB_METRICS_URL - The URL to the influxdb that holds running metrics for service, count and other http information. This has no default.
-* ANOMALY_METRICS_DRAIN - The syslog drain end point for the opentsdb custom metrics collector. This has no default.
-* PAPERTRAIL_DRAIN - The syslog standard drain end point for papertrail.  This has no default.
 
 ### Addon Envs
 * TWILIO_AUTH_KEY - The master sid:token for the twilio account.
+* ANOMALY_METRICS_DRAIN - The syslog drain end point for the opentsdb custom metrics collector. This has no default.
+* PAPERTRAIL_DRAIN - The syslog standard drain end point for papertrail.  This has no default.
 
 ## Installing ##
 
@@ -49,9 +46,11 @@ Prior to running, ensure all of the prior environment variables are properly set
 
 ## Testing ##
 
-Tests need the addition env ALAMO_BASE_DOMAIN, or the base domain for which apps will turn up on by default (e.g., .apps.company.io)
+Set above env, in addition you'll need to set TEST_MODE=true, ALAMO_BASE_DOMAIN=.domain.io, and CODACY_PROJECT_TOKEN if you want code coverage.  Then run:
 
-Prior to running tests, ensure all of the prior environment variables are properly setup in the ENV.  In addition you'll need to set the env variable ``CODACY_PROJECT_TOKEN`` (that can be generated from codacy's web site on the alamo app controller project).  Youll also need to run `create.sql` AND `create_testing.sql` in the sql folder on the database to create the test records. Once you're ready run:
+```
+cat sql/create_testing.sql | psql $DATABASE_URL
+```
 
 ```npm test```
 

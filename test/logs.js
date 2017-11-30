@@ -1,13 +1,13 @@
 "use strict"
 
+const init = require('./support/init.js');
+
 describe("logs: ensure we can pull app logs", function() {
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
-  const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
-  const builds = require('../lib/builds.js');
   const expect = require("chai").expect;
   var app_name = "alamotest" + Math.round(Math.random() * 10000);
 

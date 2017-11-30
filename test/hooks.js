@@ -41,7 +41,7 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
       callback(err, null);
     } else {
       let build_info = JSON.parse(data);
-      if(build_info.status === 'pending') {
+      if(build_info.status === 'pending' || build_info.status === 'queued') {
         process.stdout.write(".");
         setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
       } else {
@@ -51,10 +51,11 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
     }
   });
 }
+  
+const init = require('./support/init.js');
 
 describe("hooks:", function() {
   this.timeout(100000);
-  const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
   let appname_brand_new = "alamotest" + Math.floor(Math.random() * 10000);
@@ -74,7 +75,7 @@ describe("hooks:", function() {
   let hook_listener = http.createServer(handle_hook_call).on('clientError', (err, socket) => {
     console.error('client socket error:', err);
   });
-  hook_listener.listen(8000);
+  hook_listener.listen(8001);
 
   let placed_hooks = false;
 
@@ -87,7 +88,7 @@ describe("hooks:", function() {
       expect(data).to.be.a('string');
       httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/hooks', alamo_headers,
         JSON.stringify({
-          "url":"http://localhost:8000/webhook",
+          "url":"http://localhost:8001/webhook",
           "events":[
             "release",
             "build",

@@ -58,7 +58,7 @@ OR, run a test manually:
 
 ```./node_modules/.bin/_mocha test/[test_to_run.js]```
 
-# Using Alamo and its API #
+# Using Akkeris and its API #
 
 ## Authentication ##
 

@@ -837,7 +837,7 @@ Dynos represent a running process or server (or multiple instances of a process)
 
 ### Dynos Info
 
-Get information on whats currently running (servers/dynos) for the specified app, and its current state.
+Get information on whats currently running (servers/dynos) for the specified app, and its current state.  The "state" can be one of the possible values: start-failure, app-crashed, waiting, probe-failure, terminated, terminating, running
 
 `GET /apps/{appname}/dynos`
 
@@ -869,9 +869,10 @@ curl \
       "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c"
     },
     "size": "constellation",
-    "state": "Running",
+    "state": "running",
     "ready": true,
     "type": "web",
+    "additional_info":"",
     "updated_at": "2016-09-27T16:27:21Z"
   }
 ]
@@ -913,6 +914,7 @@ curl \
   "state": "Running",
   "ready": true,
   "type": "web",
+  "additional_info":"",
   "updated_at": "2016-09-27T16:27:21Z"
 }
 ```

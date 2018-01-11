@@ -60,33 +60,75 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
   process.env.DEFAULT_PORT = "9000";
   let appname_brand_new = "alamotest" + Math.floor(Math.random() * 10000);
   let build_info
-  it("covers getting dyno list.", function(done) {
-    this.timeout(0);
+
+
+  it("covers creating dependent app.", function(done) {
     // create an app.
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({org:"test", space:"default", name:appname_brand_new}), 
     (err, data) => {
       expect(err).to.be.null;
       expect(data).to.be.a('string');
-      // make a build with the wrong port.
-      let build_payload = {"sha":"123456","org":"test","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756","url":"docker://docker.io/akkeris/test-lifecycle:latest"};
-      httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/builds', alamo_headers, JSON.stringify(build_payload), (err, info) => {
-        expect(err).to.be.null;
-        expect(info).to.be.a('string');
-        build_info = JSON.parse(info);
-        wait_for_build(httph, appname_brand_new + '-default', build_info.id, (wait_err, building_info) => {
-          if(wait_err) {
-            console.error("Error waiting for build:", wait_err);
-            return expect(true).to.equal(false);
+      done()
+    })
+  })
+
+  it("covers attempting to restart an app without a release or formation", function(done) {
+    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos', alamo_headers, null, (err, info) => {
+      if(err) {
+        console.log('err on restart without release:', err);
+      }
+      expect(err).to.be.null;
+      expect(info).to.be.a('string');
+      done();
+    });
+  })
+
+
+  it("covers creating worker without release", function(done) {
+    let payload = {command:"fubar", type:"worker", "quantity":1, "size":"scout"}
+    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers, JSON.stringify(payload), (err, info) => {
+      if(err) {
+        console.log('err on worker without release:', err);
+      }
+      expect(err).to.be.null;
+      expect(info).to.be.a('string');
+      done();
+    });
+  })
+
+  it("covers attempting to restart an app with formation, without a release", function(done) {
+    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos', alamo_headers, null, (err, info) => {
+      if(err) {
+        console.log('err on restart without release:', err);
+      }
+      expect(err).to.be.null;
+      expect(info).to.be.a('string');
+      done();
+    });
+  })
+
+
+  it("covers creating dependent build and release.", function(done) {
+    this.timeout(0);
+    // make a build with the wrong port.
+    let build_payload = {"sha":"123456","org":"test","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756","url":"docker://docker.io/akkeris/test-lifecycle:latest"};
+    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/builds', alamo_headers, JSON.stringify(build_payload), (err, info) => {
+      expect(err).to.be.null;
+      expect(info).to.be.a('string');
+      build_info = JSON.parse(info);
+      wait_for_build(httph, appname_brand_new + '-default', build_info.id, (wait_err, building_info) => {
+        if(wait_err) {
+          console.error("Error waiting for build:", wait_err);
+          return expect(true).to.equal(false);
+        }
+        httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/releases', alamo_headers, JSON.stringify({"slug":build_info.id,"description":"Deploy " + build_info.id}), (err, release_info) => {
+          if(err) {
+            console.log('release error:', err);
           }
-          httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/releases', alamo_headers, JSON.stringify({"slug":build_info.id,"description":"Deploy " + build_info.id}), (err, release_info) => {
-            if(err) {
-              console.log('release error:', err);
-            }
-            expect(err).to.be.null;
-            expect(release_info).to.be.a('string');
-            done();
-          });
+          expect(err).to.be.null;
+          expect(release_info).to.be.a('string');
+          done();
         });
       });
     });
@@ -277,7 +319,6 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
       done();
     });
   });
-
 
   it("covers removing test app.", (done) => {
     // destroy the app.

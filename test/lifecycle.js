@@ -148,9 +148,9 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
     }, 250);
   });
 
-  it("change port on application via formations batch update", (done) => {
+  it("change port and quantity on application via formations batch update", (done) => {
     // submit a change to the port.
-    let changes = [{port:5000,type:"web"}]
+    let changes = [{port:5000, type:"web", quantity:1}]
     httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers, JSON.stringify(changes), (err, info) => {
       if(err) {
         console.log('err on batch updates:', err);
@@ -201,18 +201,19 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
         expect(data).to.be.a('string');
         data = JSON.parse(data);
         expect(data).to.be.an('array');
-        expect(data[0]).to.be.a('object');
-        expect(data[0].command).to.be.null;
-        expect(data[0].created_at).to.be.a.string;
-        expect(data[0].id).to.be.a.string;
-        expect(data[0].name).to.be.a.string;
-        expect(data[0].release).to.be.an('object');
-        expect(data[0].app).to.be.an('object');
-        expect(data[0].size).to.be.a('string');
-        expect(data[0].state).to.be.a('string');
-        expect(data[0].type).to.equal("web");
-        expect(data[0].updated_at).to.be.a('string');
-        dyno_name = data[0].name;
+        let datum = data.filter((x) => x.type === 'web' && x.state === "running")
+        expect(datum[0]).to.be.a('object');
+        expect(datum[0].command).to.be.null;
+        expect(datum[0].created_at).to.be.a.string;
+        expect(datum[0].id).to.be.a.string;
+        expect(datum[0].name).to.be.a.string;
+        expect(datum[0].release).to.be.an('object');
+        expect(datum[0].app).to.be.an('object');
+        expect(datum[0].size).to.be.a('string');
+        expect(datum[0].state).to.be.a('string');
+        expect(datum[0].type).to.equal("web");
+        expect(datum[0].updated_at).to.be.a('string');
+        dyno_name = datum[0].name;
         done();
       });
     },1000);

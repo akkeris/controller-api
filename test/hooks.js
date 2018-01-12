@@ -84,6 +84,9 @@ describe("hooks:", function() {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({org:"test", space:"default", name:appname_brand_new}),
     (err, data) => {
+      if(err) {
+        console.error(err)
+      }
       expect(err).to.be.null;
       expect(data).to.be.a('string');
       httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/hooks', alamo_headers,

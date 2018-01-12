@@ -20,6 +20,18 @@ describe("github: enc/dec tokens, checks against incoming payloads", function() 
     expect(common.decrypt_token("SECRET",common.encrypt_token("SECRET","FUGAZI!"))).to.equal("FUGAZI!");
     done();
   });
+  it("covers cleaning up github urls that are slightly malformed", (done) => {
+    expect(github.format_github_repo_url("https://github.com/org/repo/")).to.equal("https://github.com/org/repo")
+    expect(github.format_github_repo_url("https://github.com/org/repo/.git/")).to.equal("https://github.com/org/repo")
+    expect(github.format_github_repo_url("https://github.com/org/repo.git/")).to.equal("https://github.com/org/repo")
+    expect(github.format_github_repo_url("https://github.com/org/repo")).to.equal("https://github.com/org/repo")
+    expect(github.format_github_repo_url("https://github.com/org/repo.can.have.dots.git")).to.equal("https://github.com/org/repo.can.have.dots")
+    expect(github.format_github_repo_url("http://github.com/org/repo")).to.equal("https://github.com/org/repo")
+    expect(github.format_github_repo_url("http://www.github.com/org/repo")).to.equal("https://github.com/org/repo")
+    expect(github.format_github_repo_url("https://www.github.com/org/repo")).to.equal("https://github.com/org/repo")
+    expect(github.format_github_repo_url("git@github.com:org/repo-url.git")).to.equal("https://github.com/org/repo-url")
+    done()
+  })
   it("covers getting auto build", (done) => {
     httph.request('get', 'http://localhost:5000/apps/api-default/builds/auto/github', alamo_headers, null, (err, data) => {
       if(err) {

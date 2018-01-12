@@ -577,7 +577,7 @@ Create a new process or formation type. Note that formations can be automaticall
 |   type   | required string | The type of server requested, note that "web" has a special meaning as its the only process with an exposed port to take incoming web traffic (specified by the PORT env). | web |
 |   port   | optional integer| The port number to run on. | 9000 |
 | command  | optional string | The command to run when the build image spins up, this if left off will default to the RUN command in the docker image. | null |
-
+| healthcheck | option string | A relative URL that will be used to inspect the running app to determine if its healthy, this should be a relative url. | /health |
 
 **CURL Example**
 
@@ -586,7 +586,7 @@ curl \
   -H 'Authorization: ...' \
   -X POST \
   https://apps.akkeris.io/apps/app-space/formation
-  -d '{"size":"constellation", "quantity":1, "type":"web", "command":null}'
+  -d '{"size":"constellation", "quantity":1, "type":"web", "command":null, "healthcheck":null}'
 ```
 
 **200 "OK" Response**
@@ -735,6 +735,9 @@ Update an server, change its formation or size and quantity.  Note that valid si
 |   type   | required string | The type of server requested, for now the only available option is "web"                                                                                                                                   | web                                                                                                                                |
 |   port   | optional string | The optional port to use during a batch update| 9000 |
 | command  | optional string | The optional command to use during a batch update, or specify null to use the default command | npm start |
+| healthcheck | option string | A relative URL that will be used to inspect the running app to determine if its healthy, this should be a relative url. | /health |
+| removeHealthcheck | option bool | A true or false value to set whether to remove the health check | true |
+| remove-command | option bool | A true or false value to set whether to remove the set command and default to what is specified in the docker file | true |
 
 **CURL Example**
 
@@ -780,6 +783,9 @@ Update an server, change its formation or size and quantity.  Note that valid si
 | quantity | requred string  | The quantity of servers or instances for this app. | 1 |
 |   port   | optional string | The optional port to use during a batch update| web |
 | command  | optional string | The optional command to use during a batch update, or specify null to use the default command | npm start |
+| healthcheck | option string | A relative URL that will be used to inspect the running app to determine if its healthy, this should be a relative url. | /health |
+| removeHealthcheck | option bool | A true or false value to set whether to remove the health check | true |
+| remove-command | option bool | A true or false value to set whether to remove the set command and default to what is specified in the docker file | true |
 
 
 **CURL Example**
@@ -4097,9 +4103,11 @@ curl \
 ```
 
 ## Sites
+
 Sites provide a domain in which you can route various url paths to apps in Alamo.
 
 ### List Sites
+
 `GET /sites`
 
 **CURL Example**

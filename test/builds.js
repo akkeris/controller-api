@@ -80,6 +80,19 @@ describe("builds: conversion between payload, response and database", function()
         });
     });
   });
+
+
+  it("covers ensuring soft error on non-uuid", function(done) {
+    this.timeout(0);
+    httph.request('get', 'http://localhost:5000/apps/api-default/builds/this-is-not-a-uuid', alamo_headers, null, (err, build_info) => {
+      expect(err).to.be.an('object')
+      expect(err.code).to.equal(422)
+      expect(build_info).to.be.null;
+      done();
+    });
+  });
+
+/*
   let appname_brand_new = "alamotest" + Math.floor(Math.random() * 10000)
   it("covers creating a build and rebuilding it", function(done) {
     this.timeout(0);
@@ -133,7 +146,6 @@ describe("builds: conversion between payload, response and database", function()
         });
       });
   });
-
   it("covers creating a build with no hidden files", function(done) {
     this.timeout(0);
     let build_payload = {"sha":"123456","org":"ocatnner","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756","url":"data:base64,UEsDBAoAAAAAAPammUoAAAAAAAAAAAAAAAAIABwAc29tZWRpci9VVAkAAzAMAFlnDABZdXgLAAEEij3QXQQUAAAAUEsDBBQAAAAIAMaqTUrtS54nawAAAIUAAAASABwAc29tZWRpci9Eb2NrZXJmaWxlVVQJAAP0haJYMQwAWXV4CwABBIo90F0EFAAAAHML8vdVyMtPSbVKLErPz+MKCvVTyM1OySxS0C1Q0C8tLtIvLkrWTywo4Ar3D/J28QxCFXT2D4hU0EMVAxmRV5CrkJlXXJKYk8PlGhHgH+yqYGlgYMDl7OuiEK2gBJRW0lFQAsoXlSgpxAIAUEsDBBQAAAAIAMaqTUroz2k/cQEAAIUCAAAQABwAc29tZWRpci9pbmRleC5qc1VUCQAD9IWiWDEMAFl1eAsAAQSKPdBdBBQAAAB1UU1LAzEQve+vGPayWbrGrXgThQqFKtpKW71YkWV3WkNjopPZqmj/u5O2+AUGApnJzHtv3qRtQAhMpuY0SWrvAsMD8xMcA+FzawhVFuMsP0qeyNcYgka30uP+9Ho8vL/pXVz3pfbfr48PSAMyG7cQQG7JwaqyLcK8MhYbne44A9IKSZAima4JK8bJJqeUCCmkOeRwfALvCcS3fiHDOMCqUQdlWcD7WgQCmHms1i1ZbVyDr6O5ykSTIe8e0XGWwwnsdfMNyg8cdT4ZDXW0wS3M/E39GCff4K4BrRj1t+2/sbc9O6XoGiWJKHA7pfZOZbU1IqhP5CkrQCFRAcHXS+SvMbfhpj8bTKdX+13dhcOyhNOqgbFsBwPPaObizXYMiUUGIz6WkY3PHAtlZZX6QjWdTlQXbfcWtfULlb54Wor7LIBwm0Ln1z4Ho8l02LvsSzq9gyW+wd+KXxuXKjA7WkgLMFFZAd1SzrcF1gRGF3cnyU9QSwMEFAAAAAgAxqpNSkmwHUOYAAAA6QAAABQAHABzb21lZGlyL3BhY2thZ2UuanNvblVUCQAD9IWiWDEMAFl1eAsAAQSKPdBdBBQAAABVj7sOgzAMRXe+wvLAVCFYWasOnbuyRIkrXJWExgEhEP/eJCBVHX3O9WsrANCqgbAF/Ey8riR4SXAmL+xs4k1VV/VBDYn2PIbTHHBQnCu2hpbqdQ44ghLFFssEgvIh5awzBH/haANJlqR7Bx3evHe+BesgCZCRND+ZTIdQlkALB2gwdu55l5pC7/zvojdrspKfuj+uWOzFF1BLAQIeAwoAAAAAAPammUoAAAAAAAAAAAAAAAAIABgAAAAAAAAAEADtQQAAAABzb21lZGlyL1VUBQADMAwAWXV4CwABBIo90F0EFAAAAFBLAQIeAxQAAAAIAMaqTUrtS54nawAAAIUAAAASABgAAAAAAAEAAACkgUIAAABzb21lZGlyL0RvY2tlcmZpbGVVVAUAA/SFolh1eAsAAQSKPdBdBBQAAABQSwECHgMUAAAACADGqk1K6M9pP3EBAACFAgAAEAAYAAAAAAABAAAApIH5AAAAc29tZWRpci9pbmRleC5qc1VUBQAD9IWiWHV4CwABBIo90F0EFAAAAFBLAQIeAxQAAAAIAMaqTUpJsB1DmAAAAOkAAAAUABgAAAAAAAEAAACkgbQCAABzb21lZGlyL3BhY2thZ2UuanNvblVUBQAD9IWiWHV4CwABBIo90F0EFAAAAFBLBQYAAAAABAAEAFYBAACaAwAAAAA="};
@@ -210,5 +222,5 @@ describe("builds: conversion between payload, response and database", function()
       expect(data).to.be.a('string');
       done()
     });
-  });
+  });*/
 })

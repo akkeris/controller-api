@@ -11,6 +11,7 @@ const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello
 describe("base: Ensure helper tools work correctly.", () => {
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
+  const common = require('../lib/common.js');
   it("Ensures forward slashes are removed", (done) => {
     expect(httph.clean_forward_slash("https://fooo.com/")).to.equal("https://fooo.com");
     expect(httph.clean_forward_slash("https://fooo.com/foozle")).to.equal("https://fooo.com/foozle");
@@ -39,6 +40,22 @@ describe("base: Ensure helper tools work correctly.", () => {
   it("Ensures spaces do not match.", (done) => {
     let match = httph.first_match("http://localhost:5000/apps/h ello", new RegExp('/apps/([A-z0-9\\-\\_\\.]+)$'));
     expect(match).to.be.null
+    done();
+  });
+  it("Ensures check uuid works.", (done) => {
+    try { 
+      common.check_uuid("uuid")
+      expect(false).to.equal(true)
+    } catch (e) {
+      expect(true).to.equal(true)
+    }
+    try { 
+      common.check_uuid("123e4567-e89b-12d3-a456-426655440000")
+      expect(true).to.equal(true)
+    } catch (e) {
+      console.log(e)
+      expect(false).to.equal(true)
+    }
     done();
   });
   it("Ensure gzip compression works.", (done) => {

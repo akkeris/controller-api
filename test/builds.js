@@ -92,7 +92,6 @@ describe("builds: conversion between payload, response and database", function()
     });
   });
 
-/*
   let appname_brand_new = "alamotest" + Math.floor(Math.random() * 10000)
   it("covers creating a build and rebuilding it", function(done) {
     this.timeout(0);
@@ -222,5 +221,5 @@ describe("builds: conversion between payload, response and database", function()
       expect(data).to.be.a('string');
       done()
     });
-  });*/
+  });
 })

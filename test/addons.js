@@ -57,6 +57,8 @@ describe("addons: provisioning postgres and redis services.", function() {
   this.timeout(100000);
 
   let appname_brand_new = "alamotest" + Math.floor(Math.random() * 10000)
+  console.log("appname_brand_new="+appname_brand_new)
+
   it("covers creating the test app for services", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({org:"test", space:"default", name:appname_brand_new}), 
@@ -69,8 +71,10 @@ describe("addons: provisioning postgres and redis services.", function() {
 
 
   let postgres_plan = null;
+  let postgresonprem_plan = null;
   let redis_plan = null;
   let postgres_response = null;
+  let postgresonprem_response = null;
   let redis_response = null;
 
   it("covers getting a postgres plans", (done) => {
@@ -86,6 +90,23 @@ describe("addons: provisioning postgres and redis services.", function() {
         }
       });
       expect(postgres_plan).to.be.an('object');
+      done();
+    });
+  });
+
+  it("covers getting a postgres onprem plans", (done) => {
+    httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresqlonprem/plans', alamo_headers, null,
+    (err, data) => {
+      expect(err).to.be.null;
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('array');
+      obj.forEach(function(plan) {
+        if(plan.name === "alamo-postgresqlonprem:shared") {
+          postgresonprem_plan = plan;
+        }
+      });
+      expect(postgresonprem_plan).to.be.an('object');
       done();
     });
   });
@@ -291,6 +312,76 @@ describe("addons: provisioning postgres and redis services.", function() {
         done();
     });
   });
+  it("covers creating a postgres onprem instance", (done) => {
+    expect(postgresonprem_plan).to.be.an('object');
+    expect(postgresonprem_plan.id).to.be.a('string');
+    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons', alamo_headers, JSON.stringify({"plan":postgresonprem_plan.id}),
+    (err, data) => {
+      if(err) {
+        console.log(err);
+      }
+      expect(err).to.be.null;
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('object');
+      postgresonprem_response = obj;
+      done();
+    });
+  });
+
+  it("covers listing all services and checking for postgres onprem", (done) => {
+    expect(postgresonprem_response).to.be.an('object');
+    expect(postgresonprem_plan).to.be.an('object');
+    expect(postgresonprem_plan.id).to.be.a('string');
+    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons', alamo_headers, null,
+      (err, data) => {
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('array');
+        let found_postgres = false;
+        obj.forEach(function(service) {
+          if(service.id === postgresonprem_response.id) {
+            found_postgres = true;
+          }
+        });
+        expect(found_postgres).to.equal(true);
+        done();
+    });
+  });
+
+
+  it("covers removing a postgres onprem service", (done) => {
+    expect(postgresonprem_response).to.be.an('object');
+    expect(postgresonprem_plan).to.be.an('object');
+    expect(postgresonprem_plan.id).to.be.a('string');
+    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons' + '/' + postgresonprem_response.id, alamo_headers, null,
+    (err, data) => {
+      expect(err).to.be.null;
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('object');
+      expect(obj.id).to.equal(postgresonprem_response.id);
+      done();
+    });
+  });
+
+
+
+  it("covers ensuring all services were deleted", (done) => {
+    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons', alamo_headers, null,
+      (err, data) => {
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('array');
+        expect(obj.length).to.equal(0);
+        done();
+    });
+  });
+
+
+
   it("covers deleting the test app for services", (done) => {
     httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default', alamo_headers, null, (err, data) => {
       expect(err).to.be.null;

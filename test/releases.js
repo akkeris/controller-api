@@ -207,6 +207,20 @@ describe("releases: list, get, create a release", function() {
       });
   });
 
+
+  it("image is available", (done) => {
+    // get the app.
+    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default', alamo_headers, null, (err, data) => {
+      expect(err).to.be.null;
+      expect(data).to.be.a('string');
+      let describeobj = JSON.parse(data);
+      expect(describeobj.image).to.be.a('string')
+      expect(describeobj.image).to.not.be.null
+      done();
+    });
+  })
+
+
   it("ensures we clean up after ourselves.", (done) => {
     // destroy the app.
     httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default', alamo_headers, null, (err, data) => {

@@ -2,9 +2,11 @@ select
   apps.app,
   apps.name as app_name,
   spaces.name as space_name,
+  spaces.tags as space_tags,
   builds.build,
   builds.created,
   builds.sha,
+  organizations.name org,
   auto_builds.repo,
   auto_builds.branch,
   auto_builds.wait_on_status_checks,
@@ -13,9 +15,10 @@ select
 from
   apps
   join spaces on apps.space = spaces.space
+  join organizations on apps.org = organizations.org 
   join builds on apps.app = builds.app
   join auto_builds on auto_builds.app = apps.app
-  join authorizations on auto_builds.authorization = authorizations.authorization
+  left join authorizations on auto_builds.authorization = authorizations.authorization
 where
   builds.build = (
     select b.build

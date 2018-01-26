@@ -82,6 +82,22 @@ begin
     deleted boolean not null default false
   );
 
+  -- create table if not exists manifests (
+  --   "manifest" uuid not null primary key,
+  --   created timestamptz not null default now(),
+  --   updated timestamptz not null default now(),
+  --   name text,
+  --   description text,
+  --   default_url text,
+  --   admin_url text,
+  --   repository_url text,
+  --   langauges text,
+  --   logo_url text,
+  --   keywords text,
+  --   setup_json text,
+  --   deleted boolean not null default false
+  -- );
+
   create table if not exists dyno_types (
     "dyno_type" uuid not null primary key,
     created timestamptz not null default now(),
@@ -524,6 +540,14 @@ begin
                AND column_name = 'message')  then
     alter table builds add column message varchar(1024);
   end if;
+
+  -- if not exists( SELECT NULL
+  --             FROM INFORMATION_SCHEMA.COLUMNS
+  --            WHERE table_name = 'apps'
+  --              AND table_schema = 'public'
+  --              AND column_name = 'manifest')  then
+  --   alter table apps add column manifest references("manifests") manifest;
+  -- end if;
 
 end
 $$;

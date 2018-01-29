@@ -524,6 +524,5 @@ begin
                AND column_name = 'message')  then
     alter table builds add column message varchar(1024);
   end if;
-
 end
 $$;

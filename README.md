@@ -9,7 +9,8 @@
 * AUTH_KEY - A shared secret simple authentication, this should be used in all API calls in the Authorization header.
 * ENCRYPT_KEY - A private key used to encrypt secretive information in postgres.  This has no default.
 * BLACKLIST_ENV - A comma delimited list of socs keywords causing config vars to be redacted, defaults to 'PASS,KEY,SECRET,PRIVATE,TOKEN'
-* APPKIT_API_URL - Public URI (https://somehost/) for this api, generally appkit api url that handles user account/authorization (defaults to http://localhost:5000)
+* APPKIT_API_URL - Public URI (https://somehost/) for the appkit api in front of this api, generally appkit api url that handles user account/authorization (defaults to http://localhost:5000)
+* APPKIT_UI_URL - Public URI (https://somehost/) for the appkit ui used by developers.
 
 ### Build Information
 * BUILD_SHUTTLE_URL - The build shuttle is a small footprint API that manages specific build system such as jenkins. (see https://github.com/akkeris/buildshuttle).  This has no default.

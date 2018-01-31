@@ -57,7 +57,6 @@ describe("addons: provisioning postgres and redis services.", function() {
   this.timeout(100000);
 
   let appname_brand_new = "alamotest" + Math.floor(Math.random() * 10000)
-  console.log("appname_brand_new="+appname_brand_new)
 
   it("covers creating the test app for services", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,

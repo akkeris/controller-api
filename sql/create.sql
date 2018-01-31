@@ -82,6 +82,14 @@ begin
     deleted boolean not null default false
   );
 
+  if not exists( SELECT NULL
+              FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE table_name = 'app_setups'
+               AND table_schema = 'public'
+               AND column_name = 'status_messages')  then
+    alter table app_setups add column status_messages text;
+  end if;
+
   create table if not exists dyno_types (
     "dyno_type" uuid not null primary key,
     created timestamptz not null default now(),

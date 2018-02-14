@@ -72,9 +72,11 @@ describe("addons: provisioning postgres and redis services.", function() {
   let postgres_plan = null;
   let postgresonprem_plan = null;
   let redis_plan = null;
+  let es_plan = null;
   let postgres_response = null;
   let postgresonprem_response = null;
   let redis_response = null;
+  
 
   it("covers getting a postgres plans", (done) => {
     httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql/plans', alamo_headers, null, 
@@ -110,10 +112,11 @@ describe("addons: provisioning postgres and redis services.", function() {
     });
   });
 
+
   it("covers getting a redis plans", (done) => {
     expect(postgres_plan).to.be.an('object');
     expect(postgres_plan.id).to.be.a('string');
-    httph.request('get', 'http://localhost:5000/addon-services/alamo-redis/plans', alamo_headers, null, 
+    httph.request('get', 'http://localhost:5000/addon-services/alamo-redis/plans', alamo_headers, null,
     (err, data) => {
       expect(err).to.be.null;
       expect(data).to.be.a('string');
@@ -125,6 +128,23 @@ describe("addons: provisioning postgres and redis services.", function() {
         }
       });
       expect(redis_plan).to.be.an('object');
+      done();
+    });
+  });
+
+  it("covers getting es plans", (done) => {
+    httph.request('get', 'http://localhost:5000/addon-services/alamo-es/plans', alamo_headers, null,
+    (err, data) => {
+      expect(err).to.be.null;
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('array');
+      obj.forEach(function(plan) {
+        if(plan.name === "alamo-es:micro") {
+          es_plan = plan;
+        }
+      });
+      expect(es_plan).to.be.an('object');
       done();
     });
   });

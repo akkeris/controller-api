@@ -161,7 +161,7 @@ routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/builds/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.builds.rebuild.bind(alamo.builds.rebuild, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/builds/([A-z0-9\\-\\_\\.]+)/result$')
-          .run(alamo.builds.result.bind(alamo.builds.result, pg_pool))
+          .run(alamo.builds.http.result.bind(alamo.builds.http.result, pg_pool))
           .and.authorization([simple_key]);
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/builds$')
           .run(alamo.builds.http.create.bind(alamo.builds.http.create, pg_pool))

@@ -2170,7 +2170,7 @@ curl \
   },
   "provider_id": "alamo",
   "updated_at": "2016-08-11T20:16:45.820Z",
-  "web_url": "https://status.appreciatehub.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
+  "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
 }
 ```
 
@@ -2213,7 +2213,7 @@ curl \
     },
     "provider_id": "alamo",
     "updated_at": "2016-08-11T20:16:45.820Z",
-    "web_url": "https://status.appreciatehub.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
+    "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
   }
 ]
 ```
@@ -2254,7 +2254,7 @@ curl \
   },
   "provider_id": "alamo",
   "updated_at": "2016-08-11T20:16:45.820Z",
-  "web_url": "https://status.appreciatehub.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
+  "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
 }
 ```
 
@@ -2294,7 +2294,7 @@ curl \
   },
   "provider_id": "alamo",
   "updated_at": "2016-08-11T20:16:45.820Z",
-  "web_url": "https://status.appreciatehub.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
+  "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
 }
 ```
 
@@ -3570,7 +3570,7 @@ This occurs when an addon is provisioned or de-provisioned.  Note this does not 
       },
       "provider_id": "alamo",
       "updated_at": "2016-08-11T20:16:45.820Z",
-      "web_url": "https://status.appreciatehub.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
+      "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
     }
   ]
 }
@@ -3645,9 +3645,9 @@ Invoices provide a mechanism to check by organization, space or all up how much 
 
 Lists all invoices
 
-`GET /account/invoices
-`GET /organization/{org}/invoices
-`GET /space/{org}/invoices
+`GET /account/invoices`
+`GET /organization/{org}/invoices`
+`GET /space/{org}/invoices`
 
 **CURL Example**
 
@@ -3693,9 +3693,9 @@ curl \
 
 Get information on an invoice
 
-`GET /account/invoices/{invoice_id}
-`GET /organizations/{org}/invoices/{invoice_id}
-`GET /spaces/{org}/invoices/{invoice_id}
+`GET /account/invoices/{invoice_id}`
+`GET /organizations/{org}/invoices/{invoice_id}`
+`GET /spaces/{org}/invoices/{invoice_id}`
 
 **CURL Example**
 
@@ -3780,7 +3780,7 @@ TLS/SSL End Points requests or installs a certificate for a domain/site that's b
 
 ### Order a Certificate ##
 
-Place an order for a new ssl/tls certificate (note if common name/domain names contains a *.domain.com then a wildcard cert is issued), if more than one domain is requested a multi_domain cert is issued, if there is only one domain in the domain_names a single ssl/tls certificate is issued.
+Place an order for a new ssl/tls certificate (note if common name/domain names contains a `*.domain.com` then a wildcard cert is issued), if more than one domain is requested a multi_domain cert is issued, if there is only one domain in the domain_names a single ssl/tls certificate is issued.
 
 |   Name   |       Type      | Description                                                                                                                                                                                                | Example                                                                                                                            |
 |:--------:|:---------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
@@ -3791,7 +3791,7 @@ Place an order for a new ssl/tls certificate (note if common name/domain names c
 |  comments  | optional string | A description of what the purpose of the certificate is for info-sec. | "We need a new cert for our platform work" |
 |  region  | optional string | The region in which to order the certificate for | us-seattle |
 
-`POST /ssl-orders
+`POST /ssl-orders`
 
 **CURL Example**
 

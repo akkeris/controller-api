@@ -6,6 +6,7 @@ select
 	apps.name,
 	app_setups.status,
 	app_setups.failure_messages,
+	app_setups.status_messages,
 	app_setups.progress
 from 
 	app_setups join apps on app_setups.app = apps.app 

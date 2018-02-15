@@ -3409,6 +3409,7 @@ The following events exist for hooks to listen to:
 
 * release
 * build
+* feature_change
 * formation_change
 * logdrain_change
 * addon_change
@@ -3477,6 +3478,43 @@ The following is fired to the webhook url during a build pending, success or fai
     "created_at":"2016-08-09T12:00:00Z",
     "repo":"https://github.com/akkeris/bar.git",
     "commit":"7edbac4b6a5e09e1ef3a08084a904621"
+  }
+}
+```
+
+### Feature Change Event Payload
+
+The occurs when there is a change to to enable a feature on an app, or to disable a feature.
+
+`POST [callback end point]`
+
+```json
+{
+  "action":"feature_change",
+  "app":{
+    "name":"yourappname",
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+  },
+  "space":{
+    "name":"the-space"
+  },
+  "change":"update",
+  "changes":[
+    {
+      "type":"update",
+      "name":"feature-name",
+      "value":true
+    }
+  ],
+  "feature":{
+    "description":"Human readable description of the feature that was just enabled or disabled.",
+    "doc_url":"/features/review-apps",
+    "id":"9e7ec5d2-c410-4d04-8d5e-db7746c40b42",
+    "state":"alpha|beta|public|ga",
+    "name":"feature-name",
+    "display_name":"Human Readable Feature Name",
+    "feedback_email":"cobra@octanner.com"
+    "enabled":true
   }
 }
 ```

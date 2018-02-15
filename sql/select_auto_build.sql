@@ -4,7 +4,7 @@ select
   auto_builds.auto_build, 
   auto_builds.repo, 
   auto_builds.branch, 
-  auto_builds.auto_deploy, 
+  case when features.feature is null then false else true end as auto_deploy, 
   auto_builds.wait_on_status_checks,
   authorizations.site, 
   authorizations.username,
@@ -17,6 +17,7 @@ select
 from
   auto_builds
     join apps on auto_builds.app = apps.app
+    left join features on apps.app = features.app and features.deleted = false and features.name = 'auto-release'
     join authorizations on auto_builds.authorization = authorizations.authorization
     join spaces on apps.space = spaces.space 
     join organizations on apps.org = organizations.org

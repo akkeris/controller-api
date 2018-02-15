@@ -14,10 +14,11 @@ select
   authorizations.token
 from
   apps
+  join features on apps.app = features.app and features.name = 'auto-release' and features.deleted = false
   join spaces on apps.space = spaces.space
   join organizations on apps.org = organizations.org 
   join builds on apps.app = builds.app
-  join auto_builds on auto_builds.app = apps.app
+  left join auto_builds on auto_builds.app = apps.app
   left join authorizations on auto_builds.authorization = authorizations.authorization
 where
   builds.build = (
@@ -30,7 +31,6 @@ where
   and builds.deleted = false
   and auto_builds.deleted = false
   and spaces.deleted = false
-  and auto_builds.auto_deploy = true
   and builds.status = 'succeeded'
   and (select count(*) from releases where releases.app = apps.app and releases.build = builds.build) = 0
   and builds.created > (current_date - interval '1 day')

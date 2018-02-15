@@ -20,6 +20,7 @@ let alamo = {
   builds:require('./lib/builds.js'),
   certificates:require('./lib/certificates.js'),
   dynos:require('./lib/dynos.js'),
+  features:require('./lib/features.js'),
   formations:require('./lib/formations.js'), 
   releases:require('./lib/releases.js'), 
   github:require('./lib/github.js'), 
@@ -194,6 +195,17 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/config-vars$')
           .and.authorization([simple_key]);
 routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/config-vars$')
           .run(alamo.config_var.http.update.bind(alamo.config_var.http.update, pg_pool))
+          .and.authorization([simple_key]);
+
+// -- features
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/features$')
+          .run(alamo.features.http.list.bind(alamo.features.http.list, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/features/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.features.http.get.bind(alamo.features.http.get, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/features/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.features.http.update.bind(alamo.features.http.update, pg_pool))
           .and.authorization([simple_key]);
 
 // -- releases

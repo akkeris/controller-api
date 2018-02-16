@@ -2,7 +2,7 @@
 
 const init = require('./support/init.js');
 
-describe("metrics: ensure we can pull app metrics", function() {  
+describe("features: ensure we can set and get app features", function() {  
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';

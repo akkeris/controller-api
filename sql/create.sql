@@ -101,6 +101,16 @@ begin
     deleted boolean not null default false
   );
 
+  create table if not exists features (
+    app uuid references apps("app"),
+    feature uuid not null,
+    name varchar(1024) not null,
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    deleted boolean not null default false,
+    primary key (app, feature)
+  );
+
   create table if not exists formations (
     "formation" uuid not null primary key,
     app uuid references apps("app"),
@@ -157,7 +167,6 @@ begin
     repo href,
     branch varchar(128),
     "authorization" uuid references authorizations("authorization"),
-    auto_deploy boolean,
     wait_on_status_checks boolean,
     user_agent varchar(1024),
     validation_token varchar(128),
@@ -484,6 +493,24 @@ begin
               AND column_name = 'region'
               and data_type = 'character varying') then
     alter table sites drop column region;
+  end if;
+
+  -- transition auto_builds.auto_deploy to an app feature
+  if exists (SELECT NULL 
+              FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE table_name = 'auto_builds'
+              AND column_name = 'auto_deploy'
+              and data_type = 'boolean') then
+
+    insert into features
+      (app, feature, name, created, updated, deleted)
+      (select auto_builds.app, '8e7ec5d2-c410-4d04-8d5e-db7746c40b44', 'auto-release', auto_builds.created, auto_builds.updated, case auto_builds.auto_deploy when true then false else true end from auto_builds where auto_builds.deleted = false)
+    on conflict (app, feature)
+      do update set
+        deleted = (select case auto_builds.auto_deploy when true then false else true end from auto_builds where auto_builds.app = features.app and deleted = false),
+        updated = (select auto_builds.updated from auto_builds where auto_builds.app = features.app and deleted = false);
+
+    alter table auto_builds drop column auto_deploy;
   end if;
 
   if not exists (SELECT NULL 

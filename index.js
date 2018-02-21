@@ -23,7 +23,7 @@ let alamo = {
   features:require('./lib/features.js'),
   formations:require('./lib/formations.js'), 
   releases:require('./lib/releases.js'), 
-  github:require('./lib/github.js'), 
+  git:require('./lib/git.js'), 
   logs:require('./lib/logs.js'),
   log_drains:require('./lib/log-drains.js'),
   metrics:require('./lib/metrics.js'), 
@@ -61,24 +61,22 @@ let db_conf = {
 let pg_pool = new pg.Pool(db_conf);
 pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", err); });
 
-async function db_setup(pg_pool) {
-  try {
-    await query(fs.readFileSync('./sql/create.sql').toString('utf8'), (r) => { return r }, pg_pool, [])
-  } catch (e) {
-    console.error("Unable to successfully connect to postgresql database:", e)
-    process.exit(1) // this is very fatal.
-  }
-}
 // Run setup scripts
-db_setup(pg_pool)
-  .then(() => {
-    // Start timers
-    alamo.builds.timers.begin(pg_pool)
-    alamo.releases.timers.begin(pg_pool)
-    alamo.formations.timers.begin(pg_pool)
-    alamo.addon_services.timers.begin(pg_pool)
-  })
-  .catch(e => console.error(e.message, e.stack))
+(async () => {
+  // Run any database migrations necessary.
+  await query(fs.readFileSync('./sql/create.sql').toString('utf8'), null, pg_pool, [])
+  // Start timers
+  alamo.builds.timers.begin(pg_pool)
+  alamo.releases.timers.begin(pg_pool)
+  alamo.formations.timers.begin(pg_pool)
+  alamo.addon_services.timers.begin(pg_pool)
+  // Initialize Events
+  alamo.git.init(pg_pool)
+})().catch(e => {
+  console.error("Initialization failed, this is fatal.")
+  console.error(e.message, e.stack)
+  process.exit(1)
+})
 
 
 
@@ -173,18 +171,18 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/builds$')
 
 // -- auto build with github, get and post. should github be mounted to auto?
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto$')
-          .run(alamo.github.autobuild.bind(alamo.github.autobuild, pg_pool))
+          .run(alamo.git.autobuild.bind(alamo.git.autobuild, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')
-          .run(alamo.github.info.bind(alamo.github.info, pg_pool))
+          .run(alamo.git.info.bind(alamo.git.info, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')
-          .run(alamo.github.autobuild_remove.bind(alamo.github.autobuild_remove, pg_pool))
+          .run(alamo.git.autobuild_remove.bind(alamo.git.autobuild_remove, pg_pool))
           .and.authorization([simple_key]);
 
 // -- Github callbacks, no auth but authenticated through
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')
-          .run(alamo.github.webhook.bind(alamo.github.webhook, pg_pool));
+          .run(alamo.git.webhook.bind(alamo.git.webhook, pg_pool));
 // -- Build callbacks
 routes.add.post('/builds/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.builds.http.status_change.bind(alamo.builds.http.status_change, pg_pool));
@@ -567,3 +565,4 @@ process.on('uncaughtException', (e) => {
 });
 
 module.exports = {routes:routes, pg_pool:pg_pool};
+

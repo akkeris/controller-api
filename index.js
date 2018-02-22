@@ -72,6 +72,10 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   alamo.addon_services.timers.begin(pg_pool)
   // Initialize Events
   alamo.git.init(pg_pool)
+
+  let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
+  console.log()
+  console.log(`Akkeris Controller API (v${pkg.version}) Ready`)
 })().catch(e => {
   console.error("Initialization failed, this is fatal.")
   console.error(e.message, e.stack)

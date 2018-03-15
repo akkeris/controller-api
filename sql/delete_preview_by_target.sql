@@ -1,0 +1,1 @@
+update previews set updated=now(), deleted=true where target = $1 returning *

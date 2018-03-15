@@ -111,6 +111,19 @@ begin
     primary key (app, feature)
   );
 
+  create table if not exists previews (
+    preview uuid not null primary key,
+    source uuid references apps("app"),
+    target uuid references apps("app"),
+    foreign_key varchar(1024),
+    foreign_status_key varchar(1024),
+    additional_info text,
+    app_setup uuid references app_setups("app_setup"),
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    deleted boolean not null default false
+  );
+
   create table if not exists formations (
     "formation" uuid not null primary key,
     app uuid references apps("app"),
@@ -263,7 +276,7 @@ begin
     deleted boolean not null default false
   );
 
-  create index on pipeline_promotions (created);
+  create index if not exists pipeline_promotion_created_idx on pipeline_promotions (created);
 
   create table if not exists pipeline_promotion_targets (
     pipeline_promotion_target uuid not null primary key,
@@ -542,6 +555,14 @@ begin
                AND table_schema = 'public'
                AND column_name = 'region')  then
     alter table sites add column region uuid references regions("region") not null default 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3';
+  end if;
+
+  if not exists( SELECT NULL
+              FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE table_name = 'sites'
+               AND table_schema = 'public'
+               AND column_name = 'preview')  then
+    alter table sites add column preview uuid references previews("preview") null;
   end if;
 
   if not exists( SELECT NULL

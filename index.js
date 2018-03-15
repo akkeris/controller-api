@@ -33,6 +33,7 @@ let alamo = {
   organizations:require('./lib/organizations.js'),
   pipelines:require('./lib/pipelines.js'),
   plugins:require('./lib/plugins.js'),
+  previews:require('./lib/previews.js'),
   sites:require('./lib/sites.js'),
   routes:require('./lib/routes.js'),
   hooks:require('./lib/hooks.js'),
@@ -61,15 +62,13 @@ let db_conf = {
 let pg_pool = new pg.Pool(db_conf);
 pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", err); });
 
-// Run setup scripts
 (async () => {
-  // Run any database migrations necessary.
-  await query(fs.readFileSync('./sql/create.sql').toString('utf8'), null, pg_pool, [])
-  // Start timers
-  alamo.builds.timers.begin(pg_pool)
-  alamo.releases.timers.begin(pg_pool)
   alamo.formations.timers.begin(pg_pool)
   alamo.addon_services.timers.begin(pg_pool)
+  if(process.env.TEST_MODE) {
+    // normally in a worker.
+    alamo.releases.timers.begin(pg_pool)
+  }
   // Initialize Events
   alamo.git.init(pg_pool)
 
@@ -237,6 +236,15 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/log-drains$')
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/log-drains/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.log_drains.http.delete.bind(alamo.log_drains.http.delete, pg_pool))
           .and.authorization([simple_key]);
+
+// -- preview apps
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/previews$')
+          .run(alamo.previews.http.list.bind(alamo.previews.http.list, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/previews/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.previews.http.get.bind(alamo.previews.http.get, pg_pool))
+          .and.authorization([simple_key]);
+
 
 // -- addons
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons$')
@@ -535,13 +543,13 @@ routes.add.delete('/favorites/([A-z0-9\\-\\_\\.]+)$')
 // however we could make only the source field required
 // and assume a random name, in the future merge it with app.json.
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/app-setups$')
-          .run(alamo.app_setups.definition.bind(alamo.app_setups.definition, pg_pool))
+          .run(alamo.app_setups.http.definition.bind(alamo.app_setups.http.definition, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/app-setups/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.app_setups.get.bind(alamo.app_setups.get, pg_pool))
+          .run(alamo.app_setups.http.get.bind(alamo.app_setups.http.get, pg_pool))
           .and.authorization([simple_key]);
 routes.add.post('/app-setups$')
-          .run(alamo.app_setups.create.bind(alamo.app_setups.create, pg_pool))
+          .run(alamo.app_setups.http.create.bind(alamo.app_setups.http.create, pg_pool))
           .and.authorization([simple_key]);
 
 

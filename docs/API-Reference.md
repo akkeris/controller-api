@@ -50,6 +50,9 @@ curl \
      "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
      "name":"akkeris"
   },
+  "preview":{
+    "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
+  },
   "region":{  
      "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621",
      "name":"us-seattle"
@@ -324,6 +327,49 @@ curl \
   "updated_at":"2016-07-18T14:55:38.190Z",
   "web_url":"https://events-perf-dev-us.alamoapp.akkeris.io"
 }
+```
+
+### List App Previews
+
+`GET /apps/{appname}/previews`
+
+Preview apps are forked applications that are running a feature branch of code proposed to be merged into the source application.
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/apps/events-perf-dev/previews
+```
+
+**200 "OK" Response**
+
+```json
+[
+  {
+    "id":"6115216c-d683-060a-a133-ff7707758311",
+    "app":{
+      "id":"73764651-4cf7-11e6-beb8-1121128ca377"
+    },
+    "source":{
+      "app":{
+        "id":"4f739e5e-4cf7-11e6-beb8-9e71128cae77",
+        "name":"events-perf-dev"
+      },
+      "app-setup":{
+        "id":"55739e5e-4cf7-1155-beb8-9e711222ae11"
+      },
+      "trigger":{
+        "type":"github-pull-request",
+        "id":"feature-branch-name"
+      }
+    },
+    "created_at":"2016-07-18T14:55:38.190Z",
+    "updated_at":"2016-07-18T14:55:38.190Z"
+  }
+]
 ```
 
 
@@ -1639,6 +1685,112 @@ curl \
   "BOO":"who?"
 }
 ```
+
+
+## Features
+
+Features are capabilities you'd like to enable on an application.  Features are binary, in other words, they can only be enabled or disabled. Each feautre may be enabled or disabled by default when an app is created or they may be automatically enabled by other actions taken on an application.
+
+Features can include auto-releasing when a build is created, or creating preview applications.
+
+### Enable or Disable Features
+
+`PATCH /apps/{appname}/features/{feature}`
+
+Updates the specified feature, it should contain only one key `{"enabled":true}` to enable it, or `{"enabled":false}` to disable it.
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X PATCH \
+  https://apps.akkeris.io/apps/app-space/features/auto-release
+  -d '{"enabled":false}'
+```
+
+**200 "Updated" Response**
+
+```json
+{
+  "description":"When the application receives a new build whether or not it should automatically release the build.",
+  "doc_url":"/features/auto-release",
+  "id":"8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
+  "state":"public",
+  "name":"auto-release",
+  "display_name":"Auto release builds",
+  "feedback_email":"cobra@octanner.com",
+  "enabled":false
+}
+```
+
+### List All Features
+
+`GET /apps/{appname}/features`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/apps/app-space/features
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "description":"When the application receives a new build whether or not it should automatically release the build.",
+  "doc_url":"/features/auto-release",
+  "id":"8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
+  "state":"public",
+  "name":"auto-release",
+  "display_name":"Auto release builds",
+  "feedback_email":"cobra@octanner.com",
+  "enabled":false
+},
+{
+  "description":"When a pull request is received, automatically create a preview site and applicaiton (web dyno only) with the same config as the development application.",
+  "doc_url":"/features/preview",
+  "id":"8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
+  "state":"beta",
+  "name":"preview",
+  "display_name":"Preview Apps",
+  "feedback_email":"cobra@octanner.com",
+  "enabled":true
+}
+```
+
+
+### Get A Feature
+
+`GET /apps/{appname}/features/{feature}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/apps/app-space/features/auto-release
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "description":"When the application receives a new build whether or not it should automatically release the build.",
+  "doc_url":"/features/auto-release",
+  "id":"8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
+  "state":"public",
+  "name":"auto-release",
+  "display_name":"Auto release builds",
+  "feedback_email":"cobra@octanner.com",
+  "enabled":false
+}
+```
+
 
 ## Spaces
 
@@ -3415,6 +3567,7 @@ The following events exist for hooks to listen to:
 * addon_change
 * config_change
 * destroy
+* preview
 
 When a hook is called the URL provided is called with a POST method, the body is different depending on the event but will always have the property "action" that equals the event name. 
 
@@ -3545,6 +3698,52 @@ The occurs when there is a scale event or a new formation type is created.
       "quantity":1
     }
   ]
+}
+```
+
+### Preview App Created Event Payload
+
+The occurs when a forked preview app is created.
+
+`POST [callback end point]`
+
+```json
+{
+  "action":"preview",
+  "app":{
+    "name":"yourappname",
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+  },
+  "space":{
+    "name":"the-space"
+  },
+  "change":"create",
+  "preview":{
+    "app":{
+      "name":"youraabcdef",
+      "id":"865bac4b-6a5e-09e1-ef3a-08084a904622"
+    },
+    "app_setup":{
+      "id":"335bac4b-6a5e-09e1-ef3a-08084a904611",
+      "created_at":"2016-08-11T20:16:45.820Z",
+      "updated_at":"2016-08-11T20:16:45.820Z",
+      "app":{
+        "id":"865bac4b-6a5e-09e1-ef3a-08084a904622",
+        "name":"youraabcdef"
+      },
+      "build":{
+        "id":null,
+        "status":"queued",
+        "output_stream_url":null
+      },
+      "progress":0,
+      "status":"pending",
+      "failure_message":"",
+      "manifest_errors":[],
+      "postdeploy":null,
+      "resolved_success_url":null
+    }
+  }
 }
 ```
 

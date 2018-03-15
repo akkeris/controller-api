@@ -106,8 +106,8 @@ describe("sites/routes", function () {
               expect(err).to.be.null;
               expect(data).to.be.a('string');
               let obj = JSON.parse(data);
-              expect(obj.app).to.equal(app_id);
-              expect(obj.site).to.equal(site_id);
+              expect(obj.app.id).to.equal(app_id);
+              expect(obj.site.id).to.equal(site_id);
               expect(obj.source_path).to.equal("/source");
               expect(obj.target_path).to.equal("/target");
               route_id = obj.id
@@ -116,7 +116,8 @@ describe("sites/routes", function () {
     });
 
     let route_for_app1 = null, route_for_app2 = null;
-    it("covers creating multiple routes", (done) => {
+    it("covers creating multiple routes", function (done) {
+      this.timeout(30000)
         let payload = {
             app: app_key,
             site: site_id,
@@ -128,7 +129,7 @@ describe("sites/routes", function () {
           expect(err).to.be.null;
           expect(data).to.be.a('string');
           let obj = JSON.parse(data);
-          expect(obj.site).to.equal(site_id);
+          expect(obj.site.id).to.equal(site_id);
           expect(obj.source_path).to.equal("/source1");
           expect(obj.target_path).to.equal("/target1");
           route_for_app1 = obj.id;
@@ -143,7 +144,7 @@ describe("sites/routes", function () {
             expect(err).to.be.null;
             expect(data).to.be.a('string');
             let obj2 = JSON.parse(data);
-            expect(obj2.site).to.equal(site_id);
+            expect(obj2.site.id).to.equal(site_id);
             expect(obj2.source_path).to.equal("/source2");
             expect(obj2.target_path).to.equal("/target2");
             route_for_app2 = obj2.id;
@@ -166,7 +167,7 @@ describe("sites/routes", function () {
                 }
             });
             expect(test_route).to.be.an('object');
-            expect(test_route.app).to.equal('api-default');
+            expect(test_route.app.name).to.equal('api-default');
             expect(test_route.source_path).to.equal('/source');
             expect(test_route.target_path).to.equal('/target');
             done();
@@ -187,8 +188,8 @@ describe("sites/routes", function () {
         expect(err).to.be.null;
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
-        expect(obj.app).to.equal(app_id);
-        expect(obj.site).to.equal(site_id);
+        expect(obj.app.id).to.equal(app_id);
+        expect(obj.site.id).to.equal(site_id);
         expect(obj.source_path).to.equal("/source");
         expect(obj.target_path).to.equal("/target");
         done();

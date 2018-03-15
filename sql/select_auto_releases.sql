@@ -1,6 +1,7 @@
 select
   apps.app,
   apps.name as app_name,
+  apps.url,
   spaces.name as space_name,
   spaces.tags as space_tags,
   builds.build,
@@ -18,8 +19,8 @@ from
   join spaces on apps.space = spaces.space
   join organizations on apps.org = organizations.org 
   join builds on apps.app = builds.app
-  left join auto_builds on auto_builds.app = apps.app
-  left join authorizations on auto_builds.authorization = authorizations.authorization
+  left join auto_builds on auto_builds.app = apps.app and auto_builds.deleted = false
+  left join authorizations on auto_builds.authorization = authorizations.authorization and authorizations.deleted = false
 where
   builds.build = (
     select b.build
@@ -29,7 +30,6 @@ where
   )
   and apps.deleted = false
   and builds.deleted = false
-  and auto_builds.deleted = false
   and spaces.deleted = false
   and builds.status = 'succeeded'
   and (select count(*) from releases where releases.app = apps.app and releases.build = builds.build) = 0

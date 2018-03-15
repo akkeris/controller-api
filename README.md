@@ -47,7 +47,7 @@ Prior to running, ensure all of the prior environment variables are properly set
 
 ## Testing ##
 
-Set above env, in addition you'll need to set TEST_MODE=true, ALAMO_BASE_DOMAIN=.domain.io, and CODACY_PROJECT_TOKEN if you want code coverage.  Then run:
+Set above env, in addition you'll need to set TEST_MODE=true, ALAMO_BASE_DOMAIN=.some.domain.io, SITE_BASE_DOMAIN=.domain.io and CODACY_PROJECT_TOKEN if you want code coverage.  Then run:
 
 ```
 cat sql/create_testing.sql | psql $DATABASE_URL

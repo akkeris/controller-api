@@ -100,7 +100,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
         expect(appobj.buildpack_provided_description).to.be.a('string');
         expect(appobj.build_stack).to.be.an('object');
         expect(appobj.build_stack.id).to.be.a('string');
-        expect(appobj.build_stack.name).to.equal('ds1');
+        expect(appobj.build_stack.name).to.be.a('string');
         expect(appobj.created_at).to.be.a('string');
         expect(appobj.id).to.be.a('string');
         expect(appobj.maintenance).to.equal(false);
@@ -111,7 +111,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
         expect(appobj.organization).to.be.an('object');
         expect(appobj.organization.name).to.equal('test');
         expect(appobj.region).to.be.an('object');
-        expect(appobj.region.name).to.equal('us-seattle');
+        expect(appobj.region.name).to.be.a('string');
         expect(appobj.released_at).to.be.null;
         expect(appobj.repo_size).to.equal(0);
         expect(appobj.slug_size).to.equal(0);
@@ -136,7 +136,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
       expect(appobj.buildpack_provided_description).to.be.a('string');
       expect(appobj.build_stack).to.be.an('object');
       expect(appobj.build_stack.id).to.be.a('string');
-      expect(appobj.build_stack.name).to.equal('ds1');
+      expect(appobj.build_stack.name).to.be.a('string');
       expect(appobj.created_at).to.be.a('string');
       expect(appobj.id).to.be.a('string');
       expect(appobj.maintenance).to.equal(false);
@@ -147,7 +147,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
       expect(appobj.organization).to.be.an('object');
       expect(appobj.organization.name).to.equal('test');
       expect(appobj.region).to.be.an('object');
-      expect(appobj.region.name).to.equal('us-seattle');
+      expect(appobj.region.name).to.be.a('string');
       expect(appobj.released_at).to.be.null;
       expect(appobj.image).to.be.a('string')
       expect(appobj.repo_size).to.equal(0);
@@ -175,7 +175,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
       expect(appobj.buildpack_provided_description).to.be.a('string');
       expect(appobj.build_stack).to.be.an('object');
       expect(appobj.build_stack.id).to.be.a('string');
-      expect(appobj.build_stack.name).to.equal('ds1');
+      expect(appobj.build_stack.name).to.be.a('string');
       expect(appobj.created_at).to.be.a('string');
       expect(appobj.id).to.be.a('string');
       expect(appobj.maintenance).to.equal(true);
@@ -186,7 +186,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
       expect(appobj.organization).to.be.an('object');
       expect(appobj.organization.name).to.equal('test');
       expect(appobj.region).to.be.an('object');
-      expect(appobj.region.name).to.equal('us-seattle');
+      expect(appobj.region.name).to.be.a('string');
       expect(appobj.released_at).to.be.null;
       expect(appobj.repo_size).to.equal(0);
       expect(appobj.slug_size).to.equal(0);
@@ -214,7 +214,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
       expect(appobj.buildpack_provided_description).to.be.a('string');
       expect(appobj.build_stack).to.be.an('object');
       expect(appobj.build_stack.id).to.be.a('string');
-      expect(appobj.build_stack.name).to.equal('ds1');
+      expect(appobj.build_stack.name).to.be.a('string');
       expect(appobj.created_at).to.be.a('string');
       expect(appobj.id).to.be.a('string');
       expect(appobj.maintenance).to.equal(false);
@@ -224,7 +224,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
       expect(appobj.organization).to.be.an('object');
       expect(appobj.organization.name).to.equal('test');
       expect(appobj.region).to.be.an('object');
-      expect(appobj.region.name).to.equal('us-seattle');
+      expect(appobj.region.name).to.be.a('string');
       expect(appobj.released_at).to.be.null;
       expect(appobj.repo_size).to.equal(0);
       expect(appobj.slug_size).to.equal(0);
@@ -266,7 +266,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
           expect(appobj.buildpack_provided_description).to.be.a('string');
           expect(appobj.build_stack).to.be.an('object');
           expect(appobj.build_stack.id).to.be.a('string');
-          expect(appobj.build_stack.name).to.equal('ds1');
+          expect(appobj.build_stack.name).to.be.a('string');
           expect(appobj.created_at).to.be.a('string');
           expect(appobj.id).to.be.a('string');
           expect(appobj.maintenance).to.equal(false);
@@ -276,7 +276,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
           expect(appobj.organization).to.be.an('object');
           expect(appobj.organization.name).to.equal('test');
           expect(appobj.region).to.be.an('object');
-          expect(appobj.region.name).to.equal('us-seattle');
+          expect(appobj.region.name).to.be.a('string');
           expect(appobj.released_at).to.be.null;
           expect(appobj.repo_size).to.equal(0);
           expect(appobj.slug_size).to.equal(0);

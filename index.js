@@ -68,6 +68,7 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   if(process.env.TEST_MODE || process.env.ONE_PROCESS_MODE) {
     // normally in a worker.
     alamo.releases.timers.begin(pg_pool)
+    alamo.git.init_worker(pg_pool)
   }
   // Initialize Events
   alamo.git.init(pg_pool)

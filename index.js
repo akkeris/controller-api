@@ -65,7 +65,7 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
 (async () => {
   alamo.formations.timers.begin(pg_pool)
   alamo.addon_services.timers.begin(pg_pool)
-  if(process.env.TEST_MODE) {
+  if(process.env.TEST_MODE || process.env.ONE_PROCESS_MODE) {
     // normally in a worker.
     alamo.releases.timers.begin(pg_pool)
   }

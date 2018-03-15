@@ -12,7 +12,8 @@ select
   auto_builds.branch,
   auto_builds.wait_on_status_checks,
   authorizations.site,
-  authorizations.token
+  authorizations.token,
+  (select previews.foreign_status_key from previews where previews.deleted = false and previews.target = apps.app order by created desc limit 1) as foreign_status_key
 from
   apps
   join features on apps.app = features.app and features.name = 'auto-release' and features.deleted = false

@@ -2065,13 +2065,15 @@ curl \
 ```
 
 
-## Services
+## Services, Addons and Attachments
 
-Services are any external or internal capabilities that can be added to an application. Each service has an associated plan, each plan can be created and attached to an application as an "addon". Once an addon is created the relevant configuration variables are automatically placed in the application on start up.  
+Services (or addon-services) are any external or internal capabilities that can be added to an application. Each service has an associated plan, each plan can be created and attached to an application as an "addon". Once an addon is created the relevant configuration variables are automatically placed in the application on start up via new environment variables.  
 
 For example, alamo-postgresql is a service provided, it has plans that can be chosen through``/addon-services/alamo-postgresql/plans``, the selected plan can be then added to an application through``/apps/{appname}/addons``, the created or provisioned database can also be attached to other applications through``/apps/{appname}/addon-attachments``end point. All services can be queried through the``/addon-services``URI.
 
-### List Addon Services ##
+Attached addons differ from addons in that attachments are addons that are owned by another application and attached or shared to another application, these cannot be controlled or deleted by the attached application or those with access to the application with the attachment, only the owner of the addon may do this.
+
+### List Addon-Services ##
 
 Lists all addons services (postgres, redis, etc). 
 
@@ -2117,7 +2119,7 @@ curl \
 ]
 ```
 
-### Get Addon Service Info ##
+### Get Addon-Service Info ##
 
 Get information on a specific service (although not the plan details)
 
@@ -2149,7 +2151,7 @@ curl \
 }
 ```
 
-### List Addon Service Plans ##
+### List Addon-Service Plans ##
 
 Get all plans for a service and their costs.
 
@@ -2237,7 +2239,7 @@ curl \
 ]
 ```
 
-### Get Addon Service Plan Info 
+### Get Addon-Service Plan Info 
 
 Get specific plan for a service and its costs.
 
@@ -2449,6 +2451,109 @@ curl \
   "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
 }
 ```
+
+
+### List Addons-Attachments ##
+
+Lists all the addons for an application.
+
+`GET /apps/{appname}/addon-attachments`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/apps/app-space/addons
+```
+
+**201 "Created" Response**
+
+```json
+[
+  {
+    "addon":{
+      "actions": null,
+      "addon_service": {
+        "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+        "name": "alamo-postgresql"
+      },
+      "app": {
+        "id": "555555-2bed-4b62-bdf5-e31691fab88c",
+        "name": "sourceapp-space"
+      },
+      "config_vars": [],
+      "created_at": "2016-08-11T20:16:45.820Z",
+      "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+      "name": "a91d7641-a61e-fb09-654e-2def7c9f162d-api:alamo-postgresql-1470946605820",
+      "plan": {
+        "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+        "name": "alamo-postgresql:small"
+      }
+    },
+    "app":{
+        "id": "777777-2bed-4b62-bdf5-e31691fab88c",
+        "name": "attachedapp-space"
+    },
+    "created_at": "2016-08-11T20:16:45.820Z",
+    "updated_at": "2016-08-11T20:16:45.820Z",
+    "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
+    "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+  }
+]
+```
+
+### Get Addons-Attachments ##
+
+`GET /apps/{appname}/addon-attachments/{addon_id}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c
+```
+
+**201 "Created" Response**
+
+```json
+{
+  "addon":{
+    "actions": null,
+    "addon_service": {
+      "id":"01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+      "name":"alamo-postgresql"
+    },
+    "app": {
+      "id":"555555-2bed-4b62-bdf5-e31691fab88c",
+      "name":"sourceapp-space"
+    },
+    "config_vars": [],
+    "created_at": "2016-08-11T20:16:45.820Z",
+    "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+    "name": "a91d7641-a61e-fb09-654e-2def7c9f162d-api:alamo-postgresql-1470946605820",
+    "plan": {
+      "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+      "name": "alamo-postgresql:small"
+    }
+  },
+  "app":{
+      "id": "777777-2bed-4b62-bdf5-e31691fab88c",
+      "name": "attachedapp-space"
+  },
+  "created_at": "2016-08-11T20:16:45.820Z",
+  "updated_at": "2016-08-11T20:16:45.820Z",
+  "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
+  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+}
+```
+
+
+
+
 
 ## Regions
 

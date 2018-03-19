@@ -41,6 +41,7 @@ describe("github: ensure we can attach auto builds, submit auto builds, and remo
   const webhook201 = fs.readFileSync('./test/support/github-webhook-success-201.json').toString('utf8')
   const webhook205branch = fs.readFileSync('./test/support/github-webhook-fail-wrong-branch.json').toString('utf8')
   const webhook205type = fs.readFileSync('./test/support/github-webhook-fail-wrong-type.json').toString('utf8')
+  const webhookEmpty = fs.readFileSync('./test/support/github-webhook-empty-commit.json').toString('utf8')
 
 
   it("ensure we can create an app", async (done) => {
@@ -65,6 +66,17 @@ describe("github: ensure we can attach auto builds, submit auto builds, and remo
     }
   })
 
+  it("ensure if we cannot add an existing auto build if a hook already exists", async (done) => {
+    try {
+      let req_data = JSON.stringify({repo:"https://github.com/akkeris/controller-api", branch:"master", status_check:"true", auto_deploy:"true", username:"test", token:"existing"})
+      let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-default/builds/auto`, {"Authorization":process.env.AUTH_KEY, 'x-ignore-errors':'true'}, req_data)
+      expect(data).to.be.undefined;
+      done()
+    } catch (e) {
+      done(e)
+    }
+  })
+
   it("ensure we do not kick off a build on the wrong branch", async (done) => {
     try {
       let incoming = JSON.stringify(JSON.parse(webhook205branch))
@@ -72,6 +84,19 @@ describe("github: ensure we can attach auto builds, submit auto builds, and remo
       let headers = {'x-github-event':'push', 'x-hub-signature':hash}
       let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-default/builds/auto/github`, headers, incoming)
       expect(data.toString('utf8')).to.equal('This webhook took place on a branch that isnt of interest.')
+      done()
+    } catch (e) {
+      done(e)
+    }
+  })
+
+  it("ensure empty pushes do not cause us to fail.", async (done) => {
+    try {
+      let incoming = JSON.stringify(JSON.parse(webhookEmpty))
+      let hash = git.calculate_hash("testing", incoming)
+      let headers = {'x-github-event':'push', 'x-hub-signature':hash}
+      let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-default/builds/auto/github`, headers, incoming)
+      expect(data.toString('utf8')).to.equal('This webhook was not an event that had any affect.')
       done()
     } catch (e) {
       done(e)

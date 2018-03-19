@@ -1,0 +1,1 @@
+update previews set foreign_status_key = $2, updated = now() where preview = $1 and deleted = false returning *

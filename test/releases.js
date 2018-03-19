@@ -150,6 +150,7 @@ describe("releases: list, get, create a release", function() {
   let release_succeeded = false;
   let release_id = null;
   it("covers creating a release from the build", (done) => {
+    expect(build_id).to.be.a.string;
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/releases', alamo_headers, JSON.stringify({"slug":build_id,"description":"Deploy " + build_id}), (err, release_info) => {
       if(err) {
         console.log('release error:', err);

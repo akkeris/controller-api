@@ -15,7 +15,11 @@ begin
   end if;
 
   if (select count(*) from spaces where name = 'pipline-test-space3') = 0 then
-  	insert into spaces ( space, name ) values ( '565c9b0c-986e-455b-93c8-a146d8d49134', 'pipline-test-space3' );
+    insert into spaces ( space, name ) values ( '565c9b0c-986e-455b-93c8-a146d8d49134', 'pipline-test-space3' );
+  end if;
+
+  if (select count(*) from spaces where name = 'preview') = 0 then
+    insert into spaces ( space, name ) values ( '565c9b0c-986e-455b-93c8-a146d8d49135', 'preview' );
   end if;
 
   if (select count(*) from authorizations where "authorization" = 'fdd3793e-f9df-43c6-88d0-077dcee27b5e') = 0 then

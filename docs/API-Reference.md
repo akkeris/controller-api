@@ -2343,7 +2343,7 @@ curl \
   https://apps.akkeris.io/apps/app-space/addons
 ```
 
-**201 "Created" Response**
+**200 "OK" Response**
 
 ```json
 [
@@ -2385,7 +2385,7 @@ curl \
   https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c
 ```
 
-**201 "Created" Response**
+**200 "OK" Response**
 
 ```json
 {
@@ -2425,7 +2425,7 @@ curl \
   https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c
 ```
 
-**201 "Created" Response**
+**200 "OK" Response**
 
 ```json
 {
@@ -2468,7 +2468,7 @@ curl \
   https://apps.akkeris.io/apps/app-space/addons
 ```
 
-**201 "Created" Response**
+**200 "OK" Response**
 
 ```json
 [
@@ -2517,7 +2517,7 @@ curl \
   https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c
 ```
 
-**201 "Created" Response**
+**200 "OK" Response**
 
 ```json
 {

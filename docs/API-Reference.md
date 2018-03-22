@@ -3673,6 +3673,8 @@ The following events exist for hooks to listen to:
 * config_change
 * destroy
 * preview
+* released
+* crashed
 
 When a hook is called the URL provided is called with a POST method, the body is different depending on the event but will always have the property "action" that equals the event name. 
 
@@ -3975,6 +3977,74 @@ This event occurs when an app is destroyed permenantly.
   "space":{
     "name":"the-space"
   }
+}
+```
+
+### App Crashed Event Payload
+
+
+This event occurs when one or more dynos runs out of memory, fails to start, does not accept requests, exits prematurely or exits unexpectedly. 
+
+The crashed codes can be one of the following:
+
+* `H0 - Unknown error`, an unknown error occured and the dyno(s) were terminated. 
+* `H8 - Premature exit`, the dyno exited without an error, but failed to continuely run as expected.
+* `H9 - App did not startup`, the dyno(s) did not startup, check the dyno(s) logs for more information.
+* `H10 - App crashed`, the dyno(s) exited unexpectedly, check the dyno(s) logs for more information.
+* `H20 - App boot timeout`, the dyno did not listen to incoming requests after it started.
+* `H99 - Platform error`, an unexpected error on the platform prevented these dyno(s) from running.
+* `R14 - Memory quota exceeded`, the dyno(s) exceeded their memory limits.
+
+The `description` field contains a human readible description of the error (usually the one above).  
+The `restarts` field defines how many times the dyno(s) have been restarted or retried.
+The `dynos` array contains the dyno(s) which were affected by this event.
+
+`POST [callback end point]`
+
+```json
+{
+  "action":"crashed",
+  "app":{
+    "name":"yourappname",
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+  },
+  "space":{
+    "name":"the-space"
+  },
+  "code":"R14",
+  "description":"Memory quota exceeded",
+  "restarts":1,
+  "dynos":[
+    {
+      "type":"web",
+      "dyno":"8577193-asxdx"
+    }
+  ],
+  "crashed_at":"2017-02-05T22:16:56.616Z"
+}
+```
+
+### Released Event Payload
+
+
+This event occurs when an app has a new version and is now available for requests.  This differs from the `release` hook in that the release is the start in which a deployment begins but not when the new version is ready, running and requests are being routed to it.
+
+`POST [callback end point]`
+
+```json
+{
+  "action":"released",
+  "app":{
+    "name":"yourappname",
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+  },
+  "space":{
+    "name":"the-space"
+  },
+  "slug":{
+    "image":"registry.host.io/repo/image:tag"
+  },
+  "released_at":"2017-02-05T22:16:56.616Z"
 }
 ```
 

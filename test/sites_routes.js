@@ -32,6 +32,7 @@ describe("sites/routes", function () {
     }
 
     it("covers creating test app for sites", function(done) {
+      this.timeout(30000)
       // create an app.
       httph.request('post', 'http://localhost:5000/apps', alamo_headers,
         JSON.stringify({org:"test", space:"default", name:app_name}),
@@ -42,6 +43,7 @@ describe("sites/routes", function () {
       });
     });
     it("covers creating sites", (done) => {
+      this.timeout(30000)
         httph.request('post', 'http://localhost:5000/sites', alamo_headers, JSON.stringify({
               domain: domain1,
               owner: "owner",
@@ -61,6 +63,7 @@ describe("sites/routes", function () {
           });
     });
     it("covers listing sites", (done) => {
+      this.timeout(30000)
         httph.request('get', 'http://localhost:5000/sites', alamo_headers, null,
           (err, data) => {
             if(err) {
@@ -82,6 +85,7 @@ describe("sites/routes", function () {
           });
     });
     it("covers getting site info " + siteurl1, (done) => {
+      this.timeout(30000)
         httph.request('get', siteurl1, alamo_headers, null,
           (err, data) => {
               printErr(3, err)
@@ -94,6 +98,7 @@ describe("sites/routes", function () {
           });
     });
     it("covers creating routes", (done) => {
+      this.timeout(30000)
         let payload = {
             app: app_id,
             site: site_id,
@@ -153,6 +158,7 @@ describe("sites/routes", function () {
         });
     });
     it("covers listing routes", (done) => {
+      this.timeout(30000)
         httph.request('get', `${siteurl1}/routes`, alamo_headers, null,
           (err, data) => {
             printErr(7, err)
@@ -175,6 +181,7 @@ describe("sites/routes", function () {
     });
     
     it("covers listing routes by app", (done) => {
+      this.timeout(30000)
       httph.request('get', `http://localhost:5000/apps/${app_id}/routes`, alamo_headers, null, (err, data) => { 
         expect(err).to.be.null;
         expect(data).to.be.a('string');
@@ -183,6 +190,7 @@ describe("sites/routes", function () {
     });
 
     it("covers getting route info", (done) => {
+      this.timeout(30000)
       httph.request('get', `${siteurl1}/routes/${route_id}`, alamo_headers, null, (err, data) => {
         printErr(8, err)
         expect(err).to.be.null;
@@ -197,6 +205,7 @@ describe("sites/routes", function () {
     });
 
     it("covers ensuring routes are removed when app is deleted.", (done) => {
+      this.timeout(30000)
       // destroy the app.
       httph.request('delete', 'http://localhost:5000/apps/' + app_key, alamo_headers, null, function(err, data) {
         if(err) {
@@ -210,6 +219,7 @@ describe("sites/routes", function () {
 
 
     it("covers ensuring routes were deleted when app was removed.", (done) => {
+      this.timeout(30000)
       httph.request('get', `${siteurl1}/routes`, alamo_headers, null, (err, data) => {
         printErr(7, err)
         expect(err).to.be.null;
@@ -232,6 +242,7 @@ describe("sites/routes", function () {
     });
 
     it("covers deleting route", (done) => {
+      this.timeout(30000)
       httph.request('delete', `${siteurl1}/routes/${route_id}`, alamo_headers, null, (err, data) => {
         printErr(11, err)
         expect(err).to.be.null;
@@ -240,6 +251,7 @@ describe("sites/routes", function () {
     });
 
     it("covers ensuring route was deleted", (done) => {
+      this.timeout(30000)
       httph.request('get', `${siteurl1}/routes`, alamo_headers, null, (err, data) => {
         printErr(12, err)
         expect(err).to.be.null;
@@ -258,6 +270,7 @@ describe("sites/routes", function () {
     });
 
     it("covers ensuring we get a 404 on deleted route", (done) => {
+      this.timeout(30000)
         httph.request('get', `${siteurl1}/routes/${route_id}`, alamo_headers, null,
           (err, data) => {
               expect(err).to.be.an('object');
@@ -268,6 +281,7 @@ describe("sites/routes", function () {
     });
 
     it("covers deleting site", (done) => {
+      this.timeout(30000)
         httph.request('delete', siteurl1, alamo_headers, null, (err, data) => {
           printErr(14, err)
           expect(err).to.be.null;
@@ -276,6 +290,7 @@ describe("sites/routes", function () {
     });
 
     it("covers ensuring site was deleted", (done) => {
+      this.timeout(30000)
         httph.request('get', 'http://localhost:5000/sites', alamo_headers, null, (err, data) => {
           printErr(15, err)
           expect(err).to.be.null;
@@ -293,6 +308,7 @@ describe("sites/routes", function () {
         });
     });
     it("covers ensuring we get a 404 on deleted site", (done) => {
+      this.timeout(30000)
         httph.request('get', siteurl1, alamo_headers, null, (err, data) => {
           expect(err).to.be.an('object');
           expect(err.code).to.equal(404);

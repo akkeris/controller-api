@@ -20,6 +20,7 @@ let alamo = {
   builds:require('./lib/builds.js'),
   certificates:require('./lib/certificates.js'),
   dynos:require('./lib/dynos.js'),
+  events:require('./lib/events.js'),
   features:require('./lib/features.js'),
   formations:require('./lib/formations.js'), 
   releases:require('./lib/releases.js'), 
@@ -553,6 +554,12 @@ routes.add.post('/app-setups$')
           .run(alamo.app_setups.http.create.bind(alamo.app_setups.http.create, pg_pool))
           .and.authorization([simple_key]);
 
+
+// Events
+// listen to events
+routes.add.post('/events$')
+          .run(alamo.events.http.create.bind(alamo.events.http.create, pg_pool))
+          .and.authorization([simple_key]);
 
 
 routes.add.default((req, res) => {

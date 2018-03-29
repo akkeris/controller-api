@@ -1,6 +1,6 @@
 {
-  "name": "alamo-app-controller",
-  "version": "1.0.2",
+  "name": "akkeris-controller-api",
+  "version": "3.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {

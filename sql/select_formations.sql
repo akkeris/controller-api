@@ -7,7 +7,6 @@ select
   formations.quantity,
   formations.size,
   formations.type,
-  formations.command,
   formations.port,
   formations.updated,
   formations.healthcheck

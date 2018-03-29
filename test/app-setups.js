@@ -143,6 +143,9 @@ describe("app-setups:", function() {
           "token":"fugazi"
         }
       ],
+      "features":[
+        {"name":"auto-release","enabled":true,"id":"8e7ec5d2-c410-4d04-8d5e-db7746c40b44"}
+      ],
       "pipeline-couplings": [],
       "sites": {}
     }

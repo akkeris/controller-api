@@ -50,6 +50,9 @@ curl \
      "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
      "name":"akkeris"
   },
+  "preview":{
+    "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
+  },
   "region":{  
      "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621",
      "name":"us-seattle"
@@ -324,6 +327,49 @@ curl \
   "updated_at":"2016-07-18T14:55:38.190Z",
   "web_url":"https://events-perf-dev-us.alamoapp.akkeris.io"
 }
+```
+
+### List App Previews
+
+`GET /apps/{appname}/previews`
+
+Preview apps are forked applications that are running a feature branch of code proposed to be merged into the source application.
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/apps/events-perf-dev/previews
+```
+
+**200 "OK" Response**
+
+```json
+[
+  {
+    "id":"6115216c-d683-060a-a133-ff7707758311",
+    "app":{
+      "id":"73764651-4cf7-11e6-beb8-1121128ca377"
+    },
+    "source":{
+      "app":{
+        "id":"4f739e5e-4cf7-11e6-beb8-9e71128cae77",
+        "name":"events-perf-dev"
+      },
+      "app-setup":{
+        "id":"55739e5e-4cf7-1155-beb8-9e711222ae11"
+      },
+      "trigger":{
+        "type":"github-pull-request",
+        "id":"feature-branch-name"
+      }
+    },
+    "created_at":"2016-07-18T14:55:38.190Z",
+    "updated_at":"2016-07-18T14:55:38.190Z"
+  }
+]
 ```
 
 
@@ -1640,6 +1686,112 @@ curl \
 }
 ```
 
+
+## Features
+
+Features are capabilities you'd like to enable on an application.  Features are binary, in other words, they can only be enabled or disabled. Each feautre may be enabled or disabled by default when an app is created or they may be automatically enabled by other actions taken on an application.
+
+Features can include auto-releasing when a build is created, or creating preview applications.
+
+### Enable or Disable Features
+
+`PATCH /apps/{appname}/features/{feature}`
+
+Updates the specified feature, it should contain only one key `{"enabled":true}` to enable it, or `{"enabled":false}` to disable it.
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X PATCH \
+  https://apps.akkeris.io/apps/app-space/features/auto-release
+  -d '{"enabled":false}'
+```
+
+**200 "Updated" Response**
+
+```json
+{
+  "description":"When the application receives a new build whether or not it should automatically release the build.",
+  "doc_url":"/features/auto-release",
+  "id":"8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
+  "state":"public",
+  "name":"auto-release",
+  "display_name":"Auto release builds",
+  "feedback_email":"cobra@octanner.com",
+  "enabled":false
+}
+```
+
+### List All Features
+
+`GET /apps/{appname}/features`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/apps/app-space/features
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "description":"When the application receives a new build whether or not it should automatically release the build.",
+  "doc_url":"/features/auto-release",
+  "id":"8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
+  "state":"public",
+  "name":"auto-release",
+  "display_name":"Auto release builds",
+  "feedback_email":"cobra@octanner.com",
+  "enabled":false
+},
+{
+  "description":"When a pull request is received, automatically create a preview site and applicaiton (web dyno only) with the same config as the development application.",
+  "doc_url":"/features/preview",
+  "id":"8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
+  "state":"beta",
+  "name":"preview",
+  "display_name":"Preview Apps",
+  "feedback_email":"cobra@octanner.com",
+  "enabled":true
+}
+```
+
+
+### Get A Feature
+
+`GET /apps/{appname}/features/{feature}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/apps/app-space/features/auto-release
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "description":"When the application receives a new build whether or not it should automatically release the build.",
+  "doc_url":"/features/auto-release",
+  "id":"8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
+  "state":"public",
+  "name":"auto-release",
+  "display_name":"Auto release builds",
+  "feedback_email":"cobra@octanner.com",
+  "enabled":false
+}
+```
+
+
 ## Spaces
 
 All applications must exist in a space, spaces provide a network level isolation for a group of applications, in addition they allow developer to set "space-level" environment variables that are included in every app that is launched in the space.  This can be useful for network discovery of other applications, low latency isolation between related apps, to provide a secure boundary for dev, qa, etc environments and allow for auto-discovery of other services through space-level environment variables.  
@@ -1913,13 +2065,15 @@ curl \
 ```
 
 
-## Services
+## Services, Addons and Attachments
 
-Services are any external or internal capabilities that can be added to an application. Each service has an associated plan, each plan can be created and attached to an application as an "addon". Once an addon is created the relevant configuration variables are automatically placed in the application on start up.  
+Services (or addon-services) are any external or internal capabilities that can be added to an application. Each service has an associated plan, each plan can be created and attached to an application as an "addon". Once an addon is created the relevant configuration variables are automatically placed in the application on start up via new environment variables.  
 
 For example, alamo-postgresql is a service provided, it has plans that can be chosen through``/addon-services/alamo-postgresql/plans``, the selected plan can be then added to an application through``/apps/{appname}/addons``, the created or provisioned database can also be attached to other applications through``/apps/{appname}/addon-attachments``end point. All services can be queried through the``/addon-services``URI.
 
-### List Addon Services ##
+Attached addons differ from addons in that attachments are addons that are owned by another application and attached or shared to another application, these cannot be controlled or deleted by the attached application or those with access to the application with the attachment, only the owner of the addon may do this.
+
+### List Addon-Services ##
 
 Lists all addons services (postgres, redis, etc). 
 
@@ -1965,7 +2119,7 @@ curl \
 ]
 ```
 
-### Get Addon Service Info ##
+### Get Addon-Service Info ##
 
 Get information on a specific service (although not the plan details)
 
@@ -1997,7 +2151,7 @@ curl \
 }
 ```
 
-### List Addon Service Plans ##
+### List Addon-Service Plans ##
 
 Get all plans for a service and their costs.
 
@@ -2085,7 +2239,7 @@ curl \
 ]
 ```
 
-### Get Addon Service Plan Info 
+### Get Addon-Service Plan Info 
 
 Get specific plan for a service and its costs.
 
@@ -2189,7 +2343,7 @@ curl \
   https://apps.akkeris.io/apps/app-space/addons
 ```
 
-**201 "Created" Response**
+**200 "OK" Response**
 
 ```json
 [
@@ -2231,7 +2385,7 @@ curl \
   https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c
 ```
 
-**201 "Created" Response**
+**200 "OK" Response**
 
 ```json
 {
@@ -2271,7 +2425,7 @@ curl \
   https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c
 ```
 
-**201 "Created" Response**
+**200 "OK" Response**
 
 ```json
 {
@@ -2297,6 +2451,109 @@ curl \
   "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
 }
 ```
+
+
+### List Addons-Attachments ##
+
+Lists all the addons for an application.
+
+`GET /apps/{appname}/addon-attachments`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/apps/app-space/addons
+```
+
+**200 "OK" Response**
+
+```json
+[
+  {
+    "addon":{
+      "actions": null,
+      "addon_service": {
+        "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+        "name": "alamo-postgresql"
+      },
+      "app": {
+        "id": "555555-2bed-4b62-bdf5-e31691fab88c",
+        "name": "sourceapp-space"
+      },
+      "config_vars": [],
+      "created_at": "2016-08-11T20:16:45.820Z",
+      "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+      "name": "a91d7641-a61e-fb09-654e-2def7c9f162d-api:alamo-postgresql-1470946605820",
+      "plan": {
+        "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+        "name": "alamo-postgresql:small"
+      }
+    },
+    "app":{
+        "id": "777777-2bed-4b62-bdf5-e31691fab88c",
+        "name": "attachedapp-space"
+    },
+    "created_at": "2016-08-11T20:16:45.820Z",
+    "updated_at": "2016-08-11T20:16:45.820Z",
+    "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
+    "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+  }
+]
+```
+
+### Get Addons-Attachments ##
+
+`GET /apps/{appname}/addon-attachments/{addon_id}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "addon":{
+    "actions": null,
+    "addon_service": {
+      "id":"01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+      "name":"alamo-postgresql"
+    },
+    "app": {
+      "id":"555555-2bed-4b62-bdf5-e31691fab88c",
+      "name":"sourceapp-space"
+    },
+    "config_vars": [],
+    "created_at": "2016-08-11T20:16:45.820Z",
+    "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+    "name": "a91d7641-a61e-fb09-654e-2def7c9f162d-api:alamo-postgresql-1470946605820",
+    "plan": {
+      "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+      "name": "alamo-postgresql:small"
+    }
+  },
+  "app":{
+      "id": "777777-2bed-4b62-bdf5-e31691fab88c",
+      "name": "attachedapp-space"
+  },
+  "created_at": "2016-08-11T20:16:45.820Z",
+  "updated_at": "2016-08-11T20:16:45.820Z",
+  "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
+  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+}
+```
+
+
+
+
 
 ## Regions
 
@@ -3415,6 +3672,9 @@ The following events exist for hooks to listen to:
 * addon_change
 * config_change
 * destroy
+* preview
+* released
+* crashed
 
 When a hook is called the URL provided is called with a POST method, the body is different depending on the event but will always have the property "action" that equals the event name. 
 
@@ -3548,6 +3808,52 @@ The occurs when there is a scale event or a new formation type is created.
 }
 ```
 
+### Preview App Created Event Payload
+
+The occurs when a forked preview app is created.
+
+`POST [callback end point]`
+
+```json
+{
+  "action":"preview",
+  "app":{
+    "name":"yourappname",
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+  },
+  "space":{
+    "name":"the-space"
+  },
+  "change":"create",
+  "preview":{
+    "app":{
+      "name":"youraabcdef",
+      "id":"865bac4b-6a5e-09e1-ef3a-08084a904622"
+    },
+    "app_setup":{
+      "id":"335bac4b-6a5e-09e1-ef3a-08084a904611",
+      "created_at":"2016-08-11T20:16:45.820Z",
+      "updated_at":"2016-08-11T20:16:45.820Z",
+      "app":{
+        "id":"865bac4b-6a5e-09e1-ef3a-08084a904622",
+        "name":"youraabcdef"
+      },
+      "build":{
+        "id":null,
+        "status":"queued",
+        "output_stream_url":null
+      },
+      "progress":0,
+      "status":"pending",
+      "failure_message":"",
+      "manifest_errors":[],
+      "postdeploy":null,
+      "resolved_success_url":null
+    }
+  }
+}
+```
+
 ### Log Drain Change Event Payload
 
 The occurs when there is a change (addition or removal of log drains).
@@ -3671,6 +3977,74 @@ This event occurs when an app is destroyed permenantly.
   "space":{
     "name":"the-space"
   }
+}
+```
+
+### App Crashed Event Payload
+
+
+This event occurs when one or more dynos runs out of memory, fails to start, does not accept requests, exits prematurely or exits unexpectedly. 
+
+The crashed codes can be one of the following:
+
+* `H0 - Unknown error`, an unknown error occured and the dyno(s) were terminated. 
+* `H8 - Premature exit`, the dyno exited without an error, but failed to continuely run as expected.
+* `H9 - App did not startup`, the dyno(s) did not startup, check the dyno(s) logs for more information.
+* `H10 - App crashed`, the dyno(s) exited unexpectedly, check the dyno(s) logs for more information.
+* `H20 - App boot timeout`, the dyno did not listen to incoming requests after it started.
+* `H99 - Platform error`, an unexpected error on the platform prevented these dyno(s) from running.
+* `R14 - Memory quota exceeded`, the dyno(s) exceeded their memory limits.
+
+The `description` field contains a human readible description of the error (usually the one above).  
+The `restarts` field defines how many times the dyno(s) have been restarted or retried.
+The `dynos` array contains the dyno(s) which were affected by this event.
+
+`POST [callback end point]`
+
+```json
+{
+  "action":"crashed",
+  "app":{
+    "name":"yourappname",
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+  },
+  "space":{
+    "name":"the-space"
+  },
+  "code":"R14",
+  "description":"Memory quota exceeded",
+  "restarts":1,
+  "dynos":[
+    {
+      "type":"web",
+      "dyno":"8577193-asxdx"
+    }
+  ],
+  "crashed_at":"2017-02-05T22:16:56.616Z"
+}
+```
+
+### Released Event Payload
+
+
+This event occurs when an app has a new version and is now available for requests.  This differs from the `release` hook in that the release is the start in which a deployment begins but not when the new version is ready, running and requests are being routed to it.
+
+`POST [callback end point]`
+
+```json
+{
+  "action":"released",
+  "app":{
+    "name":"yourappname",
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+  },
+  "space":{
+    "name":"the-space"
+  },
+  "slug":{
+    "image":"registry.host.io/repo/image:tag"
+  },
+  "released_at":"2017-02-05T22:16:56.616Z"
 }
 ```
 

@@ -1,0 +1,1 @@
+update sites set preview=$2 where site=$1

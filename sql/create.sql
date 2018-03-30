@@ -373,7 +373,7 @@ begin
     hook uuid not null primary key,
     events text,
     app uuid references apps("app"),
-    url url_path not null,
+    url href not null,
     secret varchar(128) not null,
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
@@ -385,7 +385,7 @@ begin
     hook_result uuid not null primary key,
     hook uuid references hooks("hook"),
     events text,
-    url url_path not null,
+    url href not null,
     response_code int not null,
     response_headers text,
     response_body text,
@@ -539,6 +539,22 @@ begin
               AND column_name = 'region'
               and data_type = 'character varying') then
     alter table spaces drop column region;
+  end if;
+
+  if exists (SELECT NULL 
+              FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE table_name = 'hooks'
+              AND column_name = 'url'
+              and domain_name = 'url_path') then
+    alter table hooks alter column url type href;
+  end if;
+
+  if exists (SELECT NULL 
+              FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE table_name = 'hook_results'
+              AND column_name = 'url'
+              and domain_name = 'url_path') then
+    alter table hook_results alter column url type href;
   end if;
 
   if not exists( SELECT NULL

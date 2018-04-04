@@ -34,13 +34,86 @@ describe("features: ensure we can set and get app features", function() {
       let f = arr.filter((x) => x.name === "auto-release")
       expect(f.length).to.equal(1)
       check_feature(f[0])
-      expect(f[0].enabled).to.equal(false)
+      expect(f[0].enabled).to.equal(true)
       done();
     });
   });
 
 
   it("covers getting feature", (done) => {
+    httph.request('get', 'http://localhost:5000/apps/api-default/features/auto-release', alamo_headers, null, 
+    (err, data) => {
+      if(err) {
+        console.log(err);
+      } 
+      expect(err).to.be.null
+      expect(data).to.be.a('string')
+      let arr = JSON.parse(data)
+      expect(arr).to.be.an('object')
+      check_feature(arr)
+      expect(arr.name).to.equal("auto-release")
+      expect(arr.enabled).to.equal(true)
+      done();
+    });
+  });
+
+
+  
+  it("covers enabling feature", (done) => {
+    httph.request('patch', 'http://localhost:5000/apps/api-default/features/auto-release', alamo_headers, {"enabled":false}, 
+    (err, data) => {
+      if(err) {
+        console.log(err);
+      } 
+      expect(err).to.be.null
+      expect(data).to.be.a('string')
+      let arr = JSON.parse(data)
+      expect(arr).to.be.an('object')
+      check_feature(arr)
+      expect(arr.name).to.equal("auto-release")
+      expect(arr.enabled).to.equal(false)
+      done();
+    });
+  });
+
+
+  it("covers listing features (disabled)", (done) => {
+    httph.request('get', 'http://localhost:5000/apps/api-default/features', alamo_headers, null, 
+    (err, data) => {
+      if(err) {
+        console.log(err);
+      } 
+      expect(err).to.be.null;
+      expect(data).to.be.a('string');
+      let arr = JSON.parse(data);
+      expect(arr).to.be.an('array');
+      let f = arr.filter((x) => x.name === "auto-release")
+      expect(f.length).to.equal(1)
+      check_feature(f[0])
+      expect(f[0].enabled).to.equal(false)
+      done();
+    });
+  });
+
+
+  it("covers disabling feature again", (done) => {
+    httph.request('patch', 'http://localhost:5000/apps/api-default/features/auto-release', alamo_headers, {"enabled":false}, 
+    (err, data) => {
+      if(err) {
+        console.log(err);
+      } 
+      expect(err).to.be.null
+      expect(data).to.be.a('string')
+      let arr = JSON.parse(data)
+      expect(arr).to.be.an('object')
+      check_feature(arr)
+      expect(arr.name).to.equal("auto-release")
+      expect(arr.enabled).to.equal(false)
+      done();
+    });
+  });
+
+  it("covers getting features (enabled)", (done) => {
     httph.request('get', 'http://localhost:5000/apps/api-default/features/auto-release', alamo_headers, null, 
     (err, data) => {
       if(err) {
@@ -95,79 +168,6 @@ describe("features: ensure we can set and get app features", function() {
     });
   });
 
-
-  it("covers enabling feature again", (done) => {
-    httph.request('patch', 'http://localhost:5000/apps/api-default/features/auto-release', alamo_headers, {"enabled":true}, 
-    (err, data) => {
-      if(err) {
-        console.log(err);
-      } 
-      expect(err).to.be.null
-      expect(data).to.be.a('string')
-      let arr = JSON.parse(data)
-      expect(arr).to.be.an('object')
-      check_feature(arr)
-      expect(arr.name).to.equal("auto-release")
-      expect(arr.enabled).to.equal(true)
-      done();
-    });
-  });
-
-  it("covers getting features (enabled)", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/api-default/features/auto-release', alamo_headers, null, 
-    (err, data) => {
-      if(err) {
-        console.log(err);
-      } 
-      expect(err).to.be.null
-      expect(data).to.be.a('string')
-      let arr = JSON.parse(data)
-      expect(arr).to.be.an('object')
-      check_feature(arr)
-      expect(arr.name).to.equal("auto-release")
-      expect(arr.enabled).to.equal(true)
-      done();
-    });
-  });
-
-
-  
-  it("covers disabling feature", (done) => {
-    httph.request('patch', 'http://localhost:5000/apps/api-default/features/auto-release', alamo_headers, {"enabled":false}, 
-    (err, data) => {
-      if(err) {
-        console.log(err);
-      } 
-      expect(err).to.be.null
-      expect(data).to.be.a('string')
-      let arr = JSON.parse(data)
-      expect(arr).to.be.an('object')
-      check_feature(arr)
-      expect(arr.name).to.equal("auto-release")
-      expect(arr.enabled).to.equal(false)
-      done();
-    });
-  });
-
-
-  it("covers listing features (disabled)", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/api-default/features', alamo_headers, null, 
-    (err, data) => {
-      if(err) {
-        console.log(err);
-      } 
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let arr = JSON.parse(data);
-      expect(arr).to.be.an('array');
-      let f = arr.filter((x) => x.name === "auto-release")
-      expect(f.length).to.equal(1)
-      check_feature(f[0])
-      expect(f[0].enabled).to.equal(false)
-      done();
-    });
-  });
-
   
   it("covers disabling feature again", (done) => {
     httph.request('patch', 'http://localhost:5000/apps/api-default/features/auto-release', alamo_headers, {"enabled":false}, 
@@ -210,6 +210,23 @@ describe("features: ensure we can set and get app features", function() {
       expect(err).to.be.an('object')
       expect(err.code).to.equal(404)
       expect(data).to.be.null
+      done();
+    });
+  });
+
+  it("covers enabling feature again", (done) => {
+    httph.request('patch', 'http://localhost:5000/apps/api-default/features/auto-release', alamo_headers, {"enabled":true}, 
+    (err, data) => {
+      if(err) {
+        console.log(err);
+      } 
+      expect(err).to.be.null
+      expect(data).to.be.a('string')
+      let arr = JSON.parse(data)
+      expect(arr).to.be.an('object')
+      check_feature(arr)
+      expect(arr.name).to.equal("auto-release")
+      expect(arr.enabled).to.equal(true)
       done();
     });
   });

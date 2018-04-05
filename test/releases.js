@@ -184,6 +184,33 @@ describe("releases: list, get, create a release", function() {
     },1000);
   });
 
+  it("covers putting up and taking down maintenance pages", async function(done) {
+      try {
+          var payload = {}
+          payload.maintenance = true
+          let maint_info_on = JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default`, alamo_headers, JSON.stringify(payload)))
+          expect(maint_info_on.maintenance).to.equal(true)
+          let actual_page = await httph.request('get', `${maint_info_on.web_url}`, null)
+          expect(actual_page).to.contain("System Maintenance")
+          payload.maintenance = false
+          let maint_info_off = JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default`, alamo_headers, JSON.stringify(payload)))
+          expect(maint_info_off.maintenance).to.equal(false)
+          setTimeout(function() {
+              wait_for_app_content(httph, appname_brand_new, 'hello', (wait_app_err, resp) => {
+                  if (wait_app_err) {
+                      console.log('waiting for app err:', wait_app_err);
+                  }
+                  // ensure we get the response "hello", so we know its our app that turned up.
+                  expect(resp).to.equal('hello');
+                  expect(wait_app_err).to.be.null;
+                  done();
+              });
+          }, 10000);
+      } catch (e) {
+          done(e)
+      }
+  })
+
   it("ensure we can restart the app", (done) => {
     expect(release_succeeded).to.equal(true);
     // ensure we can restart the app.

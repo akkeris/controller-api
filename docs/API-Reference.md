@@ -1,3 +1,20 @@
+# Overview
+
+The Platform Apps API empowers developers to build, extend and combine Akkeris functionality with other services, tooling and systems. You can use this API to programmatically create apps, provision add-ons, promote pipelines and any other tasks you can complete with the CLI or UI. In-fact the CLI and UI use this API for all of their interactions, commands and operations.
+
+## Authentication
+
+OAuth should be used to authorize and revoke access to your account to yourself and third parties. You can either setup a new OAuth2 application with the Akkeris Auth API to retrieve tokens dynamically from end users or may use your own personal access token to authenticate against this API.  To setup a service others can use, see the article Auth API.
+
+For personal scripts you may use your personal access token, note that you should never give this token to anyone. To get a personal access token run `aka token`, this value is along string of numbers and letters similar to `2173f7b4a07be08543e113a47c33b617771f5329`.  This is your bearer token that can be passed in to the `Authorization` header to authenticate any request.  
+
+```bash
+curl -H "Authorization: Bearer `aka token`" https://apps.akkeris.io/apps
+```
+
+> **tip**
+> Remember to replace `apps.akkeris.io` with your Akkeris API host.
+
 
 ## Apps
 
@@ -1273,6 +1290,53 @@ curl \
 
 This is returned when the builds sources are unavialable (they've been archived or otherwise unavailable).  Periodically sources for builds will be archived or removed from our build repository. In this case, a build must be submitted from scratch.
 
+
+### View Slug Details
+
+A slug is an image produced by build, a slug may be associated as running on one or more applications at any point in time using pipeline promotions.  Slugs are therefore unassociated with a specific application and have their own unique end point.  However slugs do return the near same structure as builds.
+
+`GET /slugs/{slug_uuid}`
+
+Fetch information on a specific slug.
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X POST \
+  https://apps.akkeris.io/slugs/999b5ce9-b60c-42c4-bca5-e442cd86df78
+```
+
+**200 "OK" Response**
+
+```json
+{  
+  "app":{  
+    "id":"4f739e5e-4cf7-11e6-beb8-9e71128cae77"
+  },
+  "buildpacks":null,
+  "created_at":"2016-07-18T19:34:07.740Z",
+  "id":"999b5ce9-b60c-42c4-bca5-e442cd86df78",
+  "output_stream_url":"/apps/app-space/builds/999b5ce9-b60c-42c4-bca5-e442cd86df78/result",
+  "source_blob":{  
+    "checksum":"sha256:b0cef53230ead3fb08b2b82d8f933a5a611fbabf416b2117d6896c7f5bde57b8",
+    "url":"",
+    "version":"v1.0",
+    "commit":"123456"
+  },
+  "release":null,
+  "slug":{  
+    "id":"999b5ce9-b60c-42c4-bca5-e442cd86df78"
+  },
+  "status":"succeeded",
+  "updated_at":"2016-07-18T19:36:56.609Z",
+  "user":{  
+    "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
+    "email":""
+  }
+}
+```
 
 
 ## Releases

@@ -3,37 +3,38 @@
 ## Setting Up ##
 
 ### Storage 
-* **DATABASE_URL** - The database url to store build, release information.  This has no default.  Must be a postgres 9.5+ instance. See create.sql in sql folder for creating the tables and schema.
+* `DATABASE_URL` - The database url to store build, release information.  This has no default.  Must be a postgres 9.5+ instance. See create.sql in sql folder for creating the tables and schema.
 
 ### Security
-* AUTH_KEY - A shared secret simple authentication, this should be used in all API calls in the Authorization header.
-* ENCRYPT_KEY - A private key used to encrypt secretive information in postgres.  This has no default.
-* BLACKLIST_ENV - A comma delimited list of socs keywords causing config vars to be redacted, defaults to 'PASS,KEY,SECRET,PRIVATE,TOKEN'
-* APPKIT_API_URL - Public URI (https://somehost/) for the appkit api in front of this api, generally appkit api url that handles user account/authorization (defaults to http://localhost:5000)
-* APPKIT_UI_URL - Public URI (https://somehost/) for the appkit ui used by developers.
+* `AUTH_KEY` - A shared secret simple authentication, this should be used in all API calls in the Authorization header.
+* `ENCRYPT_KEY` - A private key used to encrypt secretive information in postgres.  This has no default.
+* `BLACKLIST_ENV` - A comma delimited list of socs keywords causing config vars to be redacted, defaults to 'PASS,KEY,SECRET,PRIVATE,TOKEN'
+* `APPKIT_API_URL` - Public URI (https://somehost/) for the appkit api in front of this api, generally appkit api url that handles user account/authorization (defaults to http://localhost:5000)
+* `APPKIT_UI_URL` - Public URI (https://somehost/) for the appkit ui used by developers.
 
 ### Build Information
-* BUILD_SHUTTLE_URL - The build shuttle is a small footprint API that manages specific build system such as jenkins. (see https://github.com/akkeris/buildshuttle).  This has no default.
-
+* `BUILD_SHUTTLE_URL` - The build shuttle is a small footprint API that manages specific build system such as jenkins. (see https://github.com/akkeris/buildshuttle).  This has no default.
+* `DEFAULT_GITHUB_USERNAME` - When watching github source control, use this default username if none is provided.  (should be set with `DEFAULT_GITHUB_TOKEN`)
+* `DEFAULT_GITHUB_TOKEN` - When watching github source control, use this default token if none is provided. (should be set with `DEFAULT_GITHUB_USERNAME`)
 
 ### Deployment Information
-* ALAMO_APP_CONTROLLER_URL - The API url for this host, defaults to http://localhost:5000
-* [STACKNAME]_STACK_API - The URI for the stack api by the name of STACKNAME, for example if a stack exists called FOO the uri for the stack api must be set at FOO_STACK_API
-* [REGIONNAME]_REGION_API - The URI for the regional api by the name of REGIONNAME, for example if a region exists called us-seattle the uri for the stack api must be set at US_SEATTLE_REGION_API
-* DOCKER_REGISTRY_HOST - The host for storing image sources. E.g., docker.hostname.com, This has no default.
-* DOCKER_REPO - The repo in DOCKER_REGISTRY_HOST to store gold master build images (changing this also requires changing jenkins_build_template.xml and existing build templates in jenkins). This has no default.
+* `ALAMO_APP_CONTROLLER_URL` - The API url for this host, defaults to http://localhost:5000
+* `[STACKNAME]_STACK_API` - The URI for the stack api by the name of STACKNAME, for example if a stack exists called FOO the uri for the stack api must be set at FOO_STACK_API
+* `[REGIONNAME]_REGION_API` - The URI for the regional api by the name of REGIONNAME, for example if a region exists called us-seattle the uri for the stack api must be set at US_SEATTLE_REGION_API
+* `DOCKER_REGISTRY_HOST` - The host for storing image sources. E.g., docker.hostname.com, This has no default.
+* `DOCKER_REPO` - The repo in DOCKER_REGISTRY_HOST to store gold master build images (changing this also requires changing jenkins_build_template.xml and existing build templates in jenkins). This has no default.
 
 
 ### Logging & Metric Information
-* PROMETHEUS_METRICS_URL - The url to connect to for metric information stored in prometheus. This has no default.
-* LOG_SHUTTLE_URL - The log shuttle url for log drains (https://github.com/akkeris/logshuttle). This has no default.
-* LOG_SESSION_URL - The log session url for log sessions (https://github.com/akkeris/logshuttle). This has no default.
-* INFLUXDB_METRICS_URL - The URL to the influxdb that holds running metrics for service, count and other http information. This has no default.
+* `PROMETHEUS_METRICS_URL` - The url to connect to for metric information stored in prometheus. This has no default.
+* `LOG_SHUTTLE_URL` - The log shuttle url for log drains (https://github.com/akkeris/logshuttle). This has no default.
+* `LOG_SESSION_URL` - The log session url for log sessions (https://github.com/akkeris/logshuttle). This has no default.
+* `INFLUXDB_METRICS_URL` - The URL to the influxdb that holds running metrics for service, count and other http information. This has no default.
 
 ### Addon Envs
-* TWILIO_AUTH_KEY - The master sid:token for the twilio account.
-* ANOMALY_METRICS_DRAIN - The syslog drain end point for the opentsdb custom metrics collector. This has no default.
-* PAPERTRAIL_DRAIN - The syslog standard drain end point for papertrail.  This has no default.
+* `TWILIO_AUTH_KEY` - The master sid:token for the twilio account.
+* `ANOMALY_METRICS_DRAIN` - The syslog drain end point for the opentsdb custom metrics collector. This has no default.
+* `PAPERTRAIL_DRAIN` - The syslog standard drain end point for papertrail.  This has no default.
 
 ## Installing ##
 

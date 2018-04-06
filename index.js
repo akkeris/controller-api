@@ -174,6 +174,11 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/builds$')
           .run(alamo.builds.http.list.bind(alamo.builds.http.list, pg_pool))
           .and.authorization([simple_key]);
 
+// slugs
+routes.add.get('/slugs/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.builds.http.get_slug.bind(alamo.builds.http.get_slug, pg_pool))
+          .and.authorization([simple_key]);
+
 // -- auto build with github, get and post. should github be mounted to auto?
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto$')
           .run(alamo.git.autobuild.bind(alamo.git.autobuild, pg_pool))

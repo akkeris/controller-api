@@ -2512,7 +2512,7 @@ Lists all the addons for an application.
 curl \
   -H 'Authorization: ...' \
   -X GET \
-  https://apps.akkeris.io/apps/app-space/addons
+  https://apps.akkeris.io/apps/app-space/addon-attachments
 ```
 
 **200 "OK" Response**
@@ -2561,7 +2561,7 @@ curl \
 curl \
   -H 'Authorization: ...' \
   -X GET \
-  https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c
+  https://apps.akkeris.io/apps/app-space/addon-attachments/5feef9bb-2bed-4b62-bdf5-e31691fab88c
 ```
 
 **200 "OK" Response**
@@ -2598,7 +2598,53 @@ curl \
 }
 ```
 
+### Attach Addons ##
 
+`POST /apps/{appname}/addon-attachments`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X POST \
+  https://apps.akkeris.io/apps/app-space/addon-attachments
+  -d '{"addon":"5feef9bb-2bed-4b62-bdf5-e31691fab88c", "app":"app-space"}'
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "addon":{
+    "actions": null,
+    "addon_service": {
+      "id":"01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+      "name":"alamo-postgresql"
+    },
+    "app": {
+      "id":"555555-2bed-4b62-bdf5-e31691fab88c",
+      "name":"sourceapp-space"
+    },
+    "config_vars": [],
+    "created_at": "2016-08-11T20:16:45.820Z",
+    "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+    "name": "a91d7641-a61e-fb09-654e-2def7c9f162d-api:alamo-postgresql-1470946605820",
+    "plan": {
+      "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+      "name": "alamo-postgresql:small"
+    }
+  },
+  "app":{
+      "id": "777777-2bed-4b62-bdf5-e31691fab88c",
+      "name": "attachedapp-space"
+  },
+  "created_at": "2016-08-11T20:16:45.820Z",
+  "updated_at": "2016-08-11T20:16:45.820Z",
+  "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
+  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+}
+```
 
 
 
@@ -3897,7 +3943,8 @@ The occurs when a forked preview app is created.
       "postdeploy":null,
       "resolved_success_url":null
     }
-  }
+  },
+  "sites":[]
 }
 ```
 

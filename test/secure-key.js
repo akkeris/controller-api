@@ -85,14 +85,17 @@ describe("secure keys: creating, attaching and deleting", function() {
 
   let first_app = "alamotestsk" + Math.floor(Math.random() * 10000)
   let second_app = "alamotestsk" + Math.floor(Math.random() * 10000)
-
+  let unique_var1 = Math.random().toString()
+  let unique_var2 = Math.random().toString()
 
   it("covers creating test apps", async (done) => {
     try {
       await request('post', 'http://localhost:5000/apps', alamo_headers, JSON.stringify({org:"test", space:"preview", name:first_app}))
       await request('post', `http://localhost:5000/apps/${first_app}-preview/formation`, alamo_headers, JSON.stringify({"type":"web","port":2000}))
+      await request('patch', `http://localhost:5000/apps/${first_app}-preview/config-vars`, alamo_headers, JSON.stringify({"KEEP_ME":unique_var1}))
       await request('post', 'http://localhost:5000/apps', alamo_headers, JSON.stringify({org:"test", space:"preview", name:second_app}))
       await request('post', `http://localhost:5000/apps/${second_app}-preview/formation`, alamo_headers, JSON.stringify({"type":"web","port":2000}))
+      await request('patch', `http://localhost:5000/apps/${second_app}-preview/config-vars`, alamo_headers, JSON.stringify({"KEEP_ME":unique_var2}))
       done()
     } catch (e) {
       done(e)
@@ -115,6 +118,7 @@ describe("secure keys: creating, attaching and deleting", function() {
     try {
       let config_vars = JSON.parse(await request('get', `http://localhost:5000/apps/${first_app}-preview/config-vars`, alamo_headers, null))
       expect(config_vars.SECURE_KEY).to.equal(addon.config_vars.SECURE_KEY)
+      expect(config_vars.KEEP_ME).to.equal(unique_var1)
       done()
     } catch (e) {
       done(e)
@@ -132,6 +136,7 @@ describe("secure keys: creating, attaching and deleting", function() {
       let release_info2 = JSON.parse(await request('post', `http://localhost:5000/apps/${second_app}-preview/releases`, alamo_headers, JSON.stringify({"slug":build_info2.id, "description":"secure key test"})))
       let content = JSON.parse(await wfc(httph, `${first_app}-preview`))
       expect(content.SECURE_KEY).to.equal(addon.config_vars.SECURE_KEY)
+      expect(content.KEEP_ME).to.equal(unique_var1)
       done()
     } catch (e) {
       done(e)
@@ -142,6 +147,7 @@ describe("secure keys: creating, attaching and deleting", function() {
     try {
       let config_vars = JSON.parse(await request('get', `http://localhost:5000/apps/${second_app}-preview/config-vars`, alamo_headers, null))
       expect(config_vars.SECURE_KEY).to.be.undefined;
+      expect(config_vars.KEEP_ME).to.equal(unique_var2)
       done()
     } catch (e) {
       done(e)
@@ -154,6 +160,7 @@ describe("secure keys: creating, attaching and deleting", function() {
       addon_attachment = JSON.parse(await request('post', `http://localhost:5000/apps/${second_app}-preview/addon-attachments`, alamo_headers, JSON.stringify({"addon":addon.name, "app":`${second_app}-preview`, "force":true, "name":"securekey"})))
       let config_vars = JSON.parse(await request('get', `http://localhost:5000/apps/${second_app}-preview/config-vars`, alamo_headers, null))
       expect(config_vars.SECURE_KEY).to.equal(addon.config_vars.SECURE_KEY)
+      expect(config_vars.KEEP_ME).to.equal(unique_var2)
       done()
     } catch (e) {
       done(e)
@@ -169,6 +176,8 @@ describe("secure keys: creating, attaching and deleting", function() {
       let config_vars2 = JSON.parse(await request('get', `http://localhost:5000/apps/${first_app}-preview/config-vars`, alamo_headers, null))
       expect(config_vars.SECURE_KEY).to.not.equal(addon.config_vars.SECURE_KEY)
       expect(config_vars.SECURE_KEY).to.equal(config_vars2.SECURE_KEY)
+      expect(config_vars2.KEEP_ME).to.equal(unique_var1)
+      expect(config_vars.KEEP_ME).to.equal(unique_var2)
       let secondary1 = addon.config_vars.SECURE_KEY.split(",")[0]
       let primary2 = config_vars.SECURE_KEY.split(",")[1]
       expect(secondary1).to.equal(primary2)

@@ -102,9 +102,9 @@ describe("secure keys: creating, attaching and deleting", function() {
   let addon = null
   it("covers provisioning secure keys", async (done) => {
     try {
-      addon = JSON.parse(await request('post', `http://localhost:5000/apps/${first_app}-preview/addons`, alamo_headers, JSON.stringify({"plan":"securekey:basic"})))
+      addon = JSON.parse(await request('post', `http://localhost:5000/apps/${first_app}-preview/addons`, alamo_headers, JSON.stringify({"plan":"securekey:fortnightly"})))
       expect(addon.id).to.be.a('string')
-      expect(addon.config_vars.SECURE_KEYS).to.be.a('string')
+      expect(addon.config_vars.SECURE_KEY).to.be.a('string')
       done()
     } catch (e) {
       done(e)
@@ -114,7 +114,7 @@ describe("secure keys: creating, attaching and deleting", function() {
   it("covers ensuring key is in config vars", async (done) => {
     try {
       let config_vars = JSON.parse(await request('get', `http://localhost:5000/apps/${first_app}-preview/config-vars`, alamo_headers, null))
-      expect(config_vars.SECURE_KEYS).to.equal(addon.config_vars.SECURE_KEYS)
+      expect(config_vars.SECURE_KEY).to.equal(addon.config_vars.SECURE_KEY)
       done()
     } catch (e) {
       done(e)
@@ -131,7 +131,7 @@ describe("secure keys: creating, attaching and deleting", function() {
       let release_info = JSON.parse(await request('post', `http://localhost:5000/apps/${first_app}-preview/releases`, alamo_headers, JSON.stringify({"slug":build_info.id, "description":"secure key test"})))
       let release_info2 = JSON.parse(await request('post', `http://localhost:5000/apps/${second_app}-preview/releases`, alamo_headers, JSON.stringify({"slug":build_info2.id, "description":"secure key test"})))
       let content = JSON.parse(await wfc(httph, `${first_app}-preview`))
-      expect(content.SECURE_KEYS).to.equal(addon.config_vars.SECURE_KEYS)
+      expect(content.SECURE_KEY).to.equal(addon.config_vars.SECURE_KEY)
       done()
     } catch (e) {
       done(e)
@@ -141,7 +141,7 @@ describe("secure keys: creating, attaching and deleting", function() {
   it("covers second app does not have config vars", async (done) => {
     try {
       let config_vars = JSON.parse(await request('get', `http://localhost:5000/apps/${second_app}-preview/config-vars`, alamo_headers, null))
-      expect(config_vars.SECURE_KEYS).to.be.undefined;
+      expect(config_vars.SECURE_KEY).to.be.undefined;
       done()
     } catch (e) {
       done(e)
@@ -153,7 +153,7 @@ describe("secure keys: creating, attaching and deleting", function() {
     try {
       addon_attachment = JSON.parse(await request('post', `http://localhost:5000/apps/${second_app}-preview/addon-attachments`, alamo_headers, JSON.stringify({"addon":addon.name, "app":`${second_app}-preview`, "force":true, "name":"securekey"})))
       let config_vars = JSON.parse(await request('get', `http://localhost:5000/apps/${second_app}-preview/config-vars`, alamo_headers, null))
-      expect(config_vars.SECURE_KEYS).to.equal(addon.config_vars.SECURE_KEYS)
+      expect(config_vars.SECURE_KEY).to.equal(addon.config_vars.SECURE_KEY)
       done()
     } catch (e) {
       done(e)
@@ -167,8 +167,11 @@ describe("secure keys: creating, attaching and deleting", function() {
       await request('post', `http://localhost:5000/apps/${first_app}-preview/addons/${addon.id}/actions/rotate`, alamo_headers, null)
       let config_vars = JSON.parse(await request('get', `http://localhost:5000/apps/${second_app}-preview/config-vars`, alamo_headers, null))
       let config_vars2 = JSON.parse(await request('get', `http://localhost:5000/apps/${first_app}-preview/config-vars`, alamo_headers, null))
-      expect(config_vars.SECURE_KEYS).to.not.equal(addon.config_vars.SECURE_KEYS)
-      expect(config_vars.SECURE_KEYS).to.equal(config_vars2.SECURE_KEYS)
+      expect(config_vars.SECURE_KEY).to.not.equal(addon.config_vars.SECURE_KEY)
+      expect(config_vars.SECURE_KEY).to.equal(config_vars2.SECURE_KEY)
+      let secondary1 = addon.config_vars.SECURE_KEY.split(",")[0]
+      let primary2 = config_vars.SECURE_KEY.split(",")[1]
+      expect(secondary1).to.equal(primary2)
       done()
     } catch (e) {
       done(e)

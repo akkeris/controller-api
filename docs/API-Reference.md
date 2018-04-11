@@ -3992,7 +3992,19 @@ The occurs when a forked preview app is created.
       "resolved_success_url":null
     }
   },
-  "sites":[]
+  "sites":[
+    {
+      "id": "94244b96-2889-4604-ada7-4886bf39367f",
+      "domain": "altest5809b76a1.akkeris.io",
+      "region": {
+        "name": "us-seattle",
+        "id": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3"
+      },
+      "created_at": "2018-04-11T13:48:23.767Z",
+      "updated_at": "2018-04-11T13:48:23.767Z",
+      "compliance": []
+    }
+  ]
 }
 ```
 

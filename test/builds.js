@@ -199,7 +199,6 @@ describe("builds: conversion between payload, response and database", function()
       expect(build_id).to.be.a('string')
       let slug_info = JSON.parse(await httph.request('get', `http://localhost:5000/slugs/${build_id}`, alamo_headers, null))
       expect(slug_info).to.be.an('object')
-      console.log(slug_info)
       done()
     } catch (e) {
       done(e)

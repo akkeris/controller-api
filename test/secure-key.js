@@ -189,8 +189,8 @@ describe("secure keys: creating, attaching and deleting", function() {
 
   it("covers removing test apps.", async (done) => {
     try {
-      await request('delete', `http://localhost:5000/apps/${first_app}-preview`, alamo_headers, null)
       await request('delete', `http://localhost:5000/apps/${second_app}-preview`, alamo_headers, null)
+      await request('delete', `http://localhost:5000/apps/${first_app}-preview`, alamo_headers, null)
       done()
     } catch (e) {
       done(e)

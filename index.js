@@ -10,6 +10,7 @@ const octhc = require('./lib/octhc.js');
 const routes = require('./lib/router.js');
 const simple_key_auth = require('./lib/simple_key_auth.js');
 
+
 console.assert(process.env.DATABASE_URL, "No database provided, set DATABASE_URL to a postgres db!");
 
 let alamo = { 
@@ -73,6 +74,8 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   }
   // Initialize Events
   alamo.git.init(pg_pool)
+
+  common.init();
 
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()

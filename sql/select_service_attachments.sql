@@ -12,6 +12,7 @@ select
   owner_space.name owner_space,
   service_attachments.name,
   apps.name app_name,
+  apps.org,
   spaces.name space,
   service_attachments.owned,
   service_attachments.created,

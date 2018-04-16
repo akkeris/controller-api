@@ -270,6 +270,21 @@ describe("hooks:", function() {
     });
   });
 
+  it("covers getting hook results", (done) => {
+    expect(hook_id).to.be.a('string');
+    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/hooks/' + hook_id + '/results', alamo_headers, null, (err, hook_results_info) => {
+      if(err) {
+        console.log('hook error:', err);
+      }
+      expect(err).to.be.null;
+      expect(hook_results_info).to.be.a('string');
+      hook_results_info = JSON.parse(hook_results_info);
+      expect(hook_results_info).to.be.an('array');
+      // TODO: Inspect more on the structure.
+      done();
+    });
+  });
+
   it("covers removing hook", (done) => {
     expect(hook_id).to.be.a('string');
     httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/hooks/' + hook_id, alamo_headers, null, (err, hook_info) => {

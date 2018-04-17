@@ -9,6 +9,7 @@ const config = require('./lib/config.js');
 const octhc = require('./lib/octhc.js');
 const routes = require('./lib/router.js');
 const simple_key_auth = require('./lib/simple_key_auth.js');
+const common = require('./lib/common.js');
 
 
 console.assert(process.env.DATABASE_URL, "No database provided, set DATABASE_URL to a postgres db!");

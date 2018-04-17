@@ -36,7 +36,7 @@ describe("github: ensure we can attach auto builds, submit auto builds, and remo
   const httph = require('../lib/http_helper.js')
   const git = require('../lib/git.js')
   const expect = require("chai").expect
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY}
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "x-username":"test", "x-elevated-access":"true"}
   const app_name = "alamotest" + Math.round(Math.random() * 10000)
   const webhook201 = fs.readFileSync('./test/support/github-webhook-success-201.json').toString('utf8')
   const webhook205branch = fs.readFileSync('./test/support/github-webhook-fail-wrong-branch.json').toString('utf8')

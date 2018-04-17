@@ -60,7 +60,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   const httph = require('../lib/http_helper.js')
   const git = require('../lib/git.js')
   const expect = require("chai").expect
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY}
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "x-username":"test", "x-elevated-access":"true"}
   const app_dummy_name = "altest" + Math.round(Math.random() * 10000)
   const app_name = "altest" + Math.round(Math.random() * 10000)
   const site_name = "altest" + Math.round(Math.random() * 10000) + process.env.SITE_BASE_DOMAIN

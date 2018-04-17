@@ -6,7 +6,7 @@ describe("features: ensure we can set and get app features", function() {
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
   const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;

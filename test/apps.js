@@ -10,9 +10,10 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
   const apps = require('../lib/apps.js');
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "x-username":"test", "x-elevated-access":"true"}
 
   it("Ensures apps that dont exist, return 404.", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/idonotexist-default', {"Authorization":process.env.AUTH_KEY}, null, (err, data) => {
+    httph.request('get', 'http://localhost:5000/apps/idonotexist-default', alamo_headers, null, (err, data) => {
       expect(err).to.be.an('object');
       expect(data).to.be.null;
       expect(err.code).to.equal(404);
@@ -20,7 +21,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures organization is required.", (done) => {
-    httph.request('post', 'http://localhost:5000/apps', {"Authorization":process.env.AUTH_KEY},
+    httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({name:"testing123", space:"testing123", size:"constellation", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         expect(err).to.be.an('object');
@@ -31,7 +32,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures app name is required.", (done) => {
-    httph.request('post', 'http://localhost:5000/apps', {"Authorization":process.env.AUTH_KEY},
+    httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({org:"testing123", space:"testing123", size:"constellation", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         expect(err).to.be.an('object');
@@ -42,7 +43,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures space name is required.", (done) => {
-    httph.request('post', 'http://localhost:5000/apps', {"Authorization":process.env.AUTH_KEY},
+    httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({org:"testing123", name:"testing123", size:"constellation", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         expect(err).to.be.an('object');
@@ -53,7 +54,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures apps cannot have names above 24 characters.", (done) => {
-    httph.request('post', 'http://localhost:5000/apps', {"Authorization":process.env.AUTH_KEY},
+    httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({org:"testing123", space:"testing123-1234", name:"testing123"}),
       (err, data) => {
         expect(err).to.be.an('object');
@@ -64,7 +65,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures apps cannot be created with duplicate names.", (done) => {
-    httph.request('post', 'http://localhost:5000/apps', {"Authorization":process.env.AUTH_KEY},
+    httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({org:"test", space:"default", name:"api", size:"constellation"}),
       (err, data) => {
         expect(err).to.be.an('object');
@@ -75,7 +76,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures apps cannot be created with brackets in names.", (done) => {
-    httph.request('post', 'http://localhost:5000/apps', {"Authorization":process.env.AUTH_KEY},
+    httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({org:"test", space:"default", name:"[fugazi]", size:"constellation"}),
       (err, data) => {
         expect(err).to.be.an('object');
@@ -87,7 +88,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   //todo: correct app names (no dashes, alpha numeric only)
   it("Ensures we can create an app.", (done) => {
-    httph.request('post', 'http://localhost:5000/apps', {"Authorization":process.env.AUTH_KEY},
+    httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({org:"test", space:"default", name:"alamotestapp", size:"constellation", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         if(err) {
@@ -124,7 +125,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures we can pull application info.", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/alamotestapp-default', {"Authorization":process.env.AUTH_KEY}, null, (err, data) => {
+    httph.request('get', 'http://localhost:5000/apps/alamotestapp-default',alamo_headers, null, (err, data) => {
       if(err) {
         console.error(err);
       }
@@ -161,7 +162,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures we can place the application into maintenance mode.", (done) => {
-    httph.request('patch', 'http://localhost:5000/apps/alamotestapp-default', {"Authorization":process.env.AUTH_KEY}, 
+    httph.request('patch', 'http://localhost:5000/apps/alamotestapp-default', alamo_headers, 
       JSON.stringify({"build_stack":"ds1", "maintenance":true, "name":"alamotestapp"}), 
     (err, data) => {
       if(err) {
@@ -200,7 +201,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
 
   it("Ensures we can take the application out of maintenance mode.", (done) => {
-    httph.request('patch', 'http://localhost:5000/apps/alamotestapp-default', {"Authorization":process.env.AUTH_KEY}, 
+    httph.request('patch', 'http://localhost:5000/apps/alamotestapp-default', alamo_headers, 
       JSON.stringify({"build_stack":"ds1", "maintenance":false, "name":"alamotestapp"}), 
     (err, data) => {
       if(err) {
@@ -237,7 +238,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures we can pull application info with relevant autobuild info.", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/api-default', {"Authorization":process.env.AUTH_KEY}, null, (err, data) => {
+    httph.request('get', 'http://localhost:5000/apps/api-default', alamo_headers, null, (err, data) => {
       if(err) {
         console.error(err);
       }
@@ -251,7 +252,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures we can pull all applications.", (done) => {
-    httph.request('get', 'http://localhost:5000/apps', {"Authorization":process.env.AUTH_KEY}, null, (err, data) => {
+    httph.request('get', 'http://localhost:5000/apps', alamo_headers, null, (err, data) => {
       if(err) {
         console.error(err);
       }
@@ -292,7 +293,9 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
 
   it("Ensures we cannot delete an app in a socs/prod space.", (done) => {
-    httph.request('delete', 'http://localhost:5000/apps/alamotestapp-default', {"Authorization":process.env.AUTH_KEY, 'x-username':'test'}, null, (err, data) => {
+    let new_headers = JSON.parse(JSON.stringify(alamo_headers))
+    delete new_headers['x-elevated-access']
+    httph.request('delete', 'http://localhost:5000/apps/alamotestapp-default', new_headers, null, (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
         expect(err.message).to.equal('This application can only be deleted by administrators.');
@@ -300,7 +303,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures we can delete an app.", (done) => {
-    httph.request('delete', 'http://localhost:5000/apps/alamotestapp-default', {"Authorization":process.env.AUTH_KEY}, null, (err, data) => {
+    httph.request('delete', 'http://localhost:5000/apps/alamotestapp-default', alamo_headers, null, (err, data) => {
         if(err) {
           console.error(err);
         }

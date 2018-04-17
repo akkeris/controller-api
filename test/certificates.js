@@ -6,7 +6,7 @@ describe("certificates: ensure we can pull and list certificates and orders", fu
   process.env.PORT = 5000;
   process.env.TEST_MODE = "true"; // prevents creating actual spaces.  Since we cant delete them, we bail out before committing.
   process.env.AUTH_KEY = 'hello';
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"testuser@abcd.com", "x-elevated-access":"true"};
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
   function validate_certificate(obj) {

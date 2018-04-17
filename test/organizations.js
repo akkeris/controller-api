@@ -5,7 +5,8 @@ describe("organizations: ensure we can pull and list orgs", function() {
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+  const user_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test"};
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
 
@@ -75,7 +76,7 @@ describe("organizations: ensure we can pull and list orgs", function() {
   });
 
   it("covers ensuring elevated access can only delete organizations", (done) => {
-    httph.request('delete', 'http://localhost:5000/organizations/' + org_name, Object.assign({'x-username':'foo'}, alamo_headers), null, 
+    httph.request('delete', 'http://localhost:5000/organizations/' + org_name, user_headers, null, 
     (err, data) => {
       expect(err).to.be.an('object');
       expect(err.code).to.equal(403)

@@ -6,7 +6,7 @@ const assert = require("chai").assert;
 const httph = require('../lib/http_helper.js');
 const zlib = require('zlib')
 process.env.AUTH_KEY = 'hello';
-const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 
 describe("base: Ensure helper tools work correctly.", () => {
   process.env.PORT = 5000;

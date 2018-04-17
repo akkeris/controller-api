@@ -62,7 +62,7 @@ describe("app-setups:", function() {
 
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY};
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "x-username":"test", "x-elevated-access":"true"};
 
   it("ensure we can get an app definition", (done) => {
     httph.request('get', 'http://localhost:5000/apps/api-default/app-setups', alamo_headers, null, (err, data) => {

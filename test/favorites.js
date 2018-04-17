@@ -4,7 +4,8 @@ process.env.PORT = 5000;
 process.env.DEFAULT_PORT = "5000";
 process.env.TEST_MODE = "true"; // prevents creating actual spaces.  Since we cant delete them, we bail out before committing.
 process.env.AUTH_KEY = 'hello';
-const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello"};
+const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", "x-elevated-access":"true"};
+const user_alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello"};
 
 const init = require('./support/init.js');
 const httph = require('../lib/http_helper.js');
@@ -53,14 +54,14 @@ describe("favorites: ensure we can create, list and delete favorites", function 
     });
 
     it("GET /favorites returns 401 if x-username is not present in the header", (done) => {
-        httph.request('get', 'http://localhost:5000/favorites', alamo_headers, null, (err, data) => {
+        httph.request('get', 'http://localhost:5000/favorites', user_alamo_headers, null, (err, data) => {
             expect(err.code).equals(403);
             done();
         });
     });
 
     it("POST /favorites returns 401 if x-username is not present in the header", (done) => {
-        httph.request('post', 'http://localhost:5000/favorites', alamo_headers, {app:app_id}, (err, data) => {
+        httph.request('post', 'http://localhost:5000/favorites', user_alamo_headers, {app:app_id}, (err, data) => {
             expect(err.code).equals(403);
             done();
         });
@@ -75,7 +76,7 @@ describe("favorites: ensure we can create, list and delete favorites", function 
     });
 
     it("DELETE /favorites returns 403 if x-username is not present in the header", (done) => {
-        httph.request('delete', 'http://localhost:5000/favorites/' + app_id, alamo_headers, null, (err, data) => {
+        httph.request('delete', 'http://localhost:5000/favorites/' + app_id, user_alamo_headers, null, (err, data) => {
             expect(err.code).equals(403);
             done();
         });

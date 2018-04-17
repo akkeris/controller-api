@@ -3,7 +3,7 @@
 process.env.DEFAULT_PORT = "5000";
 process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
-const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 const init = require('./support/init.js')
 
 describe("addon services: plans, services listing and getting.", function() {  

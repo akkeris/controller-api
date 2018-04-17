@@ -6,7 +6,7 @@ describe("logs: ensure we can pull app logs", function() {
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
   var app_name = "alamotest" + Math.round(Math.random() * 10000);
@@ -27,7 +27,7 @@ describe("logs: ensure we can pull app logs", function() {
 
   let id = null;
   it("covers creating log drain", (done) => {
-    httph.request('post', 'http://localhost:5000/apps', {"Authorization":process.env.AUTH_KEY},
+    httph.request('post', 'http://localhost:5000/apps', alamo_headers,
       JSON.stringify({org:"test", space:"default", name:app_name, size:"constellation", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         if(err) {
@@ -36,7 +36,7 @@ describe("logs: ensure we can pull app logs", function() {
         expect(err).to.be.null;
 
         // Create a log drain.
-        httph.request('post', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', {"Authorization":process.env.AUTH_KEY},
+        httph.request('post', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', alamo_headers,
           JSON.stringify({"url":"syslog+tls://logs.abcd.com:40481"}),
           (err, data) => {
             if(err) {
@@ -54,7 +54,7 @@ describe("logs: ensure we can pull app logs", function() {
 
   it("covers listing log drain", (done) => {
     expect(id).to.be.a('string');
-    httph.request('get', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', {"Authorization":process.env.AUTH_KEY}, null,
+    httph.request('get', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', alamo_headers, null,
     (err, data) => {
       if(err) {
         console.error(err)
@@ -72,7 +72,7 @@ describe("logs: ensure we can pull app logs", function() {
 
   it("covers getting a log drain", (done) => {
     expect(id).to.be.a('string');
-    httph.request('get', 'http://localhost:5000/apps/' + app_name + '-default/log-drains/' + id, {"Authorization":process.env.AUTH_KEY}, null,
+    httph.request('get', 'http://localhost:5000/apps/' + app_name + '-default/log-drains/' + id, alamo_headers, null,
     (err, data) => {
       if(err) {
         console.error(err)
@@ -88,7 +88,7 @@ describe("logs: ensure we can pull app logs", function() {
 
   it("covers deleting a log drain", (done) => {
     expect(id).to.be.a('string');
-    httph.request('delete', 'http://localhost:5000/apps/' + app_name + '-default/log-drains/' + id, {"Authorization":process.env.AUTH_KEY}, null,
+    httph.request('delete', 'http://localhost:5000/apps/' + app_name + '-default/log-drains/' + id, alamo_headers, null,
     (err, data) => {
       if(err) {
         console.error(err)
@@ -100,7 +100,7 @@ describe("logs: ensure we can pull app logs", function() {
 
   let addon_id = null;
   it("covers adding logdrain through papertrail plugin", (done) => {
-    httph.request('post', 'http://localhost:5000/apps/' + app_name + '-default/addons', {"Authorization":process.env.AUTH_KEY},
+    httph.request('post', 'http://localhost:5000/apps/' + app_name + '-default/addons', alamo_headers,
       JSON.stringify({"plan":"c0d522b4-5a6e-958f-aab4-12b1f628594d"}),
       (err, data) => {
         if(err) {
@@ -115,7 +115,7 @@ describe("logs: ensure we can pull app logs", function() {
 
   it("covers listing log drain", (done) => {
     expect(id).to.be.a('string');
-    httph.request('get', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', {"Authorization":process.env.AUTH_KEY}, null,
+    httph.request('get', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', alamo_headers, null,
     (err, data) => {
       if(err) {
         console.log(err);
@@ -130,7 +130,7 @@ describe("logs: ensure we can pull app logs", function() {
     });
   });
   it("covers removing logdrain through papertrail plugin", (done) => {
-    httph.request('delete', 'http://localhost:5000/apps/' + app_name + '-default/addons/' + addon_id, {"Authorization":process.env.AUTH_KEY},
+    httph.request('delete', 'http://localhost:5000/apps/' + app_name + '-default/addons/' + addon_id, alamo_headers,
       null,
       (err, data) => {
         if(err) {
@@ -143,7 +143,7 @@ describe("logs: ensure we can pull app logs", function() {
 
   it("covers ensuring no stray log drains", (done) => {
     expect(id).to.be.a('string');
-    httph.request('get', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', {"Authorization":process.env.AUTH_KEY}, null,
+    httph.request('get', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', alamo_headers, null,
     (err, data) => {
       if(err) {
         console.log(err);
@@ -158,7 +158,7 @@ describe("logs: ensure we can pull app logs", function() {
   });
 
   it("Ensure we delete the test app.", (done) => {
-    httph.request('delete', 'http://localhost:5000/apps/' + app_name + '-default', {"Authorization":process.env.AUTH_KEY}, null, (err, data) => {
+    httph.request('delete', 'http://localhost:5000/apps/' + app_name + '-default', alamo_headers, null, (err, data) => {
         if(err) {
           console.error(err);
         }

@@ -6,7 +6,7 @@ process.env.AUTH_KEY = 'hello';
 const init = require('./support/init.js');
 const httph = require('../lib/http_helper.js');
 const expect = require("chai").expect;
-const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 
 function wait_for_app(httph, app, callback, iteration) {
   iteration = iteration || 1;

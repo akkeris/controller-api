@@ -6,7 +6,7 @@
   const init = require('./support/init.js');
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 
   function validate_service(obj) {
     expect(obj.actions).to.be.an('array')

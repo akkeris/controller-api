@@ -43,7 +43,8 @@ let alamo = {
   invoices:require('./lib/invoices.js'),
   favorites:require('./lib/favorites.js'),
   regions:require('./lib/regions.js'),
-  stacks:require('./lib/stacks.js')
+  stacks:require('./lib/stacks.js'),
+  audit:require('./lib/audit.js')
 };
 
 
@@ -547,6 +548,11 @@ routes.add.post('/favorites$')
           .and.authorization([simple_key]);
 routes.add.delete('/favorites/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.favorites.delete.bind(alamo.favorites.delete, pg_pool))
+          .and.authorization([simple_key]);
+
+// Audit
+routes.add.get('/audits([A-z0-9\\=\\?\\-\\_\\.\\&\\:]*)$')
+          .run(alamo.audit.get.bind(alamo.audit.get))
           .and.authorization([simple_key]);
 
 // App setups

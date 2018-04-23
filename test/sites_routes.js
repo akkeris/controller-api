@@ -5,7 +5,7 @@ describe("sites/routes", function () {
     process.env.PORT = 5000;
     process.env.AUTH_KEY = 'hello';
     process.env.TEST_MODE = "true"; // DO NOT REMOVE THIS OTHERWISE THE TESTS WILL TRY AND DO REAL THINGS.
-    const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello"};
+    const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", "x-elevated-access":"true"};
     const running_app = require('../index.js');
     const httph = require('../lib/http_helper.js');
     const expect = require("chai").expect;
@@ -102,8 +102,8 @@ describe("sites/routes", function () {
         let payload = {
             app: app_id,
             site: site_id,
-            source_path: "/source",
-            target_path: "/target"
+            source_path: "/source-path/foo.html",
+            target_path: "/target-path/foo.html"
         };
         httph.request('post', `${siteurl1}/routes`, alamo_headers, JSON.stringify(payload),
           (err, data) => {
@@ -113,8 +113,8 @@ describe("sites/routes", function () {
               let obj = JSON.parse(data);
               expect(obj.app.id).to.equal(app_id);
               expect(obj.site.id).to.equal(site_id);
-              expect(obj.source_path).to.equal("/source");
-              expect(obj.target_path).to.equal("/target");
+              expect(obj.source_path).to.equal("/source-path/foo.html");
+              expect(obj.target_path).to.equal("/target-path/foo.html");
               route_id = obj.id
               done();
           });
@@ -174,8 +174,8 @@ describe("sites/routes", function () {
             });
             expect(test_route).to.be.an('object');
             expect(test_route.app.name).to.equal('api-default');
-            expect(test_route.source_path).to.equal('/source');
-            expect(test_route.target_path).to.equal('/target');
+            expect(test_route.source_path).to.equal('/source-path/foo.html');
+            expect(test_route.target_path).to.equal('/target-path/foo.html');
             done();
           });
     });
@@ -198,8 +198,8 @@ describe("sites/routes", function () {
         let obj = JSON.parse(data);
         expect(obj.app.id).to.equal(app_id);
         expect(obj.site.id).to.equal(site_id);
-        expect(obj.source_path).to.equal("/source");
-        expect(obj.target_path).to.equal("/target");
+        expect(obj.source_path).to.equal("/source-path/foo.html");
+        expect(obj.target_path).to.equal("/target-path/foo.html");
         done();
       });
     });

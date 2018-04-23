@@ -6,7 +6,7 @@ describe("features: ensure we can set and get app features", function() {
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
   const running_app = require('../index.js');
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
@@ -34,7 +34,6 @@ describe("features: ensure we can set and get app features", function() {
       let f = arr.filter((x) => x.name === "auto-release")
       expect(f.length).to.equal(1)
       check_feature(f[0])
-      expect(f[0].enabled).to.equal(true)
       done();
     });
   });
@@ -52,7 +51,6 @@ describe("features: ensure we can set and get app features", function() {
       expect(arr).to.be.an('object')
       check_feature(arr)
       expect(arr.name).to.equal("auto-release")
-      expect(arr.enabled).to.equal(true)
       done();
     });
   });

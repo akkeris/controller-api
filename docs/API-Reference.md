@@ -2529,7 +2529,7 @@ Lists all the addons for an application.
 curl \
   -H 'Authorization: ...' \
   -X GET \
-  https://apps.akkeris.io/apps/app-space/addons
+  https://apps.akkeris.io/apps/app-space/addon-attachments
 ```
 
 **200 "OK" Response**
@@ -2578,7 +2578,57 @@ curl \
 curl \
   -H 'Authorization: ...' \
   -X GET \
-  https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c
+  https://apps.akkeris.io/apps/app-space/addon-attachments/5feef9bb-2bed-4b62-bdf5-e31691fab88c
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "addon":{
+    "actions": null,
+    "addon_service": {
+      "id":"01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+      "name":"alamo-postgresql"
+    },
+    "app": {
+      "id":"555555-2bed-4b62-bdf5-e31691fab88c",
+      "name":"sourceapp-space"
+    },
+    "config_vars": [],
+    "created_at": "2016-08-11T20:16:45.820Z",
+    "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+    "name": "a91d7641-a61e-fb09-654e-2def7c9f162d-api:alamo-postgresql-1470946605820",
+    "plan": {
+      "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+      "name": "alamo-postgresql:small"
+    }
+  },
+  "app":{
+      "id": "777777-2bed-4b62-bdf5-e31691fab88c",
+      "name": "attachedapp-space"
+  },
+  "created_at": "2016-08-11T20:16:45.820Z",
+  "updated_at": "2016-08-11T20:16:45.820Z",
+  "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
+  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+}
+```
+
+### Attach Addons ##
+
+`POST /apps/{appname}/addon-attachments`
+
+The post property `addon` is the name or id of addon to attach.  The `app` parameter should contain the app to attach the addon to.
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X POST \
+  https://apps.akkeris.io/apps/app-space/addon-attachments
+  -d '{"addon":"5feef9bb-2bed-4b62-bdf5-e31691fab88c", "app":"app-space"}'
 ```
 
 **200 "OK" Response**
@@ -2616,8 +2666,52 @@ curl \
 ```
 
 
+### Dettach Addons ##
 
+`DELETE /apps/{appname}/addon-attachments/{addon_id}`
 
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X DELETE \
+  https://apps.akkeris.io/apps/app-space/addon-attachments/663ef9bb-2bed-4b62-bdf5-e31691fab555
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "addon":{
+    "actions": null,
+    "addon_service": {
+      "id":"01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+      "name":"alamo-postgresql"
+    },
+    "app": {
+      "id":"555555-2bed-4b62-bdf5-e31691fab88c",
+      "name":"sourceapp-space"
+    },
+    "config_vars": [],
+    "created_at": "2016-08-11T20:16:45.820Z",
+    "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+    "name": "a91d7641-a61e-fb09-654e-2def7c9f162d-api:alamo-postgresql-1470946605820",
+    "plan": {
+      "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+      "name": "alamo-postgresql:small"
+    }
+  },
+  "app":{
+      "id": "777777-2bed-4b62-bdf5-e31691fab88c",
+      "name": "attachedapp-space"
+  },
+  "created_at": "2016-08-11T20:16:45.820Z",
+  "updated_at": "2016-08-11T20:16:45.820Z",
+  "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
+  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+}
+```
 
 ## Regions
 
@@ -3723,6 +3817,212 @@ Upon successful deletion the API responds with 200.
 }
 ```
 
+### Getting Webhook Results
+
+`GET /apps/{appname_or_id}/hooks/{hook_id}/results`
+
+**200 "OK" Response**
+
+```json
+[
+  {
+    "id": "189860a9-090e-4587-a409-4b82808119ee",
+    "last_attempt": {
+      "request": {
+        "method": "post",
+        "url": "https://example.com/webhook",
+        "headers": {
+          "x-appkit-event": "release",
+          "x-appkit-delivery": "189860a9-090e-4587-a409-4b82808119ee",
+          "content-type": "application/json",
+          "user-agent": "appkit-hookshot",
+          "x-appkit-signature": "sha1=ee4bddef4659146988ae47c369a830ba50bac918"
+        },
+        "body": {
+          "action": "release",
+          "app": {
+            "name": "alamotest4131",
+            "id": "f806f1f3-c41b-4ec0-9f50-6a226554d6cd"
+          },
+          "space": {
+            "name": "default"
+          },
+          "release": {
+            "id": "c5f5b3c5-4cac-4b32-adf5-719354332b01",
+            "result": "succeeded",
+            "created_at": "2018-04-16T19:53:48.196Z",
+            "version": 1,
+            "description": "Deploy e48f626a-5c53-40ba-a66c-7e8f710ffb70"
+          },
+          "build": {
+            "id": "e48f626a-5c53-40ba-a66c-7e8f710ffb70",
+            "result": "succeeded",
+            "repo": "https://github.com/abcd/some-repo",
+            "commit": "123456",
+            "branch": "master"
+          }
+        }
+      },
+      "response": {
+        "code": 200,
+        "headers": {
+          "date": "Mon, 16 Apr 2018 19:53:48 GMT",
+          "connection": "close",
+          "content-length": "0"
+        }
+      },
+      "status": "succeeded",
+      "updated_at": "2018-04-16T19:53:48.210Z"
+    },
+    "num_attempts": 1,
+    "hook": {
+      "id": "875e1d70-c843-476d-91fc-4bea901a76da",
+      "events": [
+        "release",
+        "build",
+        "formation_change",
+        "logdrain_change",
+        "addon_change",
+        "config_change",
+        "destroy"
+      ]
+    },
+    "created_at": "2018-04-16T19:53:48.210Z"
+  },
+  {
+    "id": "25634d4a-5c5a-4f15-9a6c-550eb3e45199",
+    "last_attempt": {
+      "request": {
+        "method": "post",
+        "url": "https://example.com/webhook",
+        "headers": {
+          "x-appkit-event": "formation_change",
+          "x-appkit-delivery": "25634d4a-5c5a-4f15-9a6c-550eb3e45199",
+          "content-type": "application/json",
+          "user-agent": "appkit-hookshot",
+          "x-appkit-signature": "sha1=85cad787fa7dbc9b35c43cf1ed3d3d43dbc433dc"
+        },
+        "body": {
+          "action": "formation_change",
+          "app": {
+            "name": "alamotest4131",
+            "id": "f806f1f3-c41b-4ec0-9f50-6a226554d6cd"
+          },
+          "space": {
+            "name": "default"
+          },
+          "change": "update",
+          "changes": [
+            {
+              "type": "web",
+              "quantity": 2,
+              "size": "constellation"
+            }
+          ]
+        }
+      },
+      "response": {
+        "code": 200,
+        "headers": {
+          "date": "Mon, 16 Apr 2018 19:53:49 GMT",
+          "connection": "close",
+          "content-length": "0"
+        }
+      },
+      "status": "succeeded",
+      "updated_at": "2018-04-16T19:53:49.298Z"
+    },
+    "num_attempts": 1,
+    "hook": {
+      "id": "875e1d70-c843-476d-91fc-4bea901a76da",
+      "events": [
+        "release",
+        "build",
+        "formation_change",
+        "logdrain_change",
+        "addon_change",
+        "config_change",
+        "destroy"
+      ]
+    },
+    "created_at": "2018-04-16T19:53:49.298Z"
+  }
+]
+```
+
+
+### Getting Webhook Result
+
+`GET /apps/{appname_or_id}/hooks/{hook_id}/results/${result_id}`
+
+**200 "OK" Response**
+
+```json
+{
+  "id": "189860a9-090e-4587-a409-4b82808119ee",
+  "last_attempt": {
+    "request": {
+      "method": "post",
+      "url": "https://example.com/webhook",
+      "headers": {
+        "x-appkit-event": "release",
+        "x-appkit-delivery": "189860a9-090e-4587-a409-4b82808119ee",
+        "content-type": "application/json",
+        "user-agent": "appkit-hookshot",
+        "x-appkit-signature": "sha1=ee4bddef4659146988ae47c369a830ba50bac918"
+      },
+      "body": {
+        "action": "release",
+        "app": {
+          "name": "alamotest4131",
+          "id": "f806f1f3-c41b-4ec0-9f50-6a226554d6cd"
+        },
+        "space": {
+          "name": "default"
+        },
+        "release": {
+          "id": "c5f5b3c5-4cac-4b32-adf5-719354332b01",
+          "result": "succeeded",
+          "created_at": "2018-04-16T19:53:48.196Z",
+          "version": 1,
+          "description": "Deploy e48f626a-5c53-40ba-a66c-7e8f710ffb70"
+        },
+        "build": {
+          "id": "e48f626a-5c53-40ba-a66c-7e8f710ffb70",
+          "result": "succeeded",
+          "repo": "https://github.com/abcd/some-repo",
+          "commit": "123456",
+          "branch": "master"
+        }
+      }
+    },
+    "response": {
+      "code": 200,
+      "headers": {
+        "date": "Mon, 16 Apr 2018 19:53:48 GMT",
+        "connection": "close",
+        "content-length": "0"
+      }
+    },
+    "status": "succeeded",
+    "updated_at": "2018-04-16T19:53:48.210Z"
+  },
+  "num_attempts": 1,
+  "hook": {
+    "id": "875e1d70-c843-476d-91fc-4bea901a76da",
+    "events": [
+      "release",
+      "build",
+      "formation_change",
+      "logdrain_change",
+      "addon_change",
+      "config_change",
+      "destroy"
+    ]
+  },
+  "created_at": "2018-04-16T19:53:48.210Z"
+}
+```
 
 ## Webhook Event Payloads
 
@@ -3914,7 +4214,20 @@ The occurs when a forked preview app is created.
       "postdeploy":null,
       "resolved_success_url":null
     }
-  }
+  },
+  "sites":[
+    {
+      "id": "94244b96-2889-4604-ada7-4886bf39367f",
+      "domain": "altest5809b76a1.akkeris.io",
+      "region": {
+        "name": "us-seattle",
+        "id": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3"
+      },
+      "created_at": "2018-04-11T13:48:23.767Z",
+      "updated_at": "2018-04-11T13:48:23.767Z",
+      "compliance": []
+    }
+  ]
 }
 ```
 

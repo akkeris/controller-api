@@ -289,6 +289,12 @@ routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/hooks/([A-z0-9\\-\\_\\.]+)$')
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/hooks/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.hooks.delete.bind(alamo.hooks.delete, pg_pool))
           .and.authorization([simple_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/hooks/([A-z0-9\\-\\_\\.]+)/results$')
+          .run(alamo.hooks.results.bind(alamo.hooks.results, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/hooks/([A-z0-9\\-\\_\\.]+)/results/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.hooks.result.bind(alamo.hooks.result, pg_pool))
+          .and.authorization([simple_key]);
 
 // -- spaces
 routes.add.get('/spaces$')

@@ -7,7 +7,7 @@ let github = require('../lib/git.js');
 let common = require('../lib/common.js');
 const expect = require("chai").expect;
 
-const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 
 
 describe("github: enc/dec tokens, checks against incoming payloads", function() {

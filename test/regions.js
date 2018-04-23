@@ -3,8 +3,8 @@ process.env.PORT = 5000;
 process.env.DEFAULT_PORT = "5000";
 process.env.AUTH_KEY = 'hello';
 process.env.ENCRYPT_KEY = 'hello';
-const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
-const user_alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"this-is-me"};
+const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
+const user_alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test"};
 const http = require('http');
 const expect = require("chai").expect;
 

@@ -5,7 +5,7 @@ describe("plugins: creating, listing, updating deleting", function() {
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
 

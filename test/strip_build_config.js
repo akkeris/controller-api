@@ -4,7 +4,7 @@ process.env.DEFAULT_PORT = "5000";
 process.env.PORT = 5000;
 process.env.ALAMO_API_URL = 'http://nope.com'
 process.env.AUTH_KEY = 'hello';
-const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 
 describe("builds: ensure logs are properly tripped", function() {  
   const expect = require("chai").expect;

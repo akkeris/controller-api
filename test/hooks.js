@@ -4,7 +4,7 @@ process.env.PORT = 5000;
 process.env.DEFAULT_PORT = "5000";
 process.env.AUTH_KEY = 'hello';
 process.env.ENCRYPT_KEY = 'hello';
-const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 const http = require('http');
 
 function wait_for_app(httph, app, callback, iteration) {
@@ -266,6 +266,21 @@ describe("hooks:", function() {
       expect(hook_info.url).to.be.a('string');
       expect(hook_info.created_at).to.be.a('string');
       expect(hook_info.updated_at).to.be.a('string');
+      done();
+    });
+  });
+
+  it("covers getting hook results", (done) => {
+    expect(hook_id).to.be.a('string');
+    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/hooks/' + hook_id + '/results', alamo_headers, null, (err, hook_results_info) => {
+      if(err) {
+        console.log('hook error:', err);
+      }
+      expect(err).to.be.null;
+      expect(hook_results_info).to.be.a('string');
+      hook_results_info = JSON.parse(hook_results_info);
+      expect(hook_results_info).to.be.an('array');
+      // TODO: Inspect more on the structure.
       done();
     });
   });

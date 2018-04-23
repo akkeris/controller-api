@@ -145,7 +145,7 @@ describe("config-vars: creating, updating and deleting a config vars", function(
     });
   });
   it("covers removing test app.", (done) => {
-    // destroy t`he` app.
+    // destroy the app.
     delete alamo_headers['X-UserName'];
     httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default', alamo_headers, null, (err, data) => {
       if(err) {

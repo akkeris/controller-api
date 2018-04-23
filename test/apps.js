@@ -335,6 +335,6 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
         expect(obj[0]._source.action).to.eql("destroy")
         done();
     });
-    }, 500);
+    }, 1000);
   });
 })

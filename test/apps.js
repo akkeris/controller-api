@@ -300,7 +300,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
   it("Ensures we can delete an app.", (done) => {
-    httph.request('delete', 'http://localhost:5000/apps/alamotestapp-default', {"Authorization":process.env.AUTH_KEY}, null, (err, data) => {
+    httph.request('delete', 'http://localhost:5000/apps/alamotestapp-default', {"Authorization":process.env.AUTH_KEY, "x-username":"test"}, null, (err, data) => {
         if(err) {
           console.error(err);
         }
@@ -311,6 +311,24 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
         expect(appdelobj.name).to.equal("alamotestapp-default");
         expect(appdelobj.org).to.equal("test");
         expect(appdelobj.result).to.equal("successful");
+        done();
+    });
+  });
+
+  let audit_response = null;
+  it("covers audit events for deleting an app", (done) => {
+    httph.request('get', 'http://localhost:5000/audits?app=alamotestapp' + '&space=default', {"Authorization":process.env.AUTH_KEY, "x-username":"test"}, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+          console.error(err.message);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        console.log(obj)
+        expect(obj).to.be.an('array');
+        expect(obj[0]._source.action).to.eql("config_change")
         done();
     });
   });

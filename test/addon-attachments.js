@@ -6,7 +6,7 @@ process.env.AUTH_KEY = 'hello';
 const init = require('./support/init.js');
 const httph = require('../lib/http_helper.js')
 const expect = require("chai").expect;
-const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello"};
+const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"alamotest"};
 
 function wait_for_app_content(httph, app, path, content, callback, iteration) {
   iteration = iteration || 1;
@@ -265,7 +265,24 @@ describe("addons attachments:", function() {
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('array');
-        expect(obj.length).to.equal(0);
+        done();
+    });
+  });
+
+  let audit_response = null;
+  it("covers listing all audit events for attachments", (done) => {
+    httph.request('get', 'http://localhost:5000/audits?app=' + appname_brand_new + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+          console.error(err.message);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        console.log(obj)
+        expect(obj).to.be.an('array');
+        expect(obj[0]._source.action).to.eql("addon_change")
         done();
     });
   });

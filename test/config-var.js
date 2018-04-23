@@ -52,15 +52,57 @@ describe("config-vars: creating, updating and deleting a config vars", function(
   });
   it("covers adding sensitive vars", (done) => {
     // add a config var
-    httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/config-vars', alamo_headers, JSON.stringify({HEROKU_API_TOKEN:"NOPE"}), (err, data) => {
+    httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/config-vars', alamo_headers, JSON.stringify({FOO_API_TOKEN:"NOPE"}), (err, data) => {
       expect(err).to.be.null;
       let config_vars = JSON.parse(data);
       expect(config_vars).to.be.a('object');
       expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
       expect(config_vars.FOO).to.equal("BAR");
-      expect(config_vars.HEROKU_API_TOKEN).to.equal("[redacted]");
+      expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
       done();
     });
+  });
+  it("covers adding empty value config vars", async (done) => {
+    try {
+      let data = await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, JSON.stringify({"EMPTY_CONFIG_VAR":""}));
+      let config_vars = JSON.parse(data);
+      expect(config_vars).to.be.a('object');
+      expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
+      expect(config_vars.FOO).to.equal("BAR");
+      expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
+      expect(config_vars.EMPTY_CONFIG_VAR).to.equal("");
+      done();
+    } catch (e) {
+      done(e)
+    }
+  });
+  it("covers getting empty value config vars", async (done) => {
+    try {
+      let data = await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, null);
+      let config_vars = JSON.parse(data);
+      expect(config_vars).to.be.a('object');
+      expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
+      expect(config_vars.FOO).to.equal("BAR");
+      expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
+      expect(config_vars.EMPTY_CONFIG_VAR).to.equal("");
+      done();
+    } catch (e) {
+      done(e)
+    }
+  });
+  it("covers updating empty value config vars", async (done) => {
+    try {
+      let data = await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, JSON.stringify({"EMPTY_CONFIG_VAR":"NOT EMPTY"}));
+      let config_vars = JSON.parse(data);
+      expect(config_vars).to.be.a('object');
+      expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
+      expect(config_vars.FOO).to.equal("BAR");
+      expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
+      expect(config_vars.EMPTY_CONFIG_VAR).to.equal("NOT EMPTY");
+      done();
+    } catch (e) {
+      done(e)
+    }
   });
   it("covers adding url with sensitive vars", (done) => {
     setTimeout(() => {
@@ -71,7 +113,7 @@ describe("config-vars: creating, updating and deleting a config vars", function(
         expect(config_vars).to.be.a('object');
         expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
         expect(config_vars.FOO).to.equal("BAR");
-        expect(config_vars.HEROKU_API_TOKEN).to.equal("[redacted]");
+        expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
         expect(config_vars.SENSITIVE).to.equal("https://foo:[redacted]@hostnamme.com/path/");
         done();
       });
@@ -85,7 +127,7 @@ describe("config-vars: creating, updating and deleting a config vars", function(
       expect(config_vars).to.be.a('object');
       expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
       expect(config_vars.FOO).to.equal("GAZI");
-      expect(config_vars.HEROKU_API_TOKEN).to.equal("[redacted]");
+      expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
       done();
     });
   });
@@ -97,7 +139,7 @@ describe("config-vars: creating, updating and deleting a config vars", function(
       expect(config_vars).to.be.a('object');
       expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
       expect(config_vars.FOO).to.be.undefined;
-      expect(config_vars.HEROKU_API_TOKEN).to.equal("[redacted]");
+      expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
       expect(config_vars.SENSITIVE).to.equal("https://foo:[redacted]@hostnamme.com/path/");
       done();
     });

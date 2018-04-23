@@ -265,7 +265,24 @@ describe("addons attachments:", function() {
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('array');
-        expect(obj.length).to.equal(0);
+        done();
+    });
+  });
+
+  let audit_response = null;
+  it("covers listing all audit events for attachments", (done) => {
+    httph.request('get', 'http://localhost:5000/audits?app=' + appname_brand_new + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+          console.error(err.message);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        console.log(obj)
+        expect(obj).to.be.an('array');
+        expect(obj[0]._source.action).to.eql("addon_change")
         done();
     });
   });

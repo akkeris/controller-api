@@ -320,7 +320,8 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
 
   let audit_response = null;
   it("covers audit events for deleting an app", (done) => {
-    httph.request('get', 'http://localhost:5000/audits?app=alamotestapp' + '&space=default', {"Authorization":process.env.AUTH_KEY, "x-username":"test"}, null,
+    setTimeout(() => {
+      httph.request('get', 'http://localhost:5000/audits?app=alamotestapp' + '&space=default', {"Authorization":process.env.AUTH_KEY, "x-username":"test"}, null,
       (err, data) => {
         if(err) {
           console.error(err);
@@ -331,8 +332,9 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
         let obj = JSON.parse(data);
         console.log(obj)
         expect(obj).to.be.an('array');
-        expect(obj[0]._source.action).to.eql("config_change")
+        expect(obj[0]._source.action).to.eql("destroy")
         done();
     });
+    }, 500);
   });
 })

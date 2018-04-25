@@ -275,14 +275,13 @@ describe("addons attachments:", function() {
       (err, data) => {
         if(err) {
           console.error(err);
-          console.error(err.message);
         }
         expect(err).to.be.null;
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         console.log(obj)
         expect(obj).to.be.an('array');
-        expect(obj[0]._source.action).to.eql("addon_change")
+        expect(obj[3]._source.action).to.eql("addon_change")
         done();
     });
   });

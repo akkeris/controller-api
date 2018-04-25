@@ -327,7 +327,6 @@ describe("formations: creating, updating and deleting dynos and process types", 
     });
   });
 
-
   it("Covers getting info on a formation", function(done) {
     httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation/worker', alamo_headers, null, function(err, data) {
       if(err) {
@@ -337,6 +336,24 @@ describe("formations: creating, updating and deleting dynos and process types", 
       expect(data).to.be.a('string');
       done();
     });
+  });
+
+  it("covers audit events for formations", (done) => {
+    setTimeout(() => {
+      httph.request('get', 'http://localhost:5000/audits?app='+ appname_brand_new + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        console.log(obj)
+        expect(obj).to.be.an('array');
+        expect(obj[0]._source.action).to.eql("formation_change")
+        done();
+    });
+    }, 5000);
   });
 
   it("Covers deleting a worker", function(done) {

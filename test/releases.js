@@ -168,6 +168,25 @@ describe("releases: list, get, create a release", function() {
       done();
     });
   });
+
+  it("covers audit events for a feature", (done) => {
+    setTimeout(() => {
+      httph.request('get', 'http://localhost:5000/audits?app=' + appname_brand_new + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        console.log(obj)
+        expect(obj).to.be.an('array');
+        expect(obj[0]._source.action).to.eql("release")
+        done();
+    });
+    }, 5000);
+  });
+
   it("covers ensuring release causes an app at expected host to turn up", function(done) {
     this.timeout(0)
     expect(release_succeeded).to.equal(true)

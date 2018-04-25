@@ -318,14 +318,12 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
     });
   });
 
-  let audit_response = null;
   it("covers audit events for deleting an app", (done) => {
     setTimeout(() => {
-      httph.request('get', 'http://localhost:5000/audits?app=alamotestapp' + '&space=default', {"Authorization":process.env.AUTH_KEY, "x-username":"test"}, null,
+      httph.request('get', 'http://localhost:5000/audits?app=alamotestapp' + '&space=default', alamo_headers, null,
       (err, data) => {
         if(err) {
           console.error(err);
-          console.error(err.message);
         }
         expect(err).to.be.null;
         expect(data).to.be.a('string');

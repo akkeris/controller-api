@@ -81,7 +81,6 @@ describe("builds: conversion between payload, response and database", function()
     });
   });
 
-
   it("covers ensuring soft error on non-uuid", function(done) {
     this.timeout(0);
     httph.request('get', 'http://localhost:5000/apps/api-default/builds/this-is-not-a-uuid', alamo_headers, null, (err, build_info) => {
@@ -144,6 +143,24 @@ describe("builds: conversion between payload, response and database", function()
           });
         });
       });
+  });
+
+  it("covers audit events for a build", (done) => {
+    setTimeout(() => {
+      httph.request('get', 'http://localhost:5000/audits?app='+ appname_brand_new + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        console.log(obj)
+        expect(obj).to.be.an('array');
+        expect(obj[0]._source.action).to.eql("build")
+        done();
+    });
+    }, 5000);
   });
   
   it("covers creating a build needing escaped characters", async function(done) {

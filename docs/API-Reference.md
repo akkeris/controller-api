@@ -5124,40 +5124,31 @@ curl \
 
 ```json
 [{
-    "_index": "audit",
-    "_type": "event",
-    "_id": "26T2_WIBO7g13RiCd5lH",
-    "_score": null,
-    "_source": {
-      "action": "feature_change",
-      "app": {
-        "name": "api",
-        "id": "fa2b535d-de4d-4a14-be36-d44af53b59e3"
-      },
-      "space": {
-        "name": "default"
-      },
-      "changes": [{
-        "type": "update",
-        "name": "auto-release",
-        "value": true
-      }],
-      "feature": {
-        "description": "When the application receives a new build whether or not it should automatically release the build.",
-        "doc_url": "/features/auto-release",
-        "id": "8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
-        "state": "public",
-        "name": "auto-release",
-        "display_name": "Auto release builds",
-        "feedback_email": "cobra@octanner.com",
-        "enabled": true
-      },
-      "username": "test",
-      "timestamp": "2018-04-25T18:00:10.218Z"
+    "action": "feature_change",
+    "app": {
+      "name": "api",
+      "id": "fa2b535d-de4d-4a14-be36-d44af53b59e3"
     },
-    "sort": [
-      1524679210218
-    ]
+    "space": {
+      "name": "default"
+    },
+    "changes": [{
+      "type": "update",
+      "name": "auto-release",
+      "value": true
+    }],
+    "feature": {
+      "description": "When the application receives a new build whether or not it should automatically release the build.",
+      "doc_url": "/features/auto-release",
+      "id": "8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
+      "state": "public",
+      "name": "auto-release",
+      "display_name": "Auto release builds",
+      "feedback_email": "cobra@octanner.com",
+      "enabled": true
+    },
+    "username": "test",
+    "timestamp": "2018-04-25T18:00:10.218Z"
   }
 ]
 ```

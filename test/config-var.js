@@ -52,9 +52,8 @@ describe("config-vars: creating, updating and deleting a config vars", function(
         expect(err).to.be.null;
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
-        console.log(obj)
         expect(obj).to.be.an('array');
-        expect(obj[0]._source.action).to.eql("config_change")
+        expect(obj[0].action).to.eql("config_change")
         done();
     });
     }, 5000);

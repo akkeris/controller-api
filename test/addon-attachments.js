@@ -265,6 +265,7 @@ describe("addons attachments:", function() {
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('array');
+        expect(obj.length).to.equal(0);
         done();
     });
   });
@@ -279,9 +280,8 @@ describe("addons attachments:", function() {
         expect(err).to.be.null;
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
-        console.log(obj)
         expect(obj).to.be.an('array');
-        expect(obj[3]._source.action).to.eql("addon_change")
+        expect(obj[3].action).to.eql("addon_change")
         done();
     });
   });

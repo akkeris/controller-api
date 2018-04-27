@@ -298,6 +298,23 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     }
   })
 
+  it("covers audit events for a preview app", (done) => {
+    setTimeout(() => {
+      httph.request('get', 'http://localhost:5000/audits?app=' + app_name + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('array');
+        expect(obj[0].action).to.eql("preview")
+        done();
+    });
+    }, 5000);
+  });
+
   it("ensure quantity on formation is 1, but all other settings are the same", async (done) => {
     try {
       let data = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${preview_app.app.id}/formation`, alamo_headers, null))

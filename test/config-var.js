@@ -42,6 +42,23 @@ describe("config-vars: creating, updating and deleting a config vars", function(
     });
   });
 
+  it("covers audit events for a config var", (done) => {
+    setTimeout(() => {
+      httph.request('get', 'http://localhost:5000/audits?app='+ appname_brand_new + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('array');
+        expect(obj[0].action).to.eql("config_change")
+        done();
+    });
+    }, 5000);
+  });
+
   it("covers adding invalid config vars", (done) => {
     httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/config-vars', alamo_headers, JSON.stringify({"NOT-ALLOWED":"BOO"}), (err, data) => {
       expect(err).to.be.an('object');

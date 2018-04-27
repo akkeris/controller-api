@@ -86,6 +86,23 @@ describe("logs: ensure we can pull app logs", function() {
     });
   });
 
+  it("covers audit events for log drains", (done) => {
+    setTimeout(() => {
+      httph.request('get', 'http://localhost:5000/audits?app=' + app_name + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('array');
+        expect(obj[0].action).to.eql("logdrain_change")
+        done();
+    });
+    }, 5000);
+  });
+
   it("covers deleting a log drain", (done) => {
     expect(id).to.be.a('string');
     httph.request('delete', 'http://localhost:5000/apps/' + app_name + '-default/log-drains/' + id, alamo_headers, null,

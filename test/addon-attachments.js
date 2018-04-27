@@ -270,6 +270,22 @@ describe("addons attachments:", function() {
     });
   });
 
+  let audit_response = null;
+  it("covers listing all audit events for attachments", (done) => {
+    httph.request('get', 'http://localhost:5000/audits?app=' + appname_brand_new + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('array');
+        expect(obj[3].action).to.eql("addon_change")
+        done();
+    });
+  });
+
   // test addon attachments
   let appname_second_new = "alamotest" + Math.floor(Math.random() * 10000);
   let appname_second_id = null;

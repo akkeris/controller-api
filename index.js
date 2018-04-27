@@ -9,6 +9,8 @@ const config = require('./lib/config.js');
 const octhc = require('./lib/octhc.js');
 const routes = require('./lib/router.js');
 const simple_key_auth = require('./lib/simple_key_auth.js');
+const common = require('./lib/common.js');
+
 
 console.assert(process.env.DATABASE_URL, "No database provided, set DATABASE_URL to a postgres db!");
 
@@ -41,7 +43,8 @@ let alamo = {
   invoices:require('./lib/invoices.js'),
   favorites:require('./lib/favorites.js'),
   regions:require('./lib/regions.js'),
-  stacks:require('./lib/stacks.js')
+  stacks:require('./lib/stacks.js'),
+  audit:require('./lib/audit.js')
 };
 
 
@@ -73,6 +76,8 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   }
   // Initialize Events
   alamo.git.init(pg_pool)
+
+  common.init();
 
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()
@@ -549,6 +554,11 @@ routes.add.post('/favorites$')
           .and.authorization([simple_key]);
 routes.add.delete('/favorites/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.favorites.delete.bind(alamo.favorites.delete, pg_pool))
+          .and.authorization([simple_key]);
+
+// Audit
+routes.add.get('/audits([A-z0-9\\=\\?\\-\\_\\.\\&\\:]*)$')
+          .run(alamo.audit.get.bind(alamo.audit.get))
           .and.authorization([simple_key]);
 
 // App setups

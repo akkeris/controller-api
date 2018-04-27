@@ -300,7 +300,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
 
   it("covers audit events for a preview app", (done) => {
     setTimeout(() => {
-      httph.request('get', 'http://localhost:5000/audits?app=' + app_name + '&space=default', alamo_headers, null,
+      httph.request('get', 'http://localhost:5000/audits?app=' + app_name + '&space=preview', alamo_headers, null,
       (err, data) => {
         if(err) {
           console.error(err);

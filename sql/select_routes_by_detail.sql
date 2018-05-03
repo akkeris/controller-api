@@ -1,5 +1,5 @@
 select
-  route, app, site, source_path, target_path, created, updated
+  route, app, site, source_path, target_path, pending, created, updated
 from
   routes
 where

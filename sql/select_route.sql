@@ -8,7 +8,8 @@ select
   apps.name as app_name,
   spaces.name as space_name,
   routes.source_path, 
-  routes.target_path, 
+  routes.target_path,
+  routes.pending,
   routes.created, 
   routes.updated
 from

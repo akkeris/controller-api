@@ -28,8 +28,8 @@ begin
   end if;
 
   if (select count(*) from auto_builds where auto_build = 'c9821358-49ab-41d2-a1c6-f0fe327d1c0d') = 0 then
-  	insert into auto_builds (auto_build, app, repo, branch, "authorization", auto_deploy, wait_on_status_checks, user_agent, validation_token) values
-      	('c9821358-49ab-41d2-a1c6-f0fe327d1c0d', 'fa2b535d-de4d-4a14-be36-d44af53b59e3', 'repo', 'master', 'fdd3793e-f9df-43c6-88d0-077dcee27b5e', true, true, 'blah', 'blah');
+  	insert into auto_builds (auto_build, app, repo, branch, "authorization", wait_on_status_checks, user_agent, validation_token) values
+      	('c9821358-49ab-41d2-a1c6-f0fe327d1c0d', 'fa2b535d-de4d-4a14-be36-d44af53b59e3', 'repo', 'master', 'fdd3793e-f9df-43c6-88d0-077dcee27b5e', true, 'blah', 'blah');
   end if;
 
   if (select count(*) from certificates) = 0 then 

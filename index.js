@@ -67,15 +67,18 @@ let pg_pool = new pg.Pool(db_conf);
 pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", err); });
 
 (async () => {
-  alamo.formations.timers.begin(pg_pool)
-  alamo.addon_services.timers.begin(pg_pool)
   if(process.env.TEST_MODE || process.env.ONE_PROCESS_MODE) {
     // normally in a worker.
+    // Run any database migrations necessary.
+    await query(fs.readFileSync('./sql/create.sql').toString('utf8'), null, pg_pool, [])
     alamo.releases.timers.begin(pg_pool)
     alamo.git.init_worker(pg_pool)
   }
+  alamo.formations.timers.begin(pg_pool)
+  alamo.addon_services.timers.begin(pg_pool)
   // Initialize Events
   alamo.git.init(pg_pool)
+  alamo.routes.init(pg_pool)
 
   common.init();
 

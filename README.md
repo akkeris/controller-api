@@ -23,7 +23,7 @@
 * `[REGIONNAME]_REGION_API` - The URI for the regional api by the name of REGIONNAME, for example if a region exists called us-seattle the uri for the stack api must be set at US_SEATTLE_REGION_API
 * `DOCKER_REGISTRY_HOST` - The host for storing image sources. E.g., docker.hostname.com, This has no default.
 * `DOCKER_REPO` - The repo in DOCKER_REGISTRY_HOST to store gold master build images (changing this also requires changing jenkins_build_template.xml and existing build templates in jenkins). This has no default.
-
+* `DYNO_DEFAULT_SIZE` - The default dyno size to use. The set default is `scout` if no other is specified.
 
 ### Logging & Metric Information
 * `PROMETHEUS_METRICS_URL` - The url to connect to for metric information stored in prometheus. This has no default.
@@ -38,34 +38,69 @@
 
 ## Installing ##
 
-```npm install```
+```
+npm install
+```
 
 ## Running ##
 
 Prior to running, ensure all of the prior environment variables are properly setup in the ENV.
 
-```npm start```
+```
+npm start
+```
 
-## Testing ##
+## Testing and Developing Locally ##
 
-* TEST_CALLBACK - This is a public URL that can call back to your local box, for integrating with github and hearing callbacks from build systems, this is required (see ngrok).
-* ONE_PROCESS_MODE - When needing to integrate auto releases or other worker features while developing locally, this can be helpful to enable.
+There are some additional options that should be set when developing locally or testing.  Some of these are optional. 
+The tests that run are integration tests that require real services setup. See the setting up section above for additional required environment variables.
 
-Set above env, in addition you'll need to set TEST_MODE=true, ALAMO_BASE_DOMAIN=.some.domain.io, SITE_BASE_DOMAIN=.domain.io and CODACY_PROJECT_TOKEN if you want code coverage.  Then run:
+* `NGROK_TOKEN` - When testing a public URI is needed to test callbacks from other integrated systems, get a token at www.ngrok.com and place it in this envirionment variable.
+* `ONE_PROCESS_MODE` - When developing locally this must be set, it imports what normally would be in the worker into the main process. Just set it to true
+* `TEST_MODE` - Similar to ONE_PROCESS_MODE this should be set when running the automated tests, while ONE_PROCESS_MODE should be set when developing locally.  Just set it to true
+* `ALAMO_BASE_DOMAIN` - This should be in the format of .some.example.com, This is the base domain to use for newly created apps.
+* `SITE_BASE_DOMAIN` - This is the site base domain such as `.example.com`.
+* `CODACY_PROJECT_TOKEN` - While optional this is useful when running test coverage to report the results to www.codacy.com. 
+* `MARU_STACK_API` - Set to the alamo api, MARU is the name of our test cluster
+* `US_SEATTLE_REGION_API` - Set to the alamo api, US_SEATTLE is the name of our test region.
+
+Then run:
 
 ```
+cat sql/create.sql | psql $DATABASE_URL
 cat sql/create_testing.sql | psql $DATABASE_URL
 ```
 
-```npm test```
+Then to run the entire test suite:
 
-OR, run a test manually:
+```
+npm test
+```
 
-```./node_modules/.bin/_mocha test/[test_to_run.js]```
+OR, run an individual test manually:
 
-# Using Akkeris and its API #
+```
+./node_modules/.bin/_mocha test/[test_to_run.js]
+```
 
-## Authentication ##
+
+## Contributing ##
+
+### How Authentication Works ###
 
 The alamo app controller uses a simple key based authorization via http in the "Authorization" header.  For example if your AUTH_KEY is `fugazi` then you would pass in `Authorization: fugazi` with all your http requests to authenticate it.  In addition a `X-Username` is required which contains the username or email address of the user taking the action. Note that this api is not intended to be exposed directly to people but other systems, developers interface through appkit-api project which handles permissions and passes requests through.
+
+### Listening to Events ###
+
+To help decouple actions events my be emited by a central bus within the `common.js` file.  The exported module will have a globally unique (across one dyno instance) "lifecycle" object that implements an Event Emitter pattern in node.  The following events are emitted:
+
+* `preview-created`
+* `build-status-change`
+* `release-started`
+* `release-successful`
+* `release-failed`
+* `released`
+* `git-event`
+
+Note these are not the same concept as web hooks nor should they be confused with that.  In addition there is a lifecycle.js file which is not the same concept as this (just unfortunately named the same).
 

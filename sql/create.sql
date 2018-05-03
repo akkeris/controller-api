@@ -40,6 +40,36 @@ begin
     create type certificate_status as enum('pending', 'rejected', 'processing', 'issued', 'revoked', 'canceled', 'needs_csr', 'needs_approval');
   end if;
 
+
+  create table if not exists regions (
+    region uuid not null primary key,
+    name text not null,
+    country text not null,
+    description text not null,
+    locale text not null,
+    private_capable boolean not null default true,
+    provider_name text not null,
+    provider_region text not null,
+    provider_availability_zones text not null default '',
+    high_availability boolean not null default false,
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    deprecated boolean not null default false,
+    deleted boolean not null default false
+  );
+
+  create table if not exists stacks (
+    stack uuid not null primary key not null,
+    region uuid references regions("region") not null,
+    name text not null,
+    beta boolean not null default false,
+    "default" boolean not null default false,
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    deprecated boolean not null default false,
+    deleted boolean not null default false
+  );
+
   create table if not exists organizations (
     "org" uuid not null primary key,
     created timestamptz not null default now(),
@@ -56,6 +86,7 @@ begin
     name alpha_numeric not null,
     description text not null default '',
     tags text not null default '',
+    stack uuid references stacks("stack") not null default 'ffa8cf57-768e-5214-82fe-fda3f19353f3',
     deleted boolean not null default false
   );
 
@@ -67,6 +98,7 @@ begin
     space uuid references spaces(space),
     org uuid references organizations(org),
     url href not null,
+    disabled boolean NOT NULL default false,
     deleted boolean not null default false
   );
 
@@ -206,6 +238,8 @@ begin
     version varchar(128) not null default '',
     user_agent varchar(1024) not null default '',
     description text not null default '',
+    message varchar(1024),
+    author varchar(1024),
     deleted boolean not null default false,
     auto_build uuid references auto_builds(auto_build),
     foreign_build_key varchar(128) not null default ''
@@ -334,6 +368,7 @@ begin
     comments varchar(2048),
     org uuid references organizations("org"),
     installed boolean not null default false,
+    region uuid references regions("region") not null default 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3',
     issued timestamptz,
     expires timestamptz,
     created timestamptz not null default now(),
@@ -345,7 +380,9 @@ begin
     site uuid not null primary key,
     "domain" domain_name not null,
     certificate uuid references certificates("certificate") null,
-    region varchar(128) not null default 'us',
+    region uuid references regions("region") not null default 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3',
+    preview uuid references previews("preview") null,
+    tags text NOT NULL default '',
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
     deleted boolean not null default false
@@ -357,6 +394,7 @@ begin
     site uuid references sites("site"),
     source_path url_path not null,
     target_path url_path not null,
+    pending boolean not null default false,
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
     deleted boolean not null default false
@@ -407,85 +445,7 @@ begin
   create index if not exists favorites_username_i on favorites (username);
   create unique index if not exists favorites_username_ux on favorites (app, username);
 
-  if not exists( SELECT NULL
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'apps'
-               AND table_schema = 'public'
-               AND column_name = 'disabled') then
-
-    alter table apps add disabled boolean NOT NULL default false;
-  end if;
-
-  if not exists( SELECT NULL
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'sites'
-               AND table_schema = 'public'
-               AND column_name = 'certificate') then
-
-    alter table sites add certificate uuid NULL default NULL;
-  end if;
-
-  if not exists( SELECT NULL
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'sites'
-               AND table_schema = 'public'
-               AND column_name = 'tags')  then
-
-    alter table sites add tags text NOT NULL default '';
-  end if;
-
-  if (select count(*) from apps where name='api' and deleted = false) = 0 then
-    -- insert default information about organizations and API.
-    insert into organizations ( org, name ) values ( '0b26ccb5-83cc-4d33-a01f-100c383e0064', 'main');
-    insert into organizations ( org, name ) values ( '0b26ccb5-83cc-4d33-a01f-100c383e0065', 'test');
-    insert into organizations ( org, name ) values ( '0b26ccb5-83cc-4d33-a01f-100c383e0066', 'alamo');
-    insert into spaces ( space, name, tags ) values ( '565c9b0c-986e-455b-93c8-a146d8d49132', 'default', 'compliance=socs');
-    insert into apps ( app, name, space, org, url ) values
-      ( 'fa2b535d-de4d-4a14-be36-d44af53b59e3', 'api',
-        '565c9b0c-986e-455b-93c8-a146d8d49132', '0b26ccb5-83cc-4d33-a01f-100c383e0064', 'https://api.abcd.abcd.io' );
-    insert into formations ( formation, app, type, quantity, port, size, price ) values
-      ( 'fa2b535d-de4d-4a14-be36-d44af53b5955', 'fa2b535d-de4d-4a14-be36-d44af53b59e3', 'web', 1, 5000, 'constellation', 6000 );
-    insert into formation_changes ( formation_change, formation, app, type, quantity, port, size, price ) values
-      ( 'fa2b535d-de4d-4a14-be36-d44af53b5977', 'fa2b535d-de4d-4a14-be36-d44af53b5955', 'fa2b535d-de4d-4a14-be36-d44af53b59e3',
-        'web', 1, 5000, 'constellation', 6000 );
-    insert into builds values
-      ('9ec219f0-9227-47cb-b570-f996d50b980a','fa2b535d-de4d-4a14-be36-d44af53b59e3','2016-08-25 12:48:38.896000','2016-08-25 12:51:09.371629',
-        '123456','sha256:93f16649a03d37aef081dfec3c2fecfa41bb22dd45de2b79f32dcda83bd69bcf','','',0,'',
-        'succeeded',true,'repo','master','v1.0','curl/7.43.0','jenkins',false,NULL,107);
-    insert into releases (release, app, build, user_agent) values
-      ('52ef1ccc-de5d-4453-816b-bce5fb1cc8a5',
-       'fa2b535d-de4d-4a14-be36-d44af53b59e3', '9ec219f0-9227-47cb-b570-f996d50b980a', 'Chrome');
-  end if;
-
-  create table if not exists regions (
-    region uuid not null primary key,
-    name text not null,
-    country text not null,
-    description text not null,
-    locale text not null,
-    private_capable boolean not null default true,
-    provider_name text not null,
-    provider_region text not null,
-    provider_availability_zones text not null default '',
-    high_availability boolean not null default false,
-    created timestamptz not null default now(),
-    updated timestamptz not null default now(),
-    deprecated boolean not null default false,
-    deleted boolean not null default false
-  );
-
-  create table if not exists stacks (
-    stack uuid not null primary key not null,
-    region uuid references regions("region") not null,
-    name text not null,
-    beta boolean not null default false,
-    "default" boolean not null default false,
-    created timestamptz not null default now(),
-    updated timestamptz not null default now(),
-    deprecated boolean not null default false,
-    deleted boolean not null default false
-  );
-
+  -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then
     insert into regions 
       (region, name, country, description, locale, private_capable, provider_name, provider_region, provider_availability_zones, high_availability, created, updated, deprecated, deleted) 
@@ -500,101 +460,40 @@ begin
       ('ffa8cf57-768e-5214-82fe-fda3f19353f3', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'ds1', false, true, '2016-08-25 12:51:09.371629', now(), false, false);
   end if;
 
-  if exists (SELECT NULL 
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'sites'
-              AND column_name = 'region'
-              and data_type = 'character varying') then
-    alter table sites drop column region;
+  -- create default api and bootstrap data.
+  if (select count(*) from apps where name='api' and deleted = false) = 0 then
+    insert into organizations ( org, name ) values ( '0b26ccb5-83cc-4d33-a01f-100c383e0064', 'main');
+    insert into organizations ( org, name ) values ( '0b26ccb5-83cc-4d33-a01f-100c383e0065', 'test');
+    insert into organizations ( org, name ) values ( '0b26ccb5-83cc-4d33-a01f-100c383e0066', 'alamo');
+    insert into spaces ( space, name, tags, stack ) values ( '565c9b0c-986e-455b-93c8-a146d8d49132', 'default', 'compliance=socs', 'ffa8cf57-768e-5214-82fe-fda3f19353f3');
+    insert into apps ( app, name, space, org, url ) values
+      ( 'fa2b535d-de4d-4a14-be36-d44af53b59e3', 'api',
+        '565c9b0c-986e-455b-93c8-a146d8d49132', '0b26ccb5-83cc-4d33-a01f-100c383e0064', 'https://api.abcd.abcd.io' );
+    insert into formations ( formation, app, type, quantity, port, size, price ) values
+      ( 'fa2b535d-de4d-4a14-be36-d44af53b5955', 'fa2b535d-de4d-4a14-be36-d44af53b59e3', 'web', 1, 5000, 'constellation', 6000 );
+    insert into formation_changes ( formation_change, formation, app, type, quantity, port, size, price ) values
+      ( 'fa2b535d-de4d-4a14-be36-d44af53b5977', 'fa2b535d-de4d-4a14-be36-d44af53b5955', 'fa2b535d-de4d-4a14-be36-d44af53b59e3',
+        'web', 1, 5000, 'constellation', 6000 );
+    insert into builds values
+      ('9ec219f0-9227-47cb-b570-f996d50b980a','fa2b535d-de4d-4a14-be36-d44af53b59e3','2016-08-25 12:48:38.896000','2016-08-25 12:51:09.371629',
+        '123456','sha256:93f16649a03d37aef081dfec3c2fecfa41bb22dd45de2b79f32dcda83bd69bcf','','',0,'',
+        'succeeded',true,'repo','master','v1.0','curl/7.43.0','jenkins','message','author', false, NULL, 107);
+    insert into releases (release, app, build, user_agent) values
+      ('52ef1ccc-de5d-4453-816b-bce5fb1cc8a5',
+       'fa2b535d-de4d-4a14-be36-d44af53b59e3', '9ec219f0-9227-47cb-b570-f996d50b980a', 'Chrome');
   end if;
 
-  -- transition auto_builds.auto_deploy to an app feature
-  if exists (SELECT NULL 
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'auto_builds'
-              AND column_name = 'auto_deploy'
-              and data_type = 'boolean') then
 
-    insert into features
-      (app, feature, name, created, updated, deleted)
-      (select auto_builds.app, '8e7ec5d2-c410-4d04-8d5e-db7746c40b44', 'auto-release', auto_builds.created, auto_builds.updated, case auto_builds.auto_deploy when true then false else true end from auto_builds where auto_builds.deleted = false)
-    on conflict (app, feature)
-      do update set
-        deleted = (select case auto_builds.auto_deploy when true then false else true end from auto_builds where auto_builds.app = features.app and deleted = false),
-        updated = (select auto_builds.updated from auto_builds where auto_builds.app = features.app and deleted = false);
-
-    alter table auto_builds drop column auto_deploy;
-  end if;
-
+  -- Transitions in data structures, this should go through one iteration,
+  -- ensure any alterations happen on the OBJECT ABOVE AS WELL! Otherwise
+  -- when these are periodically removed it won't happen on new installations.
   if not exists (SELECT NULL 
               FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'certificates'
-              AND column_name = 'region') then
-    alter table certificates add column region uuid references regions("region") not null default 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3';
+             WHERE table_name = 'routes'
+              AND column_name = 'pending'
+              and table_schema = 'public') then
+    alter table routes add column pending boolean not null default false;
   end if;
 
-  if exists (SELECT NULL 
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'spaces'
-              AND column_name = 'region'
-              and data_type = 'character varying') then
-    alter table spaces drop column region;
-  end if;
-
-  if exists (SELECT NULL 
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'hooks'
-              AND column_name = 'url'
-              and domain_name = 'url_path') then
-    alter table hooks alter column url type href;
-  end if;
-
-  if exists (SELECT NULL 
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'hook_results'
-              AND column_name = 'url'
-              and domain_name = 'url_path') then
-    alter table hook_results alter column url type href;
-  end if;
-
-  if not exists( SELECT NULL
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'spaces'
-               AND table_schema = 'public'
-               AND column_name = 'stack') then
-    alter table spaces add column stack uuid references stacks("stack") not null default 'ffa8cf57-768e-5214-82fe-fda3f19353f3';
-  end if;
-
-  if not exists( SELECT NULL
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'sites'
-               AND table_schema = 'public'
-               AND column_name = 'region')  then
-    alter table sites add column region uuid references regions("region") not null default 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3';
-  end if;
-
-  if not exists( SELECT NULL
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'sites'
-               AND table_schema = 'public'
-               AND column_name = 'preview')  then
-    alter table sites add column preview uuid references previews("preview") null;
-  end if;
-
-  if not exists( SELECT NULL
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'builds'
-               AND table_schema = 'public'
-               AND column_name = 'author')  then
-    alter table builds add column author varchar(1024);
-  end if;
-
-  if not exists( SELECT NULL
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'builds'
-               AND table_schema = 'public'
-               AND column_name = 'message')  then
-    alter table builds add column message varchar(1024);
-  end if;
 end
 $$;

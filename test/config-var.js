@@ -42,6 +42,23 @@ describe("config-vars: creating, updating and deleting a config vars", function(
     });
   });
 
+  it("covers audit events for a config var", (done) => {
+    setTimeout(() => {
+      httph.request('get', 'http://localhost:5000/audits?app='+ appname_brand_new + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('array');
+        expect(obj[0].action).to.eql("config_change")
+        done();
+    });
+    }, 5000);
+  });
+
   it("covers adding invalid config vars", (done) => {
     httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/config-vars', alamo_headers, JSON.stringify({"NOT-ALLOWED":"BOO"}), (err, data) => {
       expect(err).to.be.an('object');
@@ -118,6 +135,18 @@ describe("config-vars: creating, updating and deleting a config vars", function(
         done();
       });
     }, 1000);
+  });
+  it("covers ensuring addon info does not leak config vars", async (done) => {
+    try {
+      let postgresdb = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${appname_brand_new}-default/addons`, alamo_headers, JSON.stringify({"plan":"alamo-postgresql:hobby"})));
+      let info = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/addons/${postgresdb.id}`, alamo_headers, null));
+      let cvs = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, null));
+      expect(info.config_vars.DATABASE_URL).to.equal(cvs.DATABASE_URL);
+      expect(info.config_vars.DATABASE_URL.includes('[redacted]')).to.equal(true);
+      done();
+    } catch (e) {
+      done(e);
+    }
   });
   it("covers updating config vars", (done) => {
     // update a config var

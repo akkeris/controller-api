@@ -9,6 +9,8 @@ const config = require('./lib/config.js');
 const octhc = require('./lib/octhc.js');
 const routes = require('./lib/router.js');
 const simple_key_auth = require('./lib/simple_key_auth.js');
+const common = require('./lib/common.js');
+
 
 console.assert(process.env.DATABASE_URL, "No database provided, set DATABASE_URL to a postgres db!");
 
@@ -41,7 +43,8 @@ let alamo = {
   invoices:require('./lib/invoices.js'),
   favorites:require('./lib/favorites.js'),
   regions:require('./lib/regions.js'),
-  stacks:require('./lib/stacks.js')
+  stacks:require('./lib/stacks.js'),
+  audit:require('./lib/audit.js')
 };
 
 
@@ -64,15 +67,20 @@ let pg_pool = new pg.Pool(db_conf);
 pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", err); });
 
 (async () => {
-  alamo.formations.timers.begin(pg_pool)
-  alamo.addon_services.timers.begin(pg_pool)
   if(process.env.TEST_MODE || process.env.ONE_PROCESS_MODE) {
     // normally in a worker.
+    // Run any database migrations necessary.
+    await query(fs.readFileSync('./sql/create.sql').toString('utf8'), null, pg_pool, [])
     alamo.releases.timers.begin(pg_pool)
     alamo.git.init_worker(pg_pool)
   }
+  alamo.formations.timers.begin(pg_pool)
+  alamo.addon_services.timers.begin(pg_pool)
   // Initialize Events
   alamo.git.init(pg_pool)
+  alamo.routes.init(pg_pool)
+
+  common.init();
 
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()
@@ -549,6 +557,11 @@ routes.add.post('/favorites$')
           .and.authorization([simple_key]);
 routes.add.delete('/favorites/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.favorites.delete.bind(alamo.favorites.delete, pg_pool))
+          .and.authorization([simple_key]);
+
+// Audit
+routes.add.get('/audits([A-z0-9\\=\\?\\-\\_\\.\\&\\:]*)$')
+          .run(alamo.audit.get.bind(alamo.audit.get))
           .and.authorization([simple_key]);
 
 // App setups

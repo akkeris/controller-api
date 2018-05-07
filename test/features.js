@@ -74,6 +74,22 @@ describe("features: ensure we can set and get app features", function() {
     });
   });
 
+  it("covers audit events for a feature", (done) => {
+    setTimeout(() => {
+      httph.request('get', 'http://localhost:5000/audits?app=api' + '&space=default', alamo_headers, null,
+      (err, data) => {
+        if(err) {
+          console.error(err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('array');
+        expect(obj[0].action).to.eql("feature_change")
+        done();
+    });
+    }, 5000);
+  });
 
   it("covers listing features (disabled)", (done) => {
     httph.request('get', 'http://localhost:5000/apps/api-default/features', alamo_headers, null, 

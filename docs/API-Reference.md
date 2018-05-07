@@ -4911,34 +4911,34 @@ curl \
 **200 "OK" Response**
 
 ```json
-[{
-    "id": "81442fc0-cf86-47c2-943c-28da18a84fad",
-    "domain": "alamotestsite4106",
-    "region":{
-      "name":"us-seattle",
-      "id":"81442fc0-cf86-47c2-943c-28da18a84fad"
+[
+  {
+    "id": "ee1664e0-2e30-4edc-8b2d-f9a436b439cc",
+    "domain": "test.example.com",
+    "region": {
+      "id": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3",
+      "name": "us-seattle"
     },
-    "created_at": "2017-05-02T15:31:09.774Z",
-    "updated_at": "2017-05-02T15:31:09.774Z",
-    "compliance": []
-}, {
-    "id": "ceba4ef1-5fbf-4c12-9adc-a7c1d7673b14",
-    "domain": "fuggle.akkeris.io",
-    "region":{
-      "name":"us-seattle",
-      "id":"81442fc0-cf86-47c2-943c-28da18a84fad"
+    "created_at": "2018-04-18T22:08:47.481Z",
+    "updated_at": "2018-04-18T22:08:47.481Z",
+    "compliance": [
+      "internal"
+    ]
+  },
+  {
+    "id": "aa1664e0-ee30-cedc-bb2d-39a436b43911",
+    "domain": "test2.example.com",
+    "region": {
+      "id": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3",
+      "name": "us-seattle"
     },
-    "created_at": "2017-06-21T22:22:43.780Z",
-    "updated_at": "2017-06-21T22:22:43.780Z",
-    "compliance": []
-}, {
-    "id": "3db62e0c-9496-4ad0-a735-830b6ef7d5c5",
-    "domain": "appkitui.akkeris.io",
-    "region": "us-seattle",
-    "created_at": "2017-08-02T15:30:16.158Z",
-    "updated_at": "2017-08-02T15:30:16.158Z",
-    "compliance": []
-}]
+    "created_at": "2017-03-18T22:08:47.481Z",
+    "updated_at": "2017-03-18T22:08:47.481Z",
+    "compliance": [
+      "internal"
+    ]
+  }
+]
 ```
 
 ### Create Site
@@ -4950,7 +4950,7 @@ Creates a new https website.
 |   Name       |       Type      | Description                                                                                   | Example                                                 |
 |:------------:|:---------------:|-----------------------------------------------------------------------------------------------|---------------------------------------------------------|
 | domain | required string | A name for your domain, must only contain alpha-numerics, hypens, and full stops | merpderp.akkeris.io
-| region  | required string | Cluster region | us
+| region  | required string | Cluster region | us-seattle
 | internal  | required boolean | If routing to internal apps | true  
 
 **CURL Example**
@@ -4960,8 +4960,8 @@ curl \
   -H 'Authorization: ...' \
   -X POST \
   https://apps.akkeris.io/sites \
-  -d '{"domain":"merpderp.akkeris.io",
-       "regoin":"us",
+  -d '{"domain":"test.example.com",
+       "regoin":"us-seattle",
        "internal": false}'
 ```
 
@@ -4969,18 +4969,55 @@ curl \
 
 ```json
 {
-  "id": "e4fe6f60-aa82-4ebd-ae65-d23f71334876",
-  "domain": "merpderp.akkeris.io",
-  "region": "us-seattle",
-  "created_at": "2017-09-01T20:31:13.549Z",
-  "updated_at": "2017-09-01T20:31:13.549Z",
-  "compliance": []
+  "id": "ee1664e0-2e30-4edc-8b2d-f9a436b439cc",
+  "domain": "test.example.com",
+  "region": {
+    "id": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3",
+    "name": "us-seattle"
+  },
+  "created_at": "2018-04-18T22:08:47.481Z",
+  "updated_at": "2018-04-18T22:08:47.481Z",
+  "compliance": [
+    "internal"
+  ]
+}
+```
+
+### Get Site Info
+
+`GET /sites/{site_id_or_host}`
+
+Gets information on the specified site
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/sites/test.example.com
+
+**200 "OK" Response**
+
+```json
+{
+  "id": "ee1664e0-2e30-4edc-8b2d-f9a436b439cc",
+  "domain": "test.example.com",
+  "region": {
+    "id": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3",
+    "name": "us-seattle"
+  },
+  "created_at": "2018-04-18T22:08:47.481Z",
+  "updated_at": "2018-04-18T22:08:47.481Z",
+  "compliance": [
+    "internal"
+  ]
 }
 ```
 
 ### Delete Site
 
-`DELETE /sites`
+`DELETE /sites/{site_id_or_host}`
 
 Deletes the specified website.
 
@@ -4990,27 +5027,34 @@ Deletes the specified website.
 curl \
   -H 'Authorization: ...' \
   -X DELETE \
-  https://apps.akkeris.io/sites
+  https://apps.akkeris.io/sites/test.example.com
 
-**200 "Deleted" Response**
+**200 "OK" Response**
 
 ```json
 {
-  "created_at": "2016-07-26T15:47:05.126Z",
-  "id": "3911c0ec-e967-4497-8db5-54a52c5174b4",
-  "name": "myorg",
-  "updated_at": "2016-07-26T15:47:07.267Z",
-  "role":"admin"
+  "id": "ee1664e0-2e30-4edc-8b2d-f9a436b439cc",
+  "domain": "test.example.com",
+  "region": {
+    "id": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3",
+    "name": "us-seattle"
+  },
+  "created_at": "2018-04-18T22:08:47.481Z",
+  "updated_at": "2018-04-18T22:08:47.481Z",
+  "compliance": [
+    "internal"
+  ]
 }
 ```
 
 ## Routes
+
 Routes provide path based routing to specified apps off of a site.
 
 ### List Routes
-*By site*
 
-`GET /site/{site_name}/routes`
+`GET /sites/{site_id_or_host}/routes`
+`GET /apps/{app_id_or_name}/routes`
 
 **CURL Example**
 
@@ -5018,34 +5062,59 @@ Routes provide path based routing to specified apps off of a site.
 curl \
   -H 'Authorization: ...' \
   -X GET \
-  https://apps.akkeris.io/sites/test.akkeris.io/routes
+  https://apps.akkeris.io/sites/test.example.com/routes
 ```
 
 **200 "OK" Response**
 
 ```json
-[{
-    "id": "45736b25-5752-4561-858f-fb8169375665",
-    "app": "pipeline1-cory",
-    "site": "testsite2",
-    "source_path": "/",
+[
+  {
+    "id": "7daead5d-5ed8-4c05-a50a-bcb2f8906186",
+    "pending": false,
+    "app": {
+      "id": "6332a1ee-d756-4044-b563-c24745ed4579",
+      "name": "example1-space"
+    },
+    "site": {
+      "id": "3274243d-2f8f-4297-8ff2-eddf0e0f92b6",
+      "domain": "test.example.com",
+      "region": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3",
+      "compliance": [
+        "internal"
+      ]
+    },
+    "source_path": "/somepath/",
     "target_path": "/",
-    "created_at": "2017-09-05T20:01:59.100Z",
-    "updated_at": "2017-09-05T20:01:59.100Z"
-}, {
-    "id": "0f4be452-139a-48d8-b678-0d3f0c7d3ff3",
-    "app": "pipeline2-cory",
-    "site": "testsite2",
-    "source_path": "/target",
+    "created_at": "2018-03-21T16:37:22.663Z",
+    "updated_at": "2018-03-21T16:37:22.663Z"
+  },
+  {
+    "id": "72805a4f-e59a-4a75-8e91-5f7da0719cc6",
+    "pending": false,
+    "app": {
+      "id": "3eb6d518-4111-48ef-86d8-ff5cc2250b6a",
+      "name": "example2-space"
+    },
+    "site": {
+      "id": "3274243d-2f8f-4297-8ff2-eddf0e0f92b6",
+      "domain": "test.example.com",
+      "region": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3",
+      "compliance": [
+        "internal"
+      ]
+    },
+    "source_path": "/api/example2",
     "target_path": "/",
-    "created_at": "2017-09-05T21:02:03.307Z",
-    "updated_at": "2017-09-05T21:02:03.307Z"
-}]
+    "created_at": "2018-03-22T14:28:43.831Z",
+    "updated_at": "2018-03-22T14:28:43.831Z"
+  }
+]
 ```
 
 ### Create Route
 
-`POST /routes`
+`POST /sites/{site_id_or_host}/routes`
 
 Creates a new http route for a site from a specific URI source path on the site to an apps URI target path
 
@@ -5062,10 +5131,10 @@ Creates a new http route for a site from a specific URI source path on the site 
 curl \
   -H 'Authorization: ...' \
   -X POST \
-  https://apps.akkeris.io/sites \
-  -d '{"site":"merpderp.akkeris.io",
+  https://apps.akkeris.io/sites/test.akkeris.io/routes \
+  -d '{"site":"test.example.com",
        "app":"8c4adc95-1348-4c8f-ba2f-e0b726dc2604",
-       "source_path": "/",
+       "source_path": "/foo",
        "target_path": "/"}'
 ```
 
@@ -5073,19 +5142,32 @@ curl \
 
 ```json
 {
-  "id": "45736b25-5752-4561-858f-fb8169375665",
-  "app": "pipeline1-cory",
-  "site": "testsite2",
-  "source_path": "/",
+  "id": "72805a4f-e59a-4a75-8e91-5f7da0719cc6",
+  "pending": true,
+  "app": {
+    "id": "8c4adc95-1348-4c8f-ba2f-e0b726dc2604",
+    "name": "example3-space"
+  },
+  "site": {
+    "id": "3274243d-2f8f-4297-8ff2-eddf0e0f92b6",
+    "domain": "test.example.com",
+    "region": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3",
+    "compliance": [
+      "internal"
+    ]
+  },
+  "source_path": "/foo",
   "target_path": "/",
-  "created_at": "2017-09-05T20:01:59.100Z",
-  "updated_at": "2017-09-05T20:01:59.100Z"
+  "created_at": "2018-03-22T14:28:43.831Z",
+  "updated_at": "2018-03-22T14:28:43.831Z"
 }
 ```
 
 ### Delete Route
 
 `DELETE /routes/{route_id}`
+`DELETE /sites/{site_id_or_host}/routes/{route_id}`
+`DELETE /sites/{app_name_or_id}/routes/{route_id}`
 
 Deletes a route
 
@@ -5095,7 +5177,86 @@ Deletes a route
 curl \
   -H 'Authorization: ...' \
   -X DELETE \
-  https://apps.akkeris.io/routes/45736b25-5752-4561-858f-fb8169375665
+  https://apps.akkeris.io/routes/72805a4f-e59a-4a75-8e91-5f7da0719cc6
+```
 
-**200 "Deleted" Response**
 
+**200 "Ok" Response**
+
+```json
+{
+  "id": "72805a4f-e59a-4a75-8e91-5f7da0719cc6",
+  "pending": false,
+  "app": {
+    "id": "8c4adc95-1348-4c8f-ba2f-e0b726dc2604",
+    "name": "example3-space"
+  },
+  "site": {
+    "id": "3274243d-2f8f-4297-8ff2-eddf0e0f92b6",
+    "domain": "test.example.com",
+    "region": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3",
+    "compliance": [
+      "internal"
+    ]
+  },
+  "source_path": "/foo",
+  "target_path": "/",
+  "created_at": "2018-03-22T14:28:43.831Z",
+  "updated_at": "2018-03-22T14:28:43.831Z"
+}
+```
+
+## Audits
+Audits provide activity on a given app.
+
+### List Activity
+
+`GET /audits?{app&space&user}`
+
+| Name | Type | Description | Example |
+|------|---------|---------|-----------|
+| user | optional string | filter by username that enacted the event | murray.resinski |
+| app | optional string | filter by app for all events | api |
+| space | optional string | filter by space for events on apps | default |
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/audits?app=api&space=default
+```
+
+**200 "OK" Response**
+
+```json
+[{
+    "action": "feature_change",
+    "app": {
+      "name": "api",
+      "id": "fa2b535d-de4d-4a14-be36-d44af53b59e3"
+    },
+    "space": {
+      "name": "default"
+    },
+    "changes": [{
+      "type": "update",
+      "name": "auto-release",
+      "value": true
+    }],
+    "feature": {
+      "description": "When the application receives a new build whether or not it should automatically release the build.",
+      "doc_url": "/features/auto-release",
+      "id": "8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
+      "state": "public",
+      "name": "auto-release",
+      "display_name": "Auto release builds",
+      "feedback_email": "cobra@octanner.com",
+      "enabled": true
+    },
+    "username": "test",
+    "timestamp": "2018-04-25T18:00:10.218Z"
+  }
+]
+```

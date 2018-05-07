@@ -9,6 +9,7 @@ select
   spaces.name as space_name,
   routes.source_path, 
   routes.target_path, 
+  routes.pending,
   routes.created, 
   routes.updated
 from

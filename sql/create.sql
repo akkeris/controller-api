@@ -238,7 +238,7 @@ begin
     version varchar(128) not null default '',
     user_agent varchar(1024) not null default '',
     description text not null default '',
-    message varchar(1024),
+    message text,
     author varchar(1024),
     deleted boolean not null default false,
     auto_build uuid references auto_builds(auto_build),
@@ -493,6 +493,15 @@ begin
               AND column_name = 'pending'
               and table_schema = 'public') then
     alter table routes add column pending boolean not null default false;
+  end if;
+
+  if exists (SELECT 1 
+              FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE table_name = 'builds'
+              AND column_name = 'message'
+              and character_maximum_length = 1024
+              and data_type = 'character varying') then
+    alter table builds alter column message type text using message::text;
   end if;
 
 end

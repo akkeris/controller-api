@@ -608,5 +608,5 @@ process.on('uncaughtException', (e) => {
   console.error(e.stack);
 });
 
-module.exports = {routes:routes, pg_pool:pg_pool};
+module.exports = {routes:routes, pg_pool:pg_pool, server};
 

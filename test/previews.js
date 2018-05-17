@@ -62,8 +62,8 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   const expect = require("chai").expect
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "x-username":"test", "x-elevated-access":"true"}
   const app_dummy_name = "altest" + Math.round(Math.random() * 10000)
-  const app_name = "altest" + Math.round(Math.random() * 10000)
-  const site_name = "altest" + Math.round(Math.random() * 10000) + process.env.SITE_BASE_DOMAIN
+  const app_name = "altestingapp" + Math.round(Math.random() * 10000)
+  const site_name = "altestingapp" + Math.round(Math.random() * 10000) + process.env.SITE_BASE_DOMAIN
 
 
   const webhook_pr_push_before_pr = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-push-before-pr.json').toString('utf8'))
@@ -544,14 +544,15 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     }
   })
 
+  let prod_app_name = app_name.substring(0, app_name.length - 1) + 'p'
   it("setup a prod-space app", async (done) => {
     try {
-      let req_data = JSON.stringify({org:"test", space:"default", name:app_name + 'p', size:"constellation", quantity:1, "type":"web", port:9000})
+      let req_data = JSON.stringify({org:"test", space:"default", name:prod_app_name, size:"constellation", quantity:1, "type":"web", port:9000})
       let data = await httph.request('post', 'http://localhost:5000/apps', alamo_headers, req_data)
       
       let payload = JSON.stringify({repo:"https://github.com/akkeris/preview-app-test-repo", branch:"master", status_check:"true", auto_deploy:"true", username:"test", token:"ab832239defaa3298438abb"})
-      await httph.request('post', `http://localhost:5000/apps/${app_name}p-default/builds/auto`, alamo_headers, payload)
-      await httph.request('patch', `http://localhost:5000/apps/${app_name}p-default/features/preview`, alamo_headers, {"enabled":true}, null)
+      await httph.request('post', `http://localhost:5000/apps/${prod_app_name}-default/builds/auto`, alamo_headers, payload)
+      await httph.request('patch', `http://localhost:5000/apps/${prod_app_name}-default/features/preview`, alamo_headers, {"enabled":true}, null)
 
       done()
     } catch (e) {
@@ -564,9 +565,9 @@ describe("preview apps: ensure preview apps work appropriately", function() {
       let incoming = JSON.stringify(webhook_pr_opened)
       let hash = git.calculate_hash("testing", incoming)
       let headers = {'x-github-event':'pull_request', 'x-hub-signature':hash}
-      let data = await httph.request('post', `http://localhost:5000/apps/${app_name}p-default/builds/auto/github`, headers, incoming)
+      let data = await httph.request('post', `http://localhost:5000/apps/${prod_app_name}-default/builds/auto/github`, headers, incoming)
       expect(data.toString('utf8')).to.equal('{"code":201,"message":"Roger that, message received."}')
-      let previews = await httph.request('get', `http://localhost:5000/apps/${app_name}p-default/previews`, alamo_headers, null)
+      let previews = await httph.request('get', `http://localhost:5000/apps/${prod_app_name}-default/previews`, alamo_headers, null)
       previews = JSON.parse(previews.toString())
       expect(previews).to.be.an('array')
       expect(previews.length).to.equal(0)
@@ -596,7 +597,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   })
 
   it("ensure we clean up after ourselves (2)", (done) => {
-    httph.request('delete', `http://localhost:5000/apps/${app_name}p-default`, alamo_headers, null, (err, data) => {
+    httph.request('delete', `http://localhost:5000/apps/${prod_app_name}-default`, alamo_headers, null, (err, data) => {
       expect(err).to.be.null;
       done();
     });

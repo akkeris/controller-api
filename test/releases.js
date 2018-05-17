@@ -180,7 +180,7 @@ describe("releases: list, get, create a release", function() {
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('array');
-        expect(obj[0].action).to.eql("release")
+        expect(obj.some((x)=> x.action === 'release')).to.eql(true);
         done();
     });
     }, 5000);

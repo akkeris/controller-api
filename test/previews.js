@@ -309,7 +309,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('array');
-        expect(obj[0].action).to.eql("preview")
+        expect(obj.some((x)=> x.action === 'preview')).to.eql(true);
         done();
     });
     }, 5000);

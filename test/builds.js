@@ -156,7 +156,7 @@ describe("builds: conversion between payload, response and database", function()
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('array');
-        expect(obj[1].action).to.eql("build")
+        expect(obj.some((x)=> x.action === 'build')).to.eql(true);
         done();
     });
     }, 5000);

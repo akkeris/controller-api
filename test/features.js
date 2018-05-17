@@ -85,7 +85,7 @@ describe("features: ensure we can set and get app features", function() {
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('array');
-        expect(obj[0].action).to.eql("feature_change")
+        expect(obj.some((x)=> x.action === 'feature_change')).to.eql(true);
         done();
     });
     }, 5000);

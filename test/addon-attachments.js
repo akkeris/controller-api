@@ -195,7 +195,7 @@ describe("addons attachments:", function() {
       expect(data).to.be.a('string');
       let obj = JSON.parse(data);
       expect(obj).to.be.an('array');
-      expect(obj[3].action).to.eql("addon_change")
+      expect(obj.some((x)=> x.action === 'addon_change')).to.eql(true);
       done();
     } catch (e) {
       done(e);

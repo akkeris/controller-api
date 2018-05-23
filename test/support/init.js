@@ -2,6 +2,7 @@ const ngrok = require('ngrok')
 const util = require('util')
 const httph = require('../../lib/http_helper.js')
 const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", "x-elevated-access":"true"};
+let running_app = null
 
 before(function(done) {
   if(process.env.NGROK_TOKEN) {
@@ -13,12 +14,11 @@ before(function(done) {
         process.env.TEST_CALLBACK = url
         process.env.ALAMO_APP_CONTROLLER_URL = url
       }
-      let running_app = require('../../index.js')
+      running_app = require('../../index.js')
       setTimeout(done, 500);
     })
   } else {
-
-      let running_app = require('../../index.js')
+    running_app = require('../../index.js')
     setTimeout(done, 500);
   }
 })
@@ -28,7 +28,9 @@ after(function(done) {
     ngrok.disconnect()
     ngrok.kill()
   }
-  done()
+  running_app.server.close(() => {
+    done()
+  });
 })
 
 function wait(time) {

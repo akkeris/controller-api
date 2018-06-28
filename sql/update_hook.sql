@@ -5,6 +5,6 @@ update hooks set
   active = coalesce($4, active),
   updated = now()
 where
-  hook::varchar(128) = $1::varchar(256)) and
+  hook::varchar(128) = $1::varchar(256) and
   deleted = false
 returning *

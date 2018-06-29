@@ -329,7 +329,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('array');
-        expect(obj[0].action).to.eql("destroy")
+        expect(obj.some((x)=> x.action === 'destroy')).to.eql(true);
         done();
     });
     }, 1000);

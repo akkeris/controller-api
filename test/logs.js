@@ -97,7 +97,7 @@ describe("logs: ensure we can pull app logs", function() {
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('array');
-        expect(obj[0].action).to.eql("logdrain_change")
+        expect(obj.some((x)=> x.action === 'logdrain_change')).to.eql(true);
         done();
     });
     }, 5000);

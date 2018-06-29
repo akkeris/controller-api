@@ -11,9 +11,8 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
+    "elasticsearch": "^15.0.0",
     "pg": "^7.4.1",
-    "request": "^2.85.0",
-    "elasticsearch": "^14.2.2",
     "uuid": "^2.0.2"
   },
   "devDependencies": {
@@ -22,6 +21,6 @@
     "istanbul": "^1.0.0-alpha.2",
     "mocha": "^2.5.3",
     "mocha-jenkins-reporter": "0.3.8",
-    "ngrok": "^2.3.0"
+    "ngrok": "2.3.0"
   }
 }

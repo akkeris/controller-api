@@ -264,6 +264,28 @@ describe("hooks:", function() {
       expect(hook_info.id).to.equal(hook_id);
       expect(hook_info.events).to.be.an('array');
       expect(hook_info.url).to.be.a('string');
+      expect(hook_info.active).to.equal(true);
+      expect(hook_info.created_at).to.be.a('string');
+      expect(hook_info.updated_at).to.be.a('string');
+      done();
+    });
+  });
+
+  it("covers updating hook", (done) => {
+    expect(hook_id).to.be.a('string');
+    httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/hooks/' + hook_id, alamo_headers, JSON.stringify({"url":"https://foobar", "active":false}), (err, hook_info) => {
+      if(err) {
+        console.log('hook error:', err);
+      }
+      expect(err).to.be.null;
+      expect(hook_info).to.be.a('string');
+      hook_info = JSON.parse(hook_info);
+      expect(hook_info.id).to.be.a('string');
+      expect(hook_info.id).to.equal(hook_id);
+      expect(hook_info.events).to.be.an('array');
+      expect(hook_info.url).to.be.a('string');
+      expect(hook_info.url).to.equal("https://foobar")
+      expect(hook_info.active).to.equal(false)
       expect(hook_info.created_at).to.be.a('string');
       expect(hook_info.updated_at).to.be.a('string');
       done();

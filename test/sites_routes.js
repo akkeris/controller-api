@@ -7,6 +7,7 @@ describe("sites/routes", function () {
     const support = require('./support/init.js');
     process.env.TEST_MODE = "true"; // DO NOT REMOVE THIS OTHERWISE THE TESTS WILL TRY AND DO REAL THINGS.
     const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", "x-elevated-access":"true", 'x-ignore-errors':'true'};
+    const alamo_headers_bubble_errors = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", "x-elevated-access":"true", 'x-silent-error':'true'};
     const running_app = require('../index.js');
     const httph = require('../lib/http_helper.js');
     const expect = require("chai").expect;
@@ -352,6 +353,36 @@ describe("sites/routes", function () {
         done()
       } catch (e) {
         done(e)
+      }
+    });
+
+    it("covers ensuring routes with the same source path and same target path arent allowed", async (done) => {
+      try {
+        let payload = { app: testapp3.id, site: new_site, source_path: "/override", target_path: "/" };
+        await httph.request('post', `http://localhost:5000/sites/${new_site}/routes`, alamo_headers_bubble_errors, JSON.stringify(payload));
+        done(new Error("Failed, allowed the route to be created."))
+      } catch (e) {
+        done()
+      }
+    });
+
+    it("covers ensuring routes with the same source path but different target path arent allowed", async (done) => {
+      try {
+        let payload = { app: testapp3.id, site: new_site, source_path: "/override", target_path: "/abc" };
+        await httph.request('post', `http://localhost:5000/sites/${new_site}/routes`, alamo_headers_bubble_errors, JSON.stringify(payload));
+        done(new Error("Failed, allowed the route to be created."))
+      } catch (e) {
+        done()
+      }
+    });
+
+    it("covers ensuring routes with the same source path but different target path and different app arent allowed", async (done) => {
+      try {
+        let payload = { app: testapp2.id, site: new_site, source_path: "/override", target_path: "/abc123" };
+        await httph.request('post', `http://localhost:5000/sites/${new_site}/routes`, alamo_headers_bubble_errors, JSON.stringify(payload));
+        done(new Error("Failed, allowed the route to be created."))
+      } catch (e) {
+        done()
       }
     });
 

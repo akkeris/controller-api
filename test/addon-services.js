@@ -157,6 +157,7 @@ describe("addon services: plans, services listing and getting.", function() {
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('object');
+        expect(obj.provisioned_by).to.be.an('array');
         validate_plan(obj)
         done();
       });

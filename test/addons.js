@@ -213,9 +213,9 @@ describe("addons: provisioning postgres and redis services.", function() {
       let obj = JSON.parse(data);
       expect(obj).to.be.an('object');
       expect(obj.id).to.equal(redis_response.id);
-      expect(obj.provisioned_by).to.be.an('array');
-      expect(obj.provisioned_by[0].owner).to.be.an('boolean');
-      expect(obj.provisioned_by[0].owner).to.equal(true);
+      expect(obj.attached_to).to.be.an('array');
+      expect(obj.attached_to[0].owner).to.be.an('boolean');
+      expect(obj.attached_to[0].owner).to.equal(true);
       done();
     });
   });

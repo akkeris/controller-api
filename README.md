@@ -27,8 +27,6 @@
 
 ### Logging & Metric Information
 * `PROMETHEUS_METRICS_URL` - The url to connect to for metric information stored in prometheus. This has no default.
-* `LOG_SHUTTLE_URL` - The log shuttle url for log drains (https://github.com/akkeris/logshuttle). This has no default.
-* `LOG_SESSION_URL` - The log session url for log sessions (https://github.com/akkeris/logshuttle). This has no default.
 * `INFLUXDB_METRICS_URL` - The URL to the influxdb that holds running metrics for service, count and other http information. This has no default.
 
 ### Addon Envs

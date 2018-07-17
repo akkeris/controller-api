@@ -2479,7 +2479,7 @@ curl \
   "provider_id": "alamo",
   "updated_at": "2016-08-11T20:16:45.820Z",
   "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
-  "provisioned_by": [
+  "attached_to": [
     {
       "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
       "name": "app-space",

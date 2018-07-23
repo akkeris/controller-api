@@ -359,7 +359,7 @@ routes.add.get('/addon-services/([A-z0-9\\-\\_\\.]+)$')
 routes.add.get('/addon-services/([A-z0-9\\-\\_\\.]+)/plans$')
           .run(alamo.addon_services.plans.list.bind(alamo.addon_services.plans.list, pg_pool))
           .and.authorization([simple_key]);
-routes.add.get('/addon-services/([A-z0-9\\-\\_\\.]+)/plans/([A-z0-9\\-\\_\\.]+)$')
+routes.add.get('/addon-services/([A-z0-9\\-\\_\\.]+)/plans/([A-z0-9\-\_\.\:]+)$')
           .run(alamo.addon_services.plans.get.bind(alamo.addon_services.plans.get, pg_pool))
           .and.authorization([simple_key]);
 

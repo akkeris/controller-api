@@ -219,8 +219,12 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     try {
       let result = await httph.request('patch', `http://localhost:5000/apps/${app_name}-preview/features/preview`, alamo_headers, {"enabled":true}, null)
       result = JSON.parse(result)
+      let result_sites = await httph.request('patch', `http://localhost:5000/apps/${app_name}-preview/features/preview-sites`, alamo_headers, {"enabled":true}, null)
+      result_sites = JSON.parse(result_sites)
       expect(result).be.an('object')
       expect(result.enabled).to.equal(true)
+      expect(result_sites).be.an('object')
+      expect(result_sites.enabled).to.equal(true)
       done()
     } catch(e) {
       done(e)
@@ -393,6 +397,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
 
   it("ensure a new site with same routes are created", async (done) => {
     try {
+
       let routes = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${preview_app.app.id}/routes`, alamo_headers, null))
       expect(routes.length).to.equal(1)
       expect(routes[0].app.id).to.equal(preview_app.app.id)

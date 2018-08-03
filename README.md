@@ -25,10 +25,6 @@
 * `DOCKER_REPO` - The repo in DOCKER_REGISTRY_HOST to store gold master build images (changing this also requires changing jenkins_build_template.xml and existing build templates in jenkins). This has no default.
 * `DYNO_DEFAULT_SIZE` - The default dyno size to use. The set default is `scout` if no other is specified.
 
-### Logging & Metric Information
-* `PROMETHEUS_METRICS_URL` - The url to connect to for metric information stored in prometheus. This has no default.
-* `INFLUXDB_METRICS_URL` - The URL to the influxdb that holds running metrics for service, count and other http information. This has no default.
-
 ### Addon Envs
 * `TWILIO_AUTH_KEY` - The master sid:token for the twilio account.
 * `ANOMALY_METRICS_DRAIN` - The syslog drain end point for the opentsdb custom metrics collector. This has no default.

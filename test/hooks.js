@@ -124,7 +124,7 @@ describe("hooks:", function() {
     // create a build and assign the build pending hook listener
     let pending_build_success = false;
     hook_callback = function (req, res) { //hook_pending_cb
-      let data = new Buffer(0);
+      let data = Buffer.alloc(0);
       req.on('data', (chunk) => data = Buffer.concat([data, chunk]));
       req.on('end', () => {
         let payload = JSON.parse(data.toString('utf8'));
@@ -134,7 +134,7 @@ describe("hooks:", function() {
 
         let build_success = false;
         hook_callback = function (req, res) {
-          let data = new Buffer(0);
+          let data = Buffer.alloc(0);
           req.on('data', (chunk) => data = Buffer.concat([data, chunk]));
           req.on('end', () => {
             let payload = JSON.parse(data.toString('utf8'));
@@ -171,7 +171,7 @@ describe("hooks:", function() {
     expect(placed_hooks).to.equal(true);
     let release_hook_success = false;
     hook_callback = function (req, res) {
-      let data = new Buffer(0);
+      let data = Buffer.alloc(0);
       req.on('data', (chunk) => data = Buffer.concat([data, chunk]));
       req.on('end', () => {
         let payload = JSON.parse(data.toString('utf8'));
@@ -203,7 +203,7 @@ describe("hooks:", function() {
     expect(placed_hooks).to.equal(true);
     let release_hook_success = false;
     hook_callback = function (req, res) {
-      let data = new Buffer(0);
+      let data = Buffer.alloc(0);
       req.on('data', (chunk) => data = Buffer.concat([data, chunk]));
       req.on('end', () => {
         let payload = JSON.parse(data.toString('utf8'));

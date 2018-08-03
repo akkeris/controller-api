@@ -61,11 +61,18 @@ describe("vault: provisioning, etc", function() {
     });
   });
 
-
   let vault_plan = null;
   let vault_response = null;
   let vault_qa_plan = null;
   let vault_prod_plan = null;
+  it("covers creating a formation for the app to attach services", (done) => {
+    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers,
+      JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}),
+      (err, data) => {
+        expect(err).to.be.null;
+        done();
+    });
+  });
 
   it("covers getting vault service", (done) => {
     // we need to delay and wait for vault to come available.
@@ -83,43 +90,35 @@ describe("vault: provisioning, etc", function() {
       });
     }, 20000);
   });
+
   it("covers getting vault plans", (done) => {
     // we need to delay and wait for vault to come available.
-    setTimeout(function() {
-      httph.request('get', 'http://localhost:5000/addon-services/perf-db/plans', alamo_headers, null,
-      (err, data) => {
-        if(err) {
-          console.error(err)
+    httph.request('get', 'http://localhost:5000/addon-services/perf-db/plans', alamo_headers, null,
+    (err, data) => {
+      if(err) {
+        console.error(err)
+      }
+      expect(err).to.be.null;
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('array');
+      obj.forEach(function(plan) {
+        if(plan.name === "perf-db:dev") {
+          vault_plan = plan;
+        } else if (plan.name === "perf-db:qa") {
+          vault_qa_plan = plan;
+        } else if (plan.name === "perf-db:prod") {
+          vault_prod_plan = plan;
         }
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        let obj = JSON.parse(data);
-        expect(obj).to.be.an('array');
-        obj.forEach(function(plan) {
-          if(plan.name === "perf-db:dev") {
-            vault_plan = plan;
-          } else if (plan.name === "perf-db:qa") {
-            vault_qa_plan = plan;
-          } else if (plan.name === "perf-db:prod") {
-            vault_prod_plan = plan;
-          }
-        });
-        expect(vault_plan).to.be.an('object');
-        expect(vault_qa_plan).to.be.an('object');
-        expect(vault_prod_plan).to.be.an('object');
-        obj.forEach(validate_plan)
-        done();
       });
-    }, 20000);
-  });
-  it("covers creating a formation for the app to attach services", (done) => {
-    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers,
-      JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}),
-      (err, data) => {
-        expect(err).to.be.null;
-        done();
+      expect(vault_plan).to.be.an('object');
+      expect(vault_qa_plan).to.be.an('object');
+      expect(vault_prod_plan).to.be.an('object');
+      obj.forEach(validate_plan)
+      done();
     });
   });
+
   it("covers creating a vault service", (done) => {
     expect(vault_plan).to.be.an('object');
     expect(vault_plan.id).to.be.a('string');
@@ -133,7 +132,6 @@ describe("vault: provisioning, etc", function() {
       done();
     });
   });
-
 
   // we already have dev attached, try and attach qa vault plan.
   it("covers ensuring an addon marked as unable to be attached twice, wont be attached", (done) => {

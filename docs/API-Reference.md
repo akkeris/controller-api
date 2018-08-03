@@ -2341,7 +2341,13 @@ curl \
   },
   "space_default": false,
   "state": "shutdown",
-  "updated_at": "2016-08-09T12:00:00Z"
+  "updated_at": "2016-08-09T12:00:00Z",
+  "provisioned_by": [
+    {
+      "id": "59be5dd4-1dfa-47a9-bdae-00ed93718005",
+      "name": "app-space"
+    }
+  ]
 }
 ```
 
@@ -2459,8 +2465,8 @@ curl \
     "name": "alamo-postgresql"
   },
   "app": {
-    "id": "app-space",
-    "name": "62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
+    "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
+    "name": "app-space"
   },
   "config_vars": [],
   "created_at": "2016-08-11T20:16:45.820Z",
@@ -2472,7 +2478,14 @@ curl \
   },
   "provider_id": "alamo",
   "updated_at": "2016-08-11T20:16:45.820Z",
-  "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api"
+  "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
+  "attached_to": [
+    {
+      "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
+      "name": "app-space",
+      "owner": true
+    }
+  ]
 }
 ```
 

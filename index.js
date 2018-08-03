@@ -1,5 +1,6 @@
 "use strict";
 
+const assert = require('assert')
 const fs = require('fs');
 const url = require('url');
 const http = require('http');
@@ -12,7 +13,7 @@ const simple_key_auth = require('./lib/simple_key_auth.js');
 const common = require('./lib/common.js');
 
 
-console.assert(process.env.DATABASE_URL, "No database provided, set DATABASE_URL to a postgres db!");
+assert.ok(process.env.DATABASE_URL, "No database provided, set DATABASE_URL to a postgres db!");
 
 let alamo = { 
   addon_attachments:require('./lib/addon-attachments.js'),

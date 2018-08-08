@@ -12,8 +12,8 @@ const routes = require('./lib/router.js');
 const simple_key_auth = require('./lib/simple_key_auth.js');
 const common = require('./lib/common.js');
 
-
-assert.ok(process.env.DATABASE_URL, "No database provided, set DATABASE_URL to a postgres db!");
+assert.ok(process.env.DATABASE_URL, "No database provided, set DATABASE_URL to a postgres db!")
+assert.ok(config.simple_key.length > 0, "No SECURE_KEY addon or AUTH_KEY environment variable was found, set AUTH_KEY in the environment.")
 
 let alamo = { 
   addon_attachments:require('./lib/addon-attachments.js'),
@@ -75,6 +75,21 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
     alamo.releases.timers.begin(pg_pool)
     alamo.git.init_worker(pg_pool)
   }
+  if (!config.alamo_app_controller_url) {
+    let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['api', 'default'])
+    assert.ok(records.length > 0, 'Unable to determine ALAMO_APP_CONTROLLER_URL, either set the environment variable ALAMO_APP_CONTROLLER_URL or ensure theres a record for api-default in the apps table.')
+    config.alamo_app_controller_url = records[0].url
+  }
+  if (!config.build_shuttle_url) {
+    let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['buildshuttle', 'default'])
+    assert.ok(records.length > 0, 'Unable to determine BUILD_SHUTTLE_URL, either set the environment variable BUILD_SHUTTLE_URL or ensure theres a record for buildshuttle-default in the apps table.')
+    config.build_shuttle_url = records[0].url
+  }
+  if (!config.appkit_api_url) {
+    let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['appkit', 'default'])
+    assert.ok(records.length > 0, 'Unable to determine APPKIT_API_URL, either set the environment variable APPKIT_API_URL or ensure theres a record for appkit-default in the apps table.')
+    config.appkit_api_url = records[0].url
+  }
   alamo.formations.timers.begin(pg_pool)
   alamo.addon_services.timers.begin(pg_pool)
   // Initialize Events
@@ -91,8 +106,6 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   console.error(e.message, e.stack)
   process.exit(1)
 })
-
-
 
 
 // -- apps
@@ -586,17 +599,14 @@ routes.add.post('/events$')
           .run(alamo.events.http.create.bind(alamo.events.http.create, pg_pool))
           .and.authorization([simple_key]);
 
-
 routes.add.default((req, res) => {
-  if(process.env.DEBUG === "true") {
-    console.info('[debug] 404', req.url);
-  }
-  res.writeHead(404,{}); res.end();
+  res.writeHead(404,{}); 
+  res.end();
 });
 
 let server = http.createServer((req, res) => {
-  var method = req.method.toLowerCase();
-  var path = url.parse(req.url.toLowerCase()).path;
+  let method = req.method.toLowerCase();
+  let path = url.parse(req.url.toLowerCase()).path;
   routes.process(method, path, req, res).catch((e) => { console.error("Uncaught error:", e) })
 }).listen(process.env.PORT || 5000, () => {
   if(!process.env.TEST_MODE) {

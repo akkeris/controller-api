@@ -1507,6 +1507,9 @@ curl \
 
 `POST /apps/{appname}/log-sessions`
 
+
+`POST /sites/{site}/log-sessions`
+
 Views the specified amount of lines starting from the end of the most recent log output and back.  This is the logging across all servers running the specified application.
 
 |   Name       |       Type      | Description                                                                                   | Example           |

@@ -266,6 +266,23 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/log-drains/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.log_drains.http.delete.bind(alamo.log_drains.http.delete, pg_pool))
           .and.authorization([simple_key]);
 
+
+routes.add.post('/sites/([A-z0-9\\-\\_\\.]+)/log-sessions$')
+          .run(alamo.logs.http.create.bind(alamo.logs.http.create, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.post('/sites/([A-z0-9\\-\\_\\.]+)/log-drains$')
+          .run(alamo.log_drains.http.create.bind(alamo.log_drains.http.create, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/sites/([A-z0-9\\-\\_\\.]+)/log-drains/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.log_drains.http.get.bind(alamo.log_drains.http.get, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/sites/([A-z0-9\\-\\_\\.]+)/log-drains$')
+          .run(alamo.log_drains.http.list.bind(alamo.log_drains.http.list, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.delete('/sites/([A-z0-9\\-\\_\\.]+)/log-drains/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.log_drains.http.delete.bind(alamo.log_drains.http.delete, pg_pool))
+          .and.authorization([simple_key]);
+
 // -- preview apps
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/previews$')
           .run(alamo.previews.http.list.bind(alamo.previews.http.list, pg_pool))

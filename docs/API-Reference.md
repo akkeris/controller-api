@@ -1507,6 +1507,9 @@ curl \
 
 `POST /apps/{appname}/log-sessions`
 
+
+`POST /sites/{site}/log-sessions`
+
 Views the specified amount of lines starting from the end of the most recent log output and back.  This is the logging across all servers running the specified application.
 
 |   Name       |       Type      | Description                                                                                   | Example           |
@@ -3317,17 +3320,22 @@ curl \
 
 ## Log Drains
 
+Log drains allow you to push logs for an app or site to another syslogd on another host (such as papertrail or an internal syslogd instance listening on a port).
+
 ### Add a Log Drains ##
 
 `POST /apps/{appname}/log-drains`
 
-Create a new log drain, log drains allow you to push logs to another syslogd on another host (such as papertrail or an internal syslogd instance listening on a port).
+`POST /sites/{site}/log-drains`
 
-The only required field in the post is the URL to push data to, the data should have one of the following schemas:
+
+Creates a new log drain, the only required field in the post is the URL to push data to, the data should have one of the following schemas:
 
 * syslog+tls:// - Push to a SSL (TLS technically) end point with syslogd format.
 * syslog:// - Push to a unencrypted TCP end point with syslogd format (note this is not secure, and is not recommended).
 * syslog+udp:// - Push to an unencrypted UDP end point with syslogd format (note this may result in out of order logs, is not secure and is not recommended).
+* https:// - Push to an encrypted https end point, query parameters, basic auth (https://user:pass@host) are supported. Uses octet framed RFC6587.
+* http:// - Push to an unencrypted http end point, query parameters, basic auth (http://user:pass@host) are supported. Uses octet framed RFC6587.
 
 
 |   Name   |       Type      | Description                                                                                                                                                                                                | Example                                                                                                                            |
@@ -3383,6 +3391,9 @@ Disconnects a log drain from forwarding.
 
 `DELETE /apps/{appname}/log-drains/{log_drain_id}`
 
+
+`DELETE /sites/{site}/log-drains/{log_drain_id}`
+
 **CURL Example**
 
 ```bash
@@ -3414,6 +3425,8 @@ Gets information on a current log drain.
 
 `GET /apps/{appname}/log-drians/{log_drain_id}`
 
+`GET /sites/{site}/log-drians/{log_drain_id}`
+
 **CURL Example**
 
 ```bash
@@ -3443,6 +3456,8 @@ curl \
 Lists all the log drains for an app.
 
 `GET /apps/{appname}/log-drains`
+
+`GET /sites/{site}/log-drains`
 
 **CURL Example**
 

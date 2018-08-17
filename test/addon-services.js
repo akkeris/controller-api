@@ -62,7 +62,8 @@ describe("addon services: plans, services listing and getting.", function() {
       let obj = JSON.parse(data)
       expect(obj).to.be.an('array')
       obj.forEach(validate_service)
-      done();
+      setTimeout(done,1500);
+
     });
   });
   it("covers getting a specific service (postgresql)", (done) => {

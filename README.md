@@ -60,6 +60,7 @@ cat sql/create_testing.sql | psql $DATABASE_URL
 
 3. Set the environment variables above, also save DATABASE_URL as part of your config/environment. There are some additional options that should be set when developing locally or testing.  Some of these are optional. The tests that run are integration tests that require real services setup. See the setting up section above for additional required environment variables.
 
+* `TEST_REGION` - the region to test, e.g., us-seattle, eu-ireland
 * `NGROK_TOKEN` - When testing a public URI is needed to test callbacks from other integrated systems, get a token at www.ngrok.com and place it in this envirionment variable.
 * `ONE_PROCESS_MODE` - When developing locally this must be set, it imports what normally would be in the worker into the main process. Just set it to true
 * `TEST_MODE` - Similar to ONE_PROCESS_MODE this should be set when running the automated tests, while ONE_PROCESS_MODE should be set when developing locally.  Just set it to true
@@ -71,7 +72,7 @@ cat sql/create_testing.sql | psql $DATABASE_URL
 * `ALAMO_APP_CONTROLLER_URL` - The API url for this host, you'll want to set this to http://localhost:5000
 * `BUILD_SHUTTLE_URL` - The build shuttle is a small footprint API that manages specific build system such as jenkins. (see https://github.com/akkeris/buildshuttle).  This has no default.
 * `APPKIT_API_URL` - Public URI (https://somehost/) for the appkit api in front of this api, generally appkit api url that handles user account/authorization (defaults to http://localhost:5000)
-
+* `TEST_ONPREM_POSTGRES` - whether to test the onprem postgres brokers.
 4. Run the entire test suite:
 
 ```

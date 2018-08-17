@@ -26,7 +26,7 @@ describe("addons attachments:", function() {
       let app_url = JSON.parse(data).web_url;
       expect(app_url).to.be.a('string');
       await httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers, JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}))
-      done();
+      setTimeout(done,500);
     } catch (e) {
       done(e);
     }

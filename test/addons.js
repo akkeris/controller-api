@@ -64,7 +64,7 @@ describe("addons: provisioning postgres and redis services.", function() {
       (err, data) => {
         expect(err).to.be.null;
         expect(data).to.be.a('string');
-        done();
+        setTimeout(done,500);
     });
   });
 
@@ -95,23 +95,24 @@ describe("addons: provisioning postgres and redis services.", function() {
     });
   });
 
-  it("covers getting a postgres onprem plans", (done) => {
-    httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresqlonprem/plans', alamo_headers, null,
-    (err, data) => {
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let obj = JSON.parse(data);
-      expect(obj).to.be.an('array');
-      obj.forEach(function(plan) {
-        if(plan.name === "alamo-postgresqlonprem:shared") {
-          postgresonprem_plan = plan;
-        }
+  if (process.env.TEST_ONPREM_POSTGRES) {
+    it("covers getting a postgres onprem plans", (done) => {
+      httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresqlonprem/plans', alamo_headers, null,
+      (err, data) => {
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('array');
+        obj.forEach(function(plan) {
+          if(plan.name === "alamo-postgresqlonprem:shared") {
+            postgresonprem_plan = plan;
+          }
+        });
+        expect(postgresonprem_plan).to.be.an('object');
+        done();
       });
-      expect(postgresonprem_plan).to.be.an('object');
-      done();
     });
-  });
-
+  }
 
   it("covers getting a redis plans", (done) => {
     expect(postgres_plan).to.be.an('object');
@@ -334,59 +335,62 @@ describe("addons: provisioning postgres and redis services.", function() {
         done();
     });
   });
-  it("covers creating a postgres onprem instance", (done) => {
-    expect(postgresonprem_plan).to.be.an('object');
-    expect(postgresonprem_plan.id).to.be.a('string');
-    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons', alamo_headers, JSON.stringify({"plan":postgresonprem_plan.id}),
-    (err, data) => {
-      if(err) {
-        console.log(err);
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let obj = JSON.parse(data);
-      expect(obj).to.be.an('object');
-      postgresonprem_response = obj;
-      done();
-    });
-  });
 
-  it("covers listing all services and checking for postgres onprem", (done) => {
-    expect(postgresonprem_response).to.be.an('object');
-    expect(postgresonprem_plan).to.be.an('object');
-    expect(postgresonprem_plan.id).to.be.a('string');
-    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons', alamo_headers, null,
+  if (process.env.TEST_ONPREM_POSTGRES) {
+    it("covers creating a postgres onprem instance", (done) => {
+      expect(postgresonprem_plan).to.be.an('object');
+      expect(postgresonprem_plan.id).to.be.a('string');
+      httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons', alamo_headers, JSON.stringify({"plan":postgresonprem_plan.id}),
+      (err, data) => {
+        if(err) {
+          console.log(err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('object');
+        postgresonprem_response = obj;
+        done();
+      });
+    });
+
+    it("covers listing all services and checking for postgres onprem", (done) => {
+      expect(postgresonprem_response).to.be.an('object');
+      expect(postgresonprem_plan).to.be.an('object');
+      expect(postgresonprem_plan.id).to.be.a('string');
+      httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons', alamo_headers, null,
+        (err, data) => {
+          expect(err).to.be.null;
+          expect(data).to.be.a('string');
+          let obj = JSON.parse(data);
+          expect(obj).to.be.an('array');
+          let found_postgres = false;
+          obj.forEach(function(service) {
+            if(service.id === postgresonprem_response.id) {
+              found_postgres = true;
+            }
+          });
+          expect(found_postgres).to.equal(true);
+          done();
+      });
+    });
+
+
+    it("covers removing a postgres onprem service", (done) => {
+      expect(postgresonprem_response).to.be.an('object');
+      expect(postgresonprem_plan).to.be.an('object');
+      expect(postgresonprem_plan.id).to.be.a('string');
+      httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons' + '/' + postgresonprem_response.id, alamo_headers, null,
       (err, data) => {
         expect(err).to.be.null;
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
-        expect(obj).to.be.an('array');
-        let found_postgres = false;
-        obj.forEach(function(service) {
-          if(service.id === postgresonprem_response.id) {
-            found_postgres = true;
-          }
-        });
-        expect(found_postgres).to.equal(true);
+        expect(obj).to.be.an('object');
+        expect(obj.id).to.equal(postgresonprem_response.id);
         done();
+      });
     });
-  });
-
-
-  it("covers removing a postgres onprem service", (done) => {
-    expect(postgresonprem_response).to.be.an('object');
-    expect(postgresonprem_plan).to.be.an('object');
-    expect(postgresonprem_plan.id).to.be.a('string');
-    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons' + '/' + postgresonprem_response.id, alamo_headers, null,
-    (err, data) => {
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let obj = JSON.parse(data);
-      expect(obj).to.be.an('object');
-      expect(obj.id).to.equal(postgresonprem_response.id);
-      done();
-    });
-  });
+  }
 
 
 

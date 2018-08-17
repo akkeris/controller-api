@@ -6,7 +6,7 @@ describe("sites/routes", function () {
     process.env.AUTH_KEY = 'hello';
     const support = require('./support/init.js');
     process.env.TEST_MODE = "true"; // DO NOT REMOVE THIS OTHERWISE THE TESTS WILL TRY AND DO REAL THINGS.
-    const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", "x-elevated-access":"true", 'x-ignore-errors':'true'};
+    const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", 'x-ignore-errors':'true', "x-elevated-access":"true"};
     const alamo_headers_bubble_errors = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", "x-elevated-access":"true", 'x-silent-error':'true'};
     const running_app = require('../index.js');
     const httph = require('../lib/http_helper.js');
@@ -40,14 +40,15 @@ describe("sites/routes", function () {
     it("covers creating sites", async (done) => {
       this.timeout(30000)
       try {
-        let payload = { domain: domain1, owner: "owner", region: "us-seattle", email: "email@email.com", description: "description" };
+        let payload = { domain: domain1, owner: "owner", region: process.env.TEST_REGION, email: "email@email.com", description: "description" };
         let data = await httph.request('post', 'http://localhost:5000/sites', alamo_headers, JSON.stringify(payload));
         let obj = JSON.parse(data);
         expect(obj.domain).to.equal(domain1);
-        expect(obj.region.name).to.equal('us-seattle');
+        expect(obj.region.name).to.equal(process.env.TEST_REGION);
         site_id = obj.id;
         done();
       } catch (e) {
+        console.error(e)
         done(e);
       }
     });
@@ -79,7 +80,7 @@ describe("sites/routes", function () {
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj.domain).to.equal(domain1);
-        expect(obj.region.name).to.equal('us-seattle');
+        expect(obj.region.name).to.equal(process.env.TEST_REGION);
         done();
       } catch (e) {
         done(e);
@@ -102,10 +103,11 @@ describe("sites/routes", function () {
         expect(obj.site.id).to.equal(site_id);
         expect(obj.source_path).to.equal("/source-path/foo.html");
         expect(obj.target_path).to.equal("/target-path/foo.html");
-        expect(obj.pending).to.equal(false);
+        // pending is a race condition, could be true or false.. expect(obj.pending).to.equal(false)
         route_id = obj.id
         done();
       } catch (e) {
+        console.log(e)
         done(e);
       }
     });
@@ -138,21 +140,29 @@ describe("sites/routes", function () {
     });
 
     it("covers listing routes", async (done) => {
-      this.timeout(30000)
-      let data = await httph.request('get', `${siteurl1}/routes`, alamo_headers, null);
-      let obj = JSON.parse(data);
-      expect(obj).to.be.an('array');
-      let test_route = null;
-      obj.forEach((x) => {
-          if(x.id === route_id) {
-            test_route = x;
+      try {
+        this.timeout(30000)
+        let data = await httph.request('get', `${siteurl1}/routes`, alamo_headers, null);
+        let obj = JSON.parse(data);
+        expect(obj).to.be.an('array');
+        let test_route = null;
+        obj.forEach((x) => {
+          try {
+            if(x.id === route_id) {
+              test_route = x;
+            }
+          } catch (e) {
+            console.error(e)
           }
-      });
-      expect(test_route).to.be.an('object');
-      expect(test_route.app.name).to.equal('api-default');
-      expect(test_route.source_path).to.equal('/source-path/foo.html');
-      expect(test_route.target_path).to.equal('/target-path/foo.html');
-      done();
+        });
+        expect(test_route).to.be.an('object');
+        expect(test_route.app.name).to.equal('api-default');
+        expect(test_route.source_path).to.equal('/source-path/foo.html');
+        expect(test_route.target_path).to.equal('/target-path/foo.html');
+        done();
+      } catch (e) {
+        done(e);
+      }
     });
     
     it("covers listing routes by app", async (done) => {
@@ -313,11 +323,11 @@ describe("sites/routes", function () {
       this.timeout(30000)
       try {
         expect(process.env.BASE_DOMAIN).to.be.a.string;
-        let payload = { domain: new_site, owner: "owner", region: "us-seattle", email: "email@email.com", description: "description" };
+        let payload = { domain: new_site, owner: "owner", region: process.TEST_REGION, email: "email@email.com", description: "description" };
         let data = await httph.request('post', 'http://localhost:5000/sites', alamo_headers, JSON.stringify(payload));
         let obj = JSON.parse(data);
         expect(obj.domain).to.equal(new_site);
-        expect(obj.region.name).to.equal('us-seattle');
+        expect(obj.region.name).to.equal(process.env.TEST_REGION);
         site_id = obj.id;
         done();
       } catch (e) {

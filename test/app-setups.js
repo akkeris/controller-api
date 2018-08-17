@@ -64,39 +64,6 @@ describe("app-setups:", function() {
   const expect = require("chai").expect;
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "x-username":"test", "x-elevated-access":"true"};
 
-  it("ensure we can get an app definition", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/api-default/app-setups', alamo_headers, null, (err, data) => {
-      if(err) {
-        console.error(err)
-      }
-      expect(err).to.be.null;
-      data = JSON.parse(data);
-      expect(data).to.be.an('object');
-      expect(data.app).to.be.an('object');
-      expect(data.app.name).to.equal('api');
-      expect(data.app.organization).to.be.a('string');
-      //expect(data.app.region).to.equal('us');
-      expect(data.app.space).to.equal('default');
-      expect(data.env).to.be.an('object');
-      expect(data.env.AUTH_KEY).to.be.an('object');
-      expect(data.env.AUTH_KEY.required).to.be.true;
-      expect(data.env.AUTH_KEY.value).to.be.undefined;
-      expect(data.env.PORT).to.be.an('object');
-      expect(data.env.PORT.required).to.be.false;
-      expect(data.env.PORT.value).to.equal("5000");
-      expect(data.formation).to.be.an('object');
-      expect(data.formation.web).to.be.an('object');
-      expect(data.formation.web.quantity).to.equal(1);
-      expect(data.formation.web.size).to.equal('constellation');
-      expect(data.formation.web.command).to.be.null;
-      expect(data.source_blob).to.be.an('object');
-      expect(data.source_blob.checksum).to.be.a('string');
-      expect(data.source_blob.url).to.be.a.a('string');
-      expect(data.source_blob.version).to.be.a.a('string');
-      done();
-    });
-  });
-
   let appname = "alamotest" + Math.floor(Math.random() * 10000)
   let app_uuid = null;
   let app_setup_uuid = null;
@@ -121,6 +88,11 @@ describe("app-setups:", function() {
           "description": "",
           "required": false,
           "value": "FUGAZI!!!"
+        },
+        "AUTH_KEY": {
+          "description": "",
+          "required": false,
+          "value": "AUTH_KEY"
         }
       },
       "formation": {
@@ -240,6 +212,40 @@ describe("app-setups:", function() {
       done();
     });
   });
+
+
+  it("ensure we can get an app definition", (done) => {
+    httph.request('get', 'http://localhost:5000/apps/' + appname + '-default/app-setups', alamo_headers, null, (err, data) => {
+      if(err) {
+        console.error(err)
+      }
+      expect(err).to.be.null;
+      data = JSON.parse(data);
+      expect(data).to.be.an('object');
+      expect(data.app).to.be.an('object');
+      expect(data.app.name).to.equal(appname);
+      expect(data.app.organization).to.be.a('string');
+      expect(data.app.space).to.equal('default');
+      expect(data.env).to.be.an('object');
+      expect(data.env.AUTH_KEY).to.be.an('object');
+      expect(data.env.AUTH_KEY.required).to.be.true;
+      expect(data.env.AUTH_KEY.value).to.be.undefined;
+      expect(data.env.PORT).to.be.an('object');
+      expect(data.env.PORT.required).to.be.false;
+      expect(data.env.PORT.value).to.equal("5000");
+      expect(data.formation).to.be.an('object');
+      expect(data.formation.web).to.be.an('object');
+      expect(data.formation.web.quantity).to.equal(1);
+      expect(data.formation.web.size).to.equal('scout');
+      expect(data.formation.web.command).to.be.null;
+      expect(data.source_blob).to.be.an('object');
+      expect(data.source_blob.checksum).to.be.a('string');
+      expect(data.source_blob.url).to.be.a.a('string');
+      expect(data.source_blob.version).to.be.a.a('string');
+      done();
+    });
+  });
+
 
   it("ensure we clean up after ourselves", (done) => {
     httph.request('delete', 'http://localhost:5000/apps/' + appname + '-default', alamo_headers, null, (err, data) => {

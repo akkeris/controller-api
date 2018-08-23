@@ -4437,19 +4437,31 @@ This event occurs when an app has a new version and is now available for request
 `POST [callback end point]`
 
 ```json
-{
-  "action":"released",
-  "app":{
-    "name":"yourappname",
-    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
-  },
-  "space":{
-    "name":"the-space"
-  },
-  "slug":{
-    "image":"registry.host.io/repo/image:tag"
-  },
-  "released_at":"2017-02-05T22:16:56.616Z"
+{  
+   "app":{  
+      "name":"yourappname",
+      "id":"08b17a6f-f2e7-4698-b60a-6f89f6f2f00c"
+   },
+   "space":{  
+      "name":"default"
+   },
+   "key":"yourappname-default",
+   "action":"released",
+   "slug":{  
+      "image":"docker.akkeris.io/org/yourappname-08b17a6f-f2e7-4698-b60a-6f89f6f2f00c:0.4",
+      "source_blob":{  
+         "checksum":"12345",
+         "url":"https://github.com/org/repo/commits/abcde3234fdsadf32342efasdf23432",
+         "version":"Optional Version Info",
+         "commit":"abcde3234fdsadf32342efasdf23432",
+         "author":"John Smith",
+         "repo":"https://github.com/org/repo",
+         "branch":"my_branch",
+         "message":"My commit message"
+      },
+      "id":"44bc0cf4-b3fa-415c-99ef-c8a0b6f7364a"
+   },
+   "released_at":"2018-08-23T15:38:16.010Z"
 }
 ```
 

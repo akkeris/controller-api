@@ -1786,7 +1786,7 @@ curl \
   "state":"public",
   "name":"auto-release",
   "display_name":"Auto release builds",
-  "feedback_email":"cobra@octanner.com",
+  "feedback_email":"cobra@akkeris.io",
   "enabled":false
 }
 ```
@@ -1814,7 +1814,7 @@ curl \
   "state":"public",
   "name":"auto-release",
   "display_name":"Auto release builds",
-  "feedback_email":"cobra@octanner.com",
+  "feedback_email":"cobra@akkeris.io",
   "enabled":false
 },
 {
@@ -1824,7 +1824,7 @@ curl \
   "state":"beta",
   "name":"preview",
   "display_name":"Preview Apps",
-  "feedback_email":"cobra@octanner.com",
+  "feedback_email":"cobra@akkeris.io",
   "enabled":true
 }
 ```
@@ -1853,7 +1853,7 @@ curl \
   "state":"public",
   "name":"auto-release",
   "display_name":"Auto release builds",
-  "feedback_email":"cobra@octanner.com",
+  "feedback_email":"cobra@akkeris.io",
   "enabled":false
 }
 ```
@@ -4165,7 +4165,7 @@ The occurs when there is a change to to enable a feature on an app, or to disabl
     "state":"alpha|beta|public|ga",
     "name":"feature-name",
     "display_name":"Human Readable Feature Name",
-    "feedback_email":"cobra@octanner.com"
+    "feedback_email":"cobra@akkeris.io",
     "enabled":true
   }
 }
@@ -5292,7 +5292,7 @@ curl \
       "state": "public",
       "name": "auto-release",
       "display_name": "Auto release builds",
-      "feedback_email": "cobra@octanner.com",
+      "feedback_email": "cobra@akkeris.io",
       "enabled": true
     },
     "username": "test",

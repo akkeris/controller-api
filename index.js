@@ -18,6 +18,7 @@ assert.ok(config.simple_key.length > 0, "No SECURE_KEY addon or AUTH_KEY environ
 let alamo = { 
   addon_attachments:require('./lib/addon-attachments.js'),
   addon_services:require('./lib/addon-services.js'),
+  addons:require('./lib/addons.js'),
   apps:require('./lib/apps.js'),
   app_setups:require('./lib/app-setups.js'),
   builds:require('./lib/builds.js'),
@@ -294,20 +295,20 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/previews/([A-z0-9\\-\\_\\.]+)$')
 
 // -- addons
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons$')
-          .run(alamo.addon_services.addons.http.create.bind(alamo.addon_services.addons.http.create, pg_pool))
+          .run(alamo.addons.http.create.bind(alamo.addons.http.create, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons$')
-          .run(alamo.addon_services.addons.http.list.bind(alamo.addon_services.addons.http.list, pg_pool))
+          .run(alamo.addons.http.list.bind(alamo.addons.http.list, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_services.addons.get.bind(alamo.addon_services.addons.get, pg_pool))
+          .run(alamo.addons.get.bind(alamo.addons.get, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_services.addons.delete.bind(alamo.addon_services.addons.delete, pg_pool))
+          .run(alamo.addons.delete.bind(alamo.addons.delete, pg_pool))
           .and.authorization([simple_key]);
 // -- addon actions
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_services.addons.actions.bind(alamo.addon_services.addons.actions, pg_pool))
+          .run(alamo.addons.actions.bind(alamo.addons.actions, pg_pool))
           .and.authorization([simple_key]);
 
 // GET /apps/{app_name_or_id}/addons/{addon_name_or_id}/config ?

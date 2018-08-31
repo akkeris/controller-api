@@ -301,14 +301,17 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons$')
           .run(alamo.addons.http.list.bind(alamo.addons.http.list, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addons.get.bind(alamo.addons.get, pg_pool))
+          .run(alamo.addons.http.get.bind(alamo.addons.http.get, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.update.bind(alamo.addons.http.update, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addons.delete.bind(alamo.addons.delete, pg_pool))
+          .run(alamo.addons.http.delete.bind(alamo.addons.http.delete, pg_pool))
           .and.authorization([simple_key]);
 // -- addon actions
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addons.actions.bind(alamo.addons.actions, pg_pool))
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
           .and.authorization([simple_key]);
 
 // GET /apps/{app_name_or_id}/addons/{addon_name_or_id}/config ?
@@ -423,22 +426,28 @@ routes.add.get('/ssl-endpoints/([A-z0-9\\-\\_\\.]+)$')
 
 // -- addon attachments
 routes.add.get('/addons/([A-z0-9\\-\\_\\.]+)/addon-attachments$')
-          .run(alamo.addon_attachments.list_by_addon.bind(alamo.addon_attachments.list_by_addon, pg_pool))
+          .run(alamo.addon_attachments.http.list_by_addon.bind(alamo.addon_attachments.http.list_by_addon, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.post('/addons/([A-z0-9\\-\\_\\.]+)/addon-attachments$')
+          .run(alamo.addon_attachments.http.create.bind(alamo.addon_attachments.http.create, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addon-attachments$')
           .run(alamo.addon_attachments.http.list_by_app.bind(alamo.addon_attachments.http.list_by_app, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addon-attachments/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_attachments.get.bind(alamo.addon_attachments.get, pg_pool))
+          .run(alamo.addon_attachments.http.get.bind(alamo.addon_attachments.http.get, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/addon-attachments/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addon_attachments.http.update.bind(alamo.addon_attachments.http.update, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/addon-attachments/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_attachments.get_by_id.bind(alamo.addon_attachments.get_by_id, pg_pool))
+          .run(alamo.addon_attachments.http.get_by_id.bind(alamo.addon_attachments.http.get_by_id, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/addon-attachments/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_attachments.delete_by_id.bind(alamo.addon_attachments.delete_by_id, pg_pool))
+          .run(alamo.addon_attachments.http.delete.bind(alamo.addon_attachments.http.delete, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/addon-attachments$')
-          .run(alamo.addon_attachments.list.bind(alamo.addon_attachments.list, pg_pool))
+          .run(alamo.addon_attachments.http.list_all.bind(alamo.addon_attachments.http.list_all, pg_pool))
           .and.authorization([simple_key]);
 routes.add.post('/addon-attachments$')
           .run(alamo.addon_attachments.http.create.bind(alamo.addon_attachments.http.create, pg_pool))

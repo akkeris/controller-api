@@ -99,6 +99,29 @@ async function create_build(app, image, port) {
   return build
 }
 
+async function create_addon(app, service, plan) {
+  let plan_id = JSON.parse(await httph.request('get', `http://localhost:5000/addon-services/${service}/plans`, alamo_headers, null))
+    .filter((x) => x.name === `${service}:${plan}`)[0].id
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/addons`, alamo_headers, JSON.stringify({"plan":plan_id})));
+}
+
+
+async function delete_addon(app, addon) {
+  return JSON.parse(await httph.request('delete', `http://localhost:5000/apps/${app.id}/addons/${addon.id}`, alamo_headers, null))
+}
+
+async function attach_addon(app, addon) {
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/addon-attachments`, alamo_headers, JSON.stringify({"addon":addon.id, "app":app.id})))
+}
+
+async function detach_addon(app, addon) {
+  return JSON.parse(await httph.request('delete', `http://localhost:5000/apps/${app.id}/addon-attachments/${addon.id}`, alamo_headers, null))
+}
+
+async function get_config_vars(app) {
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, null))
+}
+
 async function create_app_content(content, space, app) {
   await httph.request('patch', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, {"RETURN_VALUE":content});
   let build_info = await create_build(app, "docker://docker.io/akkeris/test-sample:latest", 2000);
@@ -112,7 +135,22 @@ async function create_test_app_with_content(content, space) {
   return await create_app_content(content, space, app);
 }
 
+async function remove_app(app) {
+  try {
+    return JSON.parse(await httph.request('delete', `http://localhost:5000/apps/${app.id}`, alamo_headers, null))
+  } catch (e) {
+    console.error("Cannot remove test app:", app)
+    console.error(e)
+  }
+}
+
 module.exports = {
+  detach_addon,
+  attach_addon,
+  delete_addon,
+  remove_app,
+  get_config_vars,
+  alamo_headers,
   wait,
   wait_for_app_content,
   wait_for_build,
@@ -120,5 +158,6 @@ module.exports = {
   create_app_content,
   delete_app,
   create_build,
+  create_addon,
   create_test_app_with_content
 }

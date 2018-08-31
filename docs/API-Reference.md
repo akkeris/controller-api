@@ -2479,6 +2479,7 @@ curl \
     "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
     "name": "alamo-postgresql:small"
   },
+  "primary": true,
   "provider_id": "alamo",
   "updated_at": "2016-08-11T20:16:45.820Z",
   "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
@@ -2491,6 +2492,58 @@ curl \
   ]
 }
 ```
+
+
+### Update an Addon ##
+
+Addons can be updated to promote (and subsequently demote) an addon of the same type.  When adding multiple addon's such as a database with the environment variable `DATABASE_URL` the second or non-primary addon has the environment variable prefixed with the addon name. For example if the addon's name is `alamo-postgres-abcdef-1235` and its a secondary (non-primary) database the environment variable would be `ABCDEF_12345_DATABASE_URL`.  The primary database always has non-prefixed environment variables, such as `DATABASE_URL`.  Updating an addon to be primary will cause an existing primary addon of the same type to become a secondary (non-primary) addon. 
+
+`GET /apps/{appname}/addons/{addon_id}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X PATCH \
+  https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false}'
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "actions": null,
+  "addon_service": {
+    "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+    "name": "alamo-postgresql"
+  },
+  "app": {
+    "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
+    "name": "app-space"
+  },
+  "config_vars": [],
+  "created_at": "2016-08-11T20:16:45.820Z",
+  "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+  "name": "alamo-postgres-abcdef-1235",
+  "plan": {
+    "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+    "name": "alamo-postgresql:small"
+  },
+  "primary": false,
+  "provider_id": "alamo",
+  "updated_at": "2016-08-11T20:16:45.820Z",
+  "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
+  "attached_to": [
+    {
+      "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
+      "name": "app-space",
+      "owner": true
+    }
+  ]
+}
+```
+
 
 ### Delete Addon ##
 
@@ -2627,9 +2680,62 @@ curl \
   "created_at": "2016-08-11T20:16:45.820Z",
   "updated_at": "2016-08-11T20:16:45.820Z",
   "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
-  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837",
+  "primary":true
 }
 ```
+
+
+### Update Addons-Attachments ##
+
+Promote an addon attachment to the primary addon for its service type.
+
+`PATCH /apps/{appname}/addon-attachments/{addon_id}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X PATCH \
+  https://apps.akkeris.io/apps/app-space/addon-attachments/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false}'
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "addon":{
+    "actions": null,
+    "addon_service": {
+      "id":"01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+      "name":"alamo-postgresql"
+    },
+    "app": {
+      "id":"555555-2bed-4b62-bdf5-e31691fab88c",
+      "name":"sourceapp-space"
+    },
+    "config_vars": [],
+    "created_at": "2016-08-11T20:16:45.820Z",
+    "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+    "name": "a91d7641-a61e-fb09-654e-2def7c9f162d-api:alamo-postgresql-1470946605820",
+    "plan": {
+      "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+      "name": "alamo-postgresql:small"
+    }
+  },
+  "app":{
+      "id": "777777-2bed-4b62-bdf5-e31691fab88c",
+      "name": "attachedapp-space"
+  },
+  "created_at": "2016-08-11T20:16:45.820Z",
+  "updated_at": "2016-08-11T20:16:45.820Z",
+  "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
+  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837",
+  "primary":false
+}
+```
+
 
 ### Attach Addons ##
 

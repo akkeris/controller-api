@@ -10,8 +10,10 @@ select
   services.created,
   services.updated,
   services.deleted,
+  service_attachments.service_attachment,
   service_attachments.owned,
   service_attachments.name,
+  service_attachments.primary,
   count(all_attached.*) attachments
 from
   services 
@@ -23,6 +25,7 @@ where
   and service_attachments.owned = true
   and service_attachments.deleted = false
 group by 
+  service_attachments.service_attachment,
   services.service,
   services.addon,
   services.addon_name,
@@ -35,4 +38,5 @@ group by
   services.updated,
   services.deleted,
   service_attachments.name,
-  service_attachments.owned
+  service_attachments.owned,
+  service_attachments.primary

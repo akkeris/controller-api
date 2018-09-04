@@ -19,6 +19,8 @@ describe("addons multiple: test the ability to promote and primary/secondary add
   let postgres1_dburl = null
   let postgres2_dburl = null
   let postgres3_dburl = null
+  let securekey1 = null
+  let securekey2 = null
   let attached_testapp2 = null
 
   it("setup: provision resources", async (done) => {
@@ -106,6 +108,44 @@ describe("addons multiple: test the ability to promote and primary/secondary add
       expect(vars['DATABASE_URL']).to.not.equal(vars[prefix + '_DATABASE_URL'])
       
       let info1 = JSON.parse(await request('get', `http://localhost:5000/apps/${testapp2.id}/addons/${postgres3_testapp2.id}`, test.alamo_headers, null))
+      let info2 = JSON.parse(await request('get', `http://localhost:5000/apps/${testapp2.id}/addon-attachments/${attached_testapp2.id}`, test.alamo_headers, null))
+
+      expect(info1.primary).to.equal(true)
+      expect(info2.primary).to.equal(false)
+      done()
+    } catch (e) {
+      done(e)
+    }
+  })
+
+  it("ensure attached addons and owned addons can co-exist", async(done) => {
+    try {
+      // what happens when you detach a non-primary with a primary addon
+      let prefix = attached_testapp2.name.split('-').slice(2).join('-').replace(/-/g, '_').replace(/ /g, '').replace(/[^a-zA-Z0-9\_]/g, '').trim().toUpperCase()
+      await test.detach_addon(testapp2, attached_testapp2)
+
+      let vars = await test.get_config_vars(testapp2)
+      expect(vars['DATABASE_URL']).to.equal(postgres3_dburl)
+      expect(vars['DATABASE_URL']).to.be.a('string')
+      expect(vars[prefix + '_DATABASE_URL']).to.be.undefined;
+      
+      let info1 = JSON.parse(await request('get', `http://localhost:5000/apps/${testapp2.id}/addons/${postgres3_testapp2.id}`, test.alamo_headers, null))
+      expect(info1.primary).to.equal(true)
+
+
+      // what happens when you reattach a previous attached addon
+      attached_testapp2 = await test.attach_addon(testapp2, postgres2_testapp1)
+      prefix = attached_testapp2.name.split('-').slice(2).join('-').replace(/-/g, '_').replace(/ /g, '').replace(/[^a-zA-Z0-9\_]/g, '').trim().toUpperCase()
+      postgres3_dburl = postgres3_testapp2.config_vars['DATABASE_URL']
+
+      vars = await test.get_config_vars(testapp2)
+      expect(vars['DATABASE_URL']).to.equal(postgres3_dburl)
+      expect(vars['DATABASE_URL']).to.be.a('string')
+      expect(vars[prefix + '_DATABASE_URL']).to.be.a('string')
+      expect(vars[prefix + '_DATABASE_URL']).to.equal(postgres2_dburl)
+      expect(vars['DATABASE_URL']).to.not.equal(vars[prefix + '_DATABASE_URL'])
+      
+      info1 = JSON.parse(await request('get', `http://localhost:5000/apps/${testapp2.id}/addons/${postgres3_testapp2.id}`, test.alamo_headers, null))
       let info2 = JSON.parse(await request('get', `http://localhost:5000/apps/${testapp2.id}/addon-attachments/${attached_testapp2.id}`, test.alamo_headers, null))
 
       expect(info1.primary).to.equal(true)

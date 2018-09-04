@@ -7,9 +7,11 @@ process.env.AUTH_KEY = 'hello'
 const test = require('./support/init.js')
 const request = require('../lib/http_helper.js').request
 const expect = require("chai").expect;
+const pg = require('pg');
+const url = require('url');
 
 describe("addons multiple: test the ability to promote and primary/secondary addons", function() {
-  this.timeout(100 * 1000)
+  this.timeout(1000 * 1000)
   
   let testapp1 = null
   let testapp2 = null
@@ -45,6 +47,7 @@ describe("addons multiple: test the ability to promote and primary/secondary add
       done(e)
     }
   })
+
   it("ensure multiple addons are allowed on one app", async (done) => {
     try {
       let vars = await test.get_config_vars(testapp1)
@@ -69,6 +72,45 @@ describe("addons multiple: test the ability to promote and primary/secondary add
       done(e)
     }
   })
+
+  if(process.env.SMOKE_TESTS) {
+    it("ensure workers see config changes", async(done) => {
+      try {
+        let build_info = await test.create_build(testapp1, 'docker://docker.io/akkeris/test-worker2:v6')
+        await test.wait_for_build(testapp1.id, build_info.id);
+        await test.create_formation(testapp1, 'worker', 'node worker.js')
+        await test.wait_for_apptype(testapp1, 'worker')
+        await test.wait(15000)
+
+        // connect to db
+        let curl = url.parse(postgres1_testapp1.config_vars.DATABASE_URL);
+        let db_conf = {
+          user: curl.auth ? curl.auth.split(':')[0] : '',
+          password: curl.auth ? curl.auth.split(':')[1] : '',
+          host:curl.hostname,
+          database:((curl.path.indexOf('?') > -1) ? curl.path.substring(1,curl.path.indexOf("?")) : curl.path).replace(/^\//, ''),
+          port:curl.port,
+          max:10,
+          idleTimeoutMillis:30000,
+          ssl:false
+        };
+        let pg_pool = new pg.Pool(db_conf);
+        pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", err); });
+
+        let client = await pg_pool.connect()
+        let result = await client.query("select data from envs", [])
+        let env = JSON.parse(result.rows[0].data)
+        expect(env['DATABASE_URL']).to.equal(postgres1_dburl)
+        let prefix = postgres2_testapp1.name.split('-').slice(2).join('-').replace(/-/g, '_').replace(/ /g, '').replace(/[^a-zA-Z0-9\_]/g, '').trim().toUpperCase()
+        expect(env[prefix + '_DATABASE_URL']).to.equal(postgres2_dburl)
+        client.release()
+        done()
+      } catch (e) {
+        done(e)
+      }
+    })
+  }
+
   it("ensure secondary databases can be promoted to primary", async (done) => {
     try {
       await request('patch', `http://localhost:5000/apps/${testapp1.id}/addons/${postgres2_testapp1.id}`, test.alamo_headers, JSON.stringify({"primary":true}))

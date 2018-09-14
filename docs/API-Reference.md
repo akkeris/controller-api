@@ -1507,6 +1507,9 @@ curl \
 
 `POST /apps/{appname}/log-sessions`
 
+
+`POST /sites/{site}/log-sessions`
+
 Views the specified amount of lines starting from the end of the most recent log output and back.  This is the logging across all servers running the specified application.
 
 |   Name       |       Type      | Description                                                                                   | Example           |
@@ -1783,7 +1786,7 @@ curl \
   "state":"public",
   "name":"auto-release",
   "display_name":"Auto release builds",
-  "feedback_email":"cobra@octanner.com",
+  "feedback_email":"cobra@akkeris.io",
   "enabled":false
 }
 ```
@@ -1811,7 +1814,7 @@ curl \
   "state":"public",
   "name":"auto-release",
   "display_name":"Auto release builds",
-  "feedback_email":"cobra@octanner.com",
+  "feedback_email":"cobra@akkeris.io",
   "enabled":false
 },
 {
@@ -1821,7 +1824,7 @@ curl \
   "state":"beta",
   "name":"preview",
   "display_name":"Preview Apps",
-  "feedback_email":"cobra@octanner.com",
+  "feedback_email":"cobra@akkeris.io",
   "enabled":true
 }
 ```
@@ -1850,7 +1853,7 @@ curl \
   "state":"public",
   "name":"auto-release",
   "display_name":"Auto release builds",
-  "feedback_email":"cobra@octanner.com",
+  "feedback_email":"cobra@akkeris.io",
   "enabled":false
 }
 ```
@@ -2476,6 +2479,7 @@ curl \
     "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
     "name": "alamo-postgresql:small"
   },
+  "primary": true,
   "provider_id": "alamo",
   "updated_at": "2016-08-11T20:16:45.820Z",
   "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
@@ -2488,6 +2492,58 @@ curl \
   ]
 }
 ```
+
+
+### Update an Addon ##
+
+Addons can be updated to promote (and subsequently demote) an addon of the same type.  When adding multiple addon's such as a database with the environment variable `DATABASE_URL` the second or non-primary addon has the environment variable prefixed with the addon name. For example if the addon's name is `alamo-postgres-abcdef-1235` and its a secondary (non-primary) database the environment variable would be `ABCDEF_12345_DATABASE_URL`.  The primary database always has non-prefixed environment variables, such as `DATABASE_URL`.  Updating an addon to be primary will cause an existing primary addon of the same type to become a secondary (non-primary) addon. 
+
+`GET /apps/{appname}/addons/{addon_id}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X PATCH \
+  https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false}'
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "actions": null,
+  "addon_service": {
+    "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+    "name": "alamo-postgresql"
+  },
+  "app": {
+    "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
+    "name": "app-space"
+  },
+  "config_vars": [],
+  "created_at": "2016-08-11T20:16:45.820Z",
+  "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+  "name": "alamo-postgres-abcdef-1235",
+  "plan": {
+    "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+    "name": "alamo-postgresql:small"
+  },
+  "primary": false,
+  "provider_id": "alamo",
+  "updated_at": "2016-08-11T20:16:45.820Z",
+  "web_url": "https://akkeris.example.com/apps/62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
+  "attached_to": [
+    {
+      "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c-api",
+      "name": "app-space",
+      "owner": true
+    }
+  ]
+}
+```
+
 
 ### Delete Addon ##
 
@@ -2624,9 +2680,62 @@ curl \
   "created_at": "2016-08-11T20:16:45.820Z",
   "updated_at": "2016-08-11T20:16:45.820Z",
   "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
-  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837",
+  "primary":true
 }
 ```
+
+
+### Update Addons-Attachments ##
+
+Promote an addon attachment to the primary addon for its service type.
+
+`PATCH /apps/{appname}/addon-attachments/{addon_id}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X PATCH \
+  https://apps.akkeris.io/apps/app-space/addon-attachments/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false}'
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "addon":{
+    "actions": null,
+    "addon_service": {
+      "id":"01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
+      "name":"alamo-postgresql"
+    },
+    "app": {
+      "id":"555555-2bed-4b62-bdf5-e31691fab88c",
+      "name":"sourceapp-space"
+    },
+    "config_vars": [],
+    "created_at": "2016-08-11T20:16:45.820Z",
+    "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
+    "name": "a91d7641-a61e-fb09-654e-2def7c9f162d-api:alamo-postgresql-1470946605820",
+    "plan": {
+      "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
+      "name": "alamo-postgresql:small"
+    }
+  },
+  "app":{
+      "id": "777777-2bed-4b62-bdf5-e31691fab88c",
+      "name": "attachedapp-space"
+  },
+  "created_at": "2016-08-11T20:16:45.820Z",
+  "updated_at": "2016-08-11T20:16:45.820Z",
+  "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
+  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837",
+  "primary":false
+}
+```
+
 
 ### Attach Addons ##
 
@@ -3317,17 +3426,22 @@ curl \
 
 ## Log Drains
 
+Log drains allow you to push logs for an app or site to another syslogd on another host (such as papertrail or an internal syslogd instance listening on a port).
+
 ### Add a Log Drains ##
 
 `POST /apps/{appname}/log-drains`
 
-Create a new log drain, log drains allow you to push logs to another syslogd on another host (such as papertrail or an internal syslogd instance listening on a port).
+`POST /sites/{site}/log-drains`
 
-The only required field in the post is the URL to push data to, the data should have one of the following schemas:
+
+Creates a new log drain, the only required field in the post is the URL to push data to, the data should have one of the following schemas:
 
 * syslog+tls:// - Push to a SSL (TLS technically) end point with syslogd format.
 * syslog:// - Push to a unencrypted TCP end point with syslogd format (note this is not secure, and is not recommended).
 * syslog+udp:// - Push to an unencrypted UDP end point with syslogd format (note this may result in out of order logs, is not secure and is not recommended).
+* https:// - Push to an encrypted https end point, query parameters, basic auth (https://user:pass@host) are supported. Uses octet framed RFC6587.
+* http:// - Push to an unencrypted http end point, query parameters, basic auth (http://user:pass@host) are supported. Uses octet framed RFC6587.
 
 
 |   Name   |       Type      | Description                                                                                                                                                                                                | Example                                                                                                                            |
@@ -3383,6 +3497,9 @@ Disconnects a log drain from forwarding.
 
 `DELETE /apps/{appname}/log-drains/{log_drain_id}`
 
+
+`DELETE /sites/{site}/log-drains/{log_drain_id}`
+
 **CURL Example**
 
 ```bash
@@ -3414,6 +3531,8 @@ Gets information on a current log drain.
 
 `GET /apps/{appname}/log-drians/{log_drain_id}`
 
+`GET /sites/{site}/log-drians/{log_drain_id}`
+
 **CURL Example**
 
 ```bash
@@ -3443,6 +3562,8 @@ curl \
 Lists all the log drains for an app.
 
 `GET /apps/{appname}/log-drains`
+
+`GET /sites/{site}/log-drains`
 
 **CURL Example**
 
@@ -4150,7 +4271,7 @@ The occurs when there is a change to to enable a feature on an app, or to disabl
     "state":"alpha|beta|public|ga",
     "name":"feature-name",
     "display_name":"Human Readable Feature Name",
-    "feedback_email":"cobra@octanner.com"
+    "feedback_email":"cobra@akkeris.io",
     "enabled":true
   }
 }
@@ -4422,19 +4543,31 @@ This event occurs when an app has a new version and is now available for request
 `POST [callback end point]`
 
 ```json
-{
-  "action":"released",
-  "app":{
-    "name":"yourappname",
-    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
-  },
-  "space":{
-    "name":"the-space"
-  },
-  "slug":{
-    "image":"registry.host.io/repo/image:tag"
-  },
-  "released_at":"2017-02-05T22:16:56.616Z"
+{  
+   "app":{  
+      "name":"yourappname",
+      "id":"08b17a6f-f2e7-4698-b60a-6f89f6f2f00c"
+   },
+   "space":{  
+      "name":"default"
+   },
+   "key":"yourappname-default",
+   "action":"released",
+   "slug":{  
+      "image":"docker.akkeris.io/org/yourappname-08b17a6f-f2e7-4698-b60a-6f89f6f2f00c:0.4",
+      "source_blob":{  
+         "checksum":"12345",
+         "url":"https://github.com/org/repo/commits/abcde3234fdsadf32342efasdf23432",
+         "version":"Optional Version Info",
+         "commit":"abcde3234fdsadf32342efasdf23432",
+         "author":"John Smith",
+         "repo":"https://github.com/org/repo",
+         "branch":"my_branch",
+         "message":"My commit message"
+      },
+      "id":"44bc0cf4-b3fa-415c-99ef-c8a0b6f7364a"
+   },
+   "released_at":"2018-08-23T15:38:16.010Z"
 }
 ```
 
@@ -5265,7 +5398,7 @@ curl \
       "state": "public",
       "name": "auto-release",
       "display_name": "Auto release builds",
-      "feedback_email": "cobra@octanner.com",
+      "feedback_email": "cobra@akkeris.io",
       "enabled": true
     },
     "username": "test",

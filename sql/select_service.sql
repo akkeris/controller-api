@@ -10,8 +10,10 @@ select
   services.created,
   services.updated,
   services.deleted,
+  service_attachments.service_attachment,
   service_attachments.owned,
   service_attachments.name,
+  service_attachments.primary,
   count(all_attached.*) attachments
 from
   services 
@@ -23,8 +25,10 @@ where
   and apps.app::varchar(128) = $2::varchar(128)
   and services.deleted = false
 group by 
+  service_attachments.service_attachment,
   service_attachments.name,
   service_attachments.owned,
+  service_attachments.primary,
   apps.app,
   services.service,
   services.addon,

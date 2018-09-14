@@ -1,5 +1,6 @@
 "use strict";
 
+const assert = require('assert')
 const fs = require('fs');
 const url = require('url');
 const http = require('http');
@@ -11,12 +12,13 @@ const routes = require('./lib/router.js');
 const simple_key_auth = require('./lib/simple_key_auth.js');
 const common = require('./lib/common.js');
 
-
-console.assert(process.env.DATABASE_URL, "No database provided, set DATABASE_URL to a postgres db!");
+assert.ok(process.env.DATABASE_URL, "No database provided, set DATABASE_URL to a postgres db!")
+assert.ok(config.simple_key.length > 0, "No SECURE_KEY addon or AUTH_KEY environment variable was found, set AUTH_KEY in the environment.")
 
 let alamo = { 
   addon_attachments:require('./lib/addon-attachments.js'),
   addon_services:require('./lib/addon-services.js'),
+  addons:require('./lib/addons.js'),
   apps:require('./lib/apps.js'),
   app_setups:require('./lib/app-setups.js'),
   builds:require('./lib/builds.js'),
@@ -74,6 +76,21 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
     alamo.releases.timers.begin(pg_pool)
     alamo.git.init_worker(pg_pool)
   }
+  if (!config.alamo_app_controller_url) {
+    let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['api', 'default'])
+    assert.ok(records.length > 0, 'Unable to determine ALAMO_APP_CONTROLLER_URL, either set the environment variable ALAMO_APP_CONTROLLER_URL or ensure theres a record for api-default in the apps table.')
+    config.alamo_app_controller_url = records[0].url
+  }
+  if (!config.build_shuttle_url) {
+    let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['buildshuttle', 'default'])
+    assert.ok(records.length > 0, 'Unable to determine BUILD_SHUTTLE_URL, either set the environment variable BUILD_SHUTTLE_URL or ensure theres a record for buildshuttle-default in the apps table.')
+    config.build_shuttle_url = records[0].url
+  }
+  if (!config.appkit_api_url) {
+    let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['appkit', 'default'])
+    assert.ok(records.length > 0, 'Unable to determine APPKIT_API_URL, either set the environment variable APPKIT_API_URL or ensure theres a record for appkit-default in the apps table.')
+    config.appkit_api_url = records[0].url
+  }
   alamo.formations.timers.begin(pg_pool)
   alamo.addon_services.timers.begin(pg_pool)
   // Initialize Events
@@ -90,8 +107,6 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   console.error(e.message, e.stack)
   process.exit(1)
 })
-
-
 
 
 // -- apps
@@ -252,6 +267,23 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/log-drains/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.log_drains.http.delete.bind(alamo.log_drains.http.delete, pg_pool))
           .and.authorization([simple_key]);
 
+
+routes.add.post('/sites/([A-z0-9\\-\\_\\.]+)/log-sessions$')
+          .run(alamo.logs.http.create.bind(alamo.logs.http.create, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.post('/sites/([A-z0-9\\-\\_\\.]+)/log-drains$')
+          .run(alamo.log_drains.http.create.bind(alamo.log_drains.http.create, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/sites/([A-z0-9\\-\\_\\.]+)/log-drains/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.log_drains.http.get.bind(alamo.log_drains.http.get, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/sites/([A-z0-9\\-\\_\\.]+)/log-drains$')
+          .run(alamo.log_drains.http.list.bind(alamo.log_drains.http.list, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.delete('/sites/([A-z0-9\\-\\_\\.]+)/log-drains/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.log_drains.http.delete.bind(alamo.log_drains.http.delete, pg_pool))
+          .and.authorization([simple_key]);
+
 // -- preview apps
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/previews$')
           .run(alamo.previews.http.list.bind(alamo.previews.http.list, pg_pool))
@@ -263,20 +295,23 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/previews/([A-z0-9\\-\\_\\.]+)$')
 
 // -- addons
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons$')
-          .run(alamo.addon_services.addons.http.create.bind(alamo.addon_services.addons.http.create, pg_pool))
+          .run(alamo.addons.http.create.bind(alamo.addons.http.create, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons$')
-          .run(alamo.addon_services.addons.http.list.bind(alamo.addon_services.addons.http.list, pg_pool))
+          .run(alamo.addons.http.list.bind(alamo.addons.http.list, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_services.addons.get.bind(alamo.addon_services.addons.get, pg_pool))
+          .run(alamo.addons.http.get.bind(alamo.addons.http.get, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.update.bind(alamo.addons.http.update, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_services.addons.delete.bind(alamo.addon_services.addons.delete, pg_pool))
+          .run(alamo.addons.http.delete.bind(alamo.addons.http.delete, pg_pool))
           .and.authorization([simple_key]);
 // -- addon actions
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_services.addons.actions.bind(alamo.addon_services.addons.actions, pg_pool))
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
           .and.authorization([simple_key]);
 
 // GET /apps/{app_name_or_id}/addons/{addon_name_or_id}/config ?
@@ -391,22 +426,28 @@ routes.add.get('/ssl-endpoints/([A-z0-9\\-\\_\\.]+)$')
 
 // -- addon attachments
 routes.add.get('/addons/([A-z0-9\\-\\_\\.]+)/addon-attachments$')
-          .run(alamo.addon_attachments.list_by_addon.bind(alamo.addon_attachments.list_by_addon, pg_pool))
+          .run(alamo.addon_attachments.http.list_by_addon.bind(alamo.addon_attachments.http.list_by_addon, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.post('/addons/([A-z0-9\\-\\_\\.]+)/addon-attachments$')
+          .run(alamo.addon_attachments.http.create.bind(alamo.addon_attachments.http.create, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addon-attachments$')
           .run(alamo.addon_attachments.http.list_by_app.bind(alamo.addon_attachments.http.list_by_app, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addon-attachments/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_attachments.get.bind(alamo.addon_attachments.get, pg_pool))
+          .run(alamo.addon_attachments.http.get.bind(alamo.addon_attachments.http.get, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/addon-attachments/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addon_attachments.http.update.bind(alamo.addon_attachments.http.update, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/addon-attachments/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_attachments.get_by_id.bind(alamo.addon_attachments.get_by_id, pg_pool))
+          .run(alamo.addon_attachments.http.get_by_id.bind(alamo.addon_attachments.http.get_by_id, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/addon-attachments/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.addon_attachments.delete_by_id.bind(alamo.addon_attachments.delete_by_id, pg_pool))
+          .run(alamo.addon_attachments.http.delete.bind(alamo.addon_attachments.http.delete, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/addon-attachments$')
-          .run(alamo.addon_attachments.list.bind(alamo.addon_attachments.list, pg_pool))
+          .run(alamo.addon_attachments.http.list_all.bind(alamo.addon_attachments.http.list_all, pg_pool))
           .and.authorization([simple_key]);
 routes.add.post('/addon-attachments$')
           .run(alamo.addon_attachments.http.create.bind(alamo.addon_attachments.http.create, pg_pool))
@@ -585,17 +626,14 @@ routes.add.post('/events$')
           .run(alamo.events.http.create.bind(alamo.events.http.create, pg_pool))
           .and.authorization([simple_key]);
 
-
 routes.add.default((req, res) => {
-  if(process.env.DEBUG === "true") {
-    console.info('[debug] 404', req.url);
-  }
-  res.writeHead(404,{}); res.end();
+  res.writeHead(404,{}); 
+  res.end();
 });
 
 let server = http.createServer((req, res) => {
-  var method = req.method.toLowerCase();
-  var path = url.parse(req.url.toLowerCase()).path;
+  let method = req.method.toLowerCase();
+  let path = url.parse(req.url.toLowerCase()).path;
   routes.process(method, path, req, res).catch((e) => { console.error("Uncaught error:", e) })
 }).listen(process.env.PORT || 5000, () => {
   if(!process.env.TEST_MODE) {

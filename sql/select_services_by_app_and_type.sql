@@ -11,7 +11,7 @@ select
   services.updated,
   services.deleted,
   service_attachments.service_attachment,
-  service_attachments.owned,
+  service_attachments.secondary_configvar_map_ids,
   service_attachments.name,
   service_attachments.primary,
   count(all_attached.*) attachments
@@ -21,11 +21,10 @@ from
   join apps on service_attachments.app = apps.app and apps.deleted = false
   left join service_attachments all_attached on (all_attached.service = services.service and all_attached.deleted = false)
 where
-  apps.app = $1
-  and service_attachments.owned = true
+  apps.app::varchar(1024) = $1::varchar(1024)
+  and (services.addon::varchar(1024) = $2::varchar(1024) or services.addon_name = $2)
   and service_attachments.deleted = false
 group by 
-  service_attachments.service_attachment,
   services.service,
   services.addon,
   services.addon_name,
@@ -37,6 +36,7 @@ group by
   services.created,
   services.updated,
   services.deleted,
+  service_attachments.service_attachment,
+  service_attachments.secondary_configvar_map_ids,
   service_attachments.name,
-  service_attachments.owned,
   service_attachments.primary

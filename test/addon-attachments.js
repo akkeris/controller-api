@@ -19,6 +19,9 @@ describe("addons attachments:", function() {
   let appname_second_id = null;
   let memcached_addon_attachment_id = null;
 
+  let appname_third_new = `alamotest${Math.floor(Math.random() * 10000)}`;
+  let appname_third_id = null;
+
   it("covers creating the test app for services", async (done) => {
     try {
       let data = await httph.request('post', 'http://localhost:5000/apps', alamo_headers, JSON.stringify({org:"test", space:"default", name:appname_brand_new}));
@@ -26,7 +29,7 @@ describe("addons attachments:", function() {
       let app_url = JSON.parse(data).web_url;
       expect(app_url).to.be.a('string');
       await httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers, JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}))
-      done();
+      setTimeout(done,500);
     } catch (e) {
       done(e);
     }
@@ -230,7 +233,7 @@ describe("addons attachments:", function() {
     }
   })
 
-  it("covers attaching memcachier to the second test app by name", async (done) => {
+  it("covers attaching memcachier to the second test app by name, ensures prod=prod apps can attach", async (done) => {
     try {
       expect(appname_second_id).to.be.a("string");
       let data = await httph.request('post', 'http://localhost:5000/addon-attachments', alamo_headers, JSON.stringify({"addon":memcached_response.name, "app":appname_second_id, "force":true, "name":"memcachier"}));
@@ -247,6 +250,48 @@ describe("addons attachments:", function() {
       done(e);
     }
   });
+
+
+  it("covers creating the third test app for services", async (done) => {
+    try {
+      let data = await httph.request('post', 'http://localhost:5000/apps', alamo_headers, JSON.stringify({org:"test", space:"preview", name:appname_third_new}));  
+      expect(data).to.be.a('string');
+      data = JSON.parse(data);
+      appname_third_id = data.id;
+      await httph.request('post', 'http://localhost:5000/apps/' + appname_third_new + '-preview/formation', alamo_headers, JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}));
+      done();
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it("covers attaching memcachier to the third test app by name, ensures prod!=non-prod apps can attach", async (done) => {
+    try {
+      expect(appname_second_id).to.be.a("string");
+      let data = await httph.request('post', 'http://localhost:5000/addon-attachments', Object.assign({"x-silent-error":"true"}, alamo_headers), JSON.stringify({"addon":memcached_response.name, "app":appname_third_id, "name":"memcachier"}));
+      done(new Error('this should not have worked.'));
+    } catch (e) {
+      expect(e.code).to.equal(409)
+      expect(e.message).to.equal('Addons from a socs controlled space cannot be attached to a non-socs controlled space.')
+      done();
+    }
+  });
+
+  it("covers creating dependent build for third app", async (done) => {
+    try {
+      let build_payload = {"sha":"123456","org":"test","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756","url":"docker://docker.io/akkeris/test-attach:v3"};
+      let info = await httph.request('post', 'http://localhost:5000/apps/' + appname_third_new + '-preview/builds', alamo_headers, JSON.stringify(build_payload));
+      expect(info).to.be.a('string');
+      let build_info = JSON.parse(info);
+      let building_info = await support.wait_for_build(`${appname_third_new}-preview`, build_info.id);
+      let release_info = await httph.request('post', `http://localhost:5000/apps/${appname_third_new}-preview/releases`, alamo_headers, JSON.stringify({"slug":build_info.id,"description":"Deploy " + build_info.id}));
+      expect(release_info).to.be.a('string');
+      done();
+    } catch (e) {
+      done(e);
+    }
+  })
+
 
   it("covers ensuring attached addon MEMCACHED_URL is returned from second app", async (done) => {
     try {
@@ -393,6 +438,15 @@ describe("addons attachments:", function() {
   it("covers deleting the test app for services", async (done) => {
     try { 
       let data = await httph.request('delete', `http://localhost:5000/apps/${appname_brand_new}-default`, alamo_headers, null);
+      expect(data).to.be.a('string');
+      done();
+    } catch (e) {
+      done(e);
+    }
+  });
+  it("covers deleting the test app for services", async (done) => {
+    try { 
+      let data = await httph.request('delete', `http://localhost:5000/apps/${appname_third_new}-preview`, alamo_headers, null);
       expect(data).to.be.a('string');
       done();
     } catch (e) {

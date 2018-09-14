@@ -2,6 +2,7 @@ select
   service_attachments.service_attachment,
   service_attachments.name,
   service_attachments.service,
+  service_attachments.primary,
   services.addon,
   services.addon_name,
   services.plan,

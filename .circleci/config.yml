@@ -11,7 +11,7 @@ jobs:
           name: Build application Docker image
           command: |
             docker build -t controller-api .
-       - deploy:
+      - deploy:
           name: Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" != "release" ]; then

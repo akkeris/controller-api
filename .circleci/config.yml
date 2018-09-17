@@ -1,0 +1,29 @@
+version: 2
+jobs:
+  build:
+    working_directory: /app
+    docker:
+      - image: docker:17.05.0-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build application Docker image
+          command: |
+            docker build -t controller-api .
+       - deploy:
+          name: Push application Docker image
+          command: |
+            if [ "${CIRCLE_BRANCH}" != "release" ]; then
+              if [ "${CIRCLE_PROJECT_USERNAME}" == "akkeris" ]; then 
+                docker login -u $DOCKER_LOGIN -p $DOCKER_PASS
+                docker tag controller-api "docker.io/akkeris/controller-api:${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
+                docker push "docker.io/akkeris/controller-api:${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
+                if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                  docker tag controller-api "docker.io/akkeris/controller-api:release-${CIRCLE_BUILD_NUM}"
+                  docker tag controller-api "docker.io/akkeris/controller-api:latest"
+                  docker push "docker.io/akkeris/controller-api:latest"
+                  docker push "docker.io/akkeris/controller-apirelease-${CIRCLE_BUILD_NUM}"
+                fi
+              fi
+            fi

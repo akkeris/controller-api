@@ -23,7 +23,7 @@ jobs:
                   docker tag controller-api "docker.io/akkeris/controller-api:release-${CIRCLE_BUILD_NUM}"
                   docker tag controller-api "docker.io/akkeris/controller-api:latest"
                   docker push "docker.io/akkeris/controller-api:latest"
-                  docker push "docker.io/akkeris/controller-apirelease-${CIRCLE_BUILD_NUM}"
+                  docker push "docker.io/akkeris/controller-api:release-${CIRCLE_BUILD_NUM}"
                 fi
               fi
             fi

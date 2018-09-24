@@ -251,6 +251,17 @@ describe("releases: list, get, create a release", function() {
       });
   });
 
+  it("ensure we get a reasonable error with an invalid release id on rollback of an app", (done) => {
+      expect(release_succeeded).to.equal(true);
+      httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/releases', alamo_headers, JSON.stringify({"release":"12345"}), (rollback_err, rollback_info) => {
+        expect(rollback_err).to.be.an('object');
+        expect(rollback_err.code).to.equal(409);
+        expect(rollback_err.message).to.equal('The release 12345 does not exist');
+        expect(rollback_info).to.be.null;
+        done();
+      });
+  });
+
 
   it("image is available", (done) => {
     // get the app.

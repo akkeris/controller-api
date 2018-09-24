@@ -91,12 +91,64 @@ async function delete_app(app) {
   return await httph.request('delete', `http://localhost:5000/apps/${app.id}`, alamo_headers, null);
 }
 
+async function create_formation(app, type, command) {
+  return await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"scout", "quantity":1, "type":type, "command":command}))
+}
+
 async function create_build(app, image, port) {
   if(port) {
     await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"scout", "quantity":1, "type":"web", "command":null, "port":port}))
   }
   let build = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/builds`, alamo_headers, JSON.stringify({"org":"test", "checksum":"", "url":image}))); 
   return build
+}
+
+async function create_addon(app, service, plan) {
+  let plan_id = JSON.parse(await httph.request('get', `http://localhost:5000/addon-services/${service}/plans`, alamo_headers, null))
+    .filter((x) => x.name === `${service}:${plan}`)[0].id
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/addons`, alamo_headers, JSON.stringify({"plan":plan_id})));
+}
+
+async function is_running(app, type) {
+  let dynos = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/dynos`, alamo_headers, null)).filter((x) => x.type === type)
+  if (dynos.length === 0) {
+    return false
+  }
+  return dynos[0].state.toLowerCase() === 'running'
+}
+
+async function wait(time) {
+  await (new Promise((resolve, reject) => { setTimeout(function() { resolve() }, time)}))
+}
+
+async function wait_for_apptype(app, type) {
+  process.stdout.write('    ~ Waiting for app to turn up ')
+  for(let i=0; i < 200; i++) {
+    await wait(1000)
+    process.stdout.write('.')
+    if (await is_running(app, 'worker')) {
+      console.log()
+      return
+    }
+  }
+  console.log()
+  throw new Error('failed waiting for app to turn up.')
+}
+
+async function delete_addon(app, addon) {
+  return JSON.parse(await httph.request('delete', `http://localhost:5000/apps/${app.id}/addons/${addon.id}`, alamo_headers, null))
+}
+
+async function attach_addon(app, addon) {
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/addon-attachments`, alamo_headers, JSON.stringify({"addon":addon.id, "app":app.id})))
+}
+
+async function detach_addon(app, addon) {
+  return JSON.parse(await httph.request('delete', `http://localhost:5000/apps/${app.id}/addon-attachments/${addon.id}`, alamo_headers, null))
+}
+
+async function get_config_vars(app) {
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, null))
 }
 
 async function create_app_content(content, space, app) {
@@ -112,7 +164,26 @@ async function create_test_app_with_content(content, space) {
   return await create_app_content(content, space, app);
 }
 
+async function remove_app(app) {
+  try {
+    return JSON.parse(await httph.request('delete', `http://localhost:5000/apps/${app.id}`, alamo_headers, null))
+  } catch (e) {
+    console.error("Cannot remove test app:", app)
+    console.error(e)
+  }
+}
+
 module.exports = {
+  wait,
+  wait_for_apptype,
+  is_running,
+  create_formation,
+  detach_addon,
+  attach_addon,
+  delete_addon,
+  remove_app,
+  get_config_vars,
+  alamo_headers,
   wait,
   wait_for_app_content,
   wait_for_build,
@@ -120,5 +191,6 @@ module.exports = {
   create_app_content,
   delete_app,
   create_build,
+  create_addon,
   create_test_app_with_content
 }

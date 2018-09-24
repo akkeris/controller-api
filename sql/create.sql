@@ -342,6 +342,8 @@ begin
     name varchar(128) not null,
     app uuid references apps("app"),
     owned boolean not null default false,
+    "primary" boolean not null default true,
+    secondary_configvar_map_ids text default null,
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
     deleted boolean not null default false
@@ -538,20 +540,20 @@ begin
   -- when these are periodically removed it won't happen on new installations.
   if not exists (SELECT NULL 
               FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'routes'
-              AND column_name = 'pending'
+             WHERE table_name = 'service_attachments'
+              AND column_name = 'primary'
               and table_schema = 'public') then
-    alter table routes add column pending boolean not null default false;
+    alter table service_attachments add column "primary" boolean not null default true;
+  end if;
+  if not exists (SELECT NULL 
+              FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE table_name = 'service_attachments'
+              AND column_name = 'secondary_configvar_map_ids'
+              and table_schema = 'public') then
+    alter table service_attachments add column secondary_configvar_map_ids text default null;
   end if;
 
-  if exists (SELECT 1 
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'builds'
-              AND column_name = 'message'
-              and character_maximum_length = 1024
-              and data_type = 'character varying') then
-    alter table builds alter column message type text using message::text;
-  end if;
+
 
 end
 $$;

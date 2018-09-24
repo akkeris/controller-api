@@ -79,6 +79,16 @@ describe("config-vars: creating, updating and deleting a config vars", function(
       done();
     });
   });
+
+  it("covers ensuring removing a config var that doesn't exist errors", async (done) => {
+    try {
+      let data = await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, Object.assign(alamo_headers, {"x-silent-error":"true"}), JSON.stringify({"REMOVE_NON_EXISTANT":null}));
+      done(new Error('The config var that was removed didnt exist but was removed anyway.'));
+    } catch (e) {
+      done()
+    }
+  });
+
   it("covers adding empty value config vars", async (done) => {
     try {
       let data = await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, JSON.stringify({"EMPTY_CONFIG_VAR":""}));

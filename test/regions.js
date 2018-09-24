@@ -43,7 +43,7 @@ describe("regions: list and get available regions", function() {
     });
   });
   it("covers getting specific region", (done) => {
-    httph.request('get', 'http://localhost:5000/regions/us-seattle', alamo_headers, null, (err, data) => {
+    httph.request('get', 'http://localhost:5000/regions/' + process.env.TEST_REGION, alamo_headers, null, (err, data) => {
       expect(err).to.be.null;
       expect(data).to.be.a('string');
       data = JSON.parse(data)
@@ -61,7 +61,7 @@ describe("regions: list and get available regions", function() {
     });
   });
   it("covers ensuring regions cannot be updated unless its an elevated access request", (done) => {
-    httph.request('patch', 'http://localhost:5000/regions/us-seattle', user_alamo_headers, {"name":"should-not-happen"}, (err, data) => {
+    httph.request('patch', 'http://localhost:5000/regions/' + process.env.TEST_REGION, user_alamo_headers, {"name":"should-not-happen"}, (err, data) => {
       expect(err).to.be.an('object');
       expect(err.code).to.equal(403);
       expect(data).to.be.null;
@@ -70,7 +70,7 @@ describe("regions: list and get available regions", function() {
   });
 
   it("covers ensuring regions cannot be deleted unless its an elevated access request", (done) => {
-    httph.request('delete', 'http://localhost:5000/regions/us-seattle', user_alamo_headers, null, (err, data) => {
+    httph.request('delete', 'http://localhost:5000/regions/'  + process.env.TEST_REGION, user_alamo_headers, null, (err, data) => {
       expect(err).to.be.an('object');
       expect(err.code).to.equal(403);
       expect(data).to.be.null;

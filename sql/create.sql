@@ -442,6 +442,47 @@ begin
     deleted boolean not null default false
   );
 
+  create table if not exists topic_configs (
+    topic_config uuid not null primary key, 
+    name text not null unique, 
+    description text not null,
+    cleanup_policy text not null, 
+    partitions int not null, 
+    retention_ms bigint not null, 
+    replicas int not null,
+    sort_order int not null unique,
+    created timestamptz not null default now(),
+    updated timestamptz,
+    deleted boolean not null default false
+  );
+
+  create table if not exists topics (
+    topic uuid not null primary key,
+    topic_config uuid not null references topic_configs("topic_config"),
+    name text not null unique,
+    description text not null,
+    partitions int not null,
+    replicas int not null,
+    retention_ms int not null,
+    cleanup_policy text not null,
+    region text not null,
+    cluster text not null,
+    organization text not null,
+    created timestamptz not null default now(),
+    updated timestamptz,
+    deleted boolean not null default false
+  );
+
+  create table if not exists topic_acls (
+    topic_acl uuid not null primary key,
+    topic uuid not null references topics("topic"),
+    app uuid not null references apps("app"),
+    role text not null,
+    created timestamptz default now(),
+    updated timestamptz,
+    deleted boolean not null default false
+  );
+
   create index if not exists favorites_username_i on favorites (username);
   create unique index if not exists favorites_username_ux on favorites (app, username);
 
@@ -483,6 +524,14 @@ begin
        'fa2b535d-de4d-4a14-be36-d44af53b59e3', '9ec219f0-9227-47cb-b570-f996d50b980a', 'Chrome');
   end if;
 
+  if (select count(*) from topic_configs) = 0 then
+    insert into topic_configs (topic_config, name, description, cleanup_policy, partitions, retention_ms, replicas, sort_order)
+      values ('61234c3c-fe5d-4253-e26b-b222fb1ccbcb', 'state', 'A compacted topic with infinite retention, for keeping state of one type.', 'compact', 3, -1, 3, 1);
+    insert into topic_configs (topic_config, name, description, cleanup_policy, partitions, retention_ms, replicas, sort_order)
+      values ('72334dac-f444-8325-8218-cd21fb1c382c', 'ledger', 'A non-compacted audit-log style topic for tracking changes in one value type.', 'delete', 3, 2629740000, 3, 2);
+    insert into topic_configs (topic_config, name, description, cleanup_policy, partitions, retention_ms, replicas, sort_order)
+      values ('d3464caa-ee5d-4a03-8adb-37c2fb1c111b', 'event', 'A non-compacted event-stream style topic which may contain multiple types of values', 'delete', 3, 2629740000, 3, 3);
+  end if;
 
   -- Transitions in data structures, this should go through one iteration,
   -- ensure any alterations happen on the OBJECT ABOVE AS WELL! Otherwise

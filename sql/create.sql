@@ -444,15 +444,11 @@ begin
     deleted boolean not null default false
   );
 
-  create table if not exists topic_configs (
-    topic_config uuid not null primary key, 
-    name text not null unique, 
-    description text not null,
-    cleanup_policy text not null, 
-    partitions int not null, 
-    retention_ms bigint not null, 
-    replicas int not null,
-    sort_order int not null unique,
+  create table if not exists clusters (
+    cluster uuid not null primary key,
+    region uuid references regions("region"),
+    name text not null,
+    tags text not null default '',
     created timestamptz not null default now(),
     updated timestamptz,
     deleted boolean not null default false
@@ -460,15 +456,15 @@ begin
 
   create table if not exists topics (
     topic uuid not null primary key,
-    topic_config uuid not null references topic_configs("topic_config"),
+    cluster uuid references clusters("cluster"),
+    region uuid references regions("region"),
+    config text not null,
     name text not null unique,
     description text not null,
     partitions int not null,
     replicas int not null,
     retention_ms int not null,
     cleanup_policy text not null,
-    region text not null,
-    cluster text not null,
     organization text not null,
     created timestamptz not null default now(),
     updated timestamptz,
@@ -503,6 +499,13 @@ begin
       ('ffa8cf57-768e-5214-82fe-fda3f19353f3', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'ds1', false, true, '2016-08-25 12:51:09.371629', now(), false, false);
   end if;
 
+  -- create default cluster for topics
+  if (select count(*) from clusters where deleted = false) = 0 then
+    insert into clusters (cluster, region, name) values ('606ece73-4b9a-4454-8848-c33faadc3121', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'non-prod');
+    insert into clusters (cluster, region, name, tags) values ('97ab5c4a-044b-47f8-a7dc-46ad02aec5ce', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'prod', 'prod');
+    insert into clusters (cluster, region, name) values ('222b5c4e-011b-34a8-ab9c-123402aec5ff', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'maru');
+  end if;
+  
   -- create default api and bootstrap data.
   if (select count(*) from apps where name='api' and deleted = false) = 0 then
     insert into organizations ( org, name ) values ( '0b26ccb5-83cc-4d33-a01f-100c383e0064', 'main');
@@ -524,15 +527,6 @@ begin
     insert into releases (release, app, build, user_agent) values
       ('52ef1ccc-de5d-4453-816b-bce5fb1cc8a5',
        'fa2b535d-de4d-4a14-be36-d44af53b59e3', '9ec219f0-9227-47cb-b570-f996d50b980a', 'Chrome');
-  end if;
-
-  if (select count(*) from topic_configs) = 0 then
-    insert into topic_configs (topic_config, name, description, cleanup_policy, partitions, retention_ms, replicas, sort_order)
-      values ('61234c3c-fe5d-4253-e26b-b222fb1ccbcb', 'state', 'A compacted topic with infinite retention, for keeping state of one type.', 'compact', 3, -1, 3, 1);
-    insert into topic_configs (topic_config, name, description, cleanup_policy, partitions, retention_ms, replicas, sort_order)
-      values ('72334dac-f444-8325-8218-cd21fb1c382c', 'ledger', 'A non-compacted audit-log style topic for tracking changes in one value type.', 'delete', 3, 2629740000, 3, 2);
-    insert into topic_configs (topic_config, name, description, cleanup_policy, partitions, retention_ms, replicas, sort_order)
-      values ('d3464caa-ee5d-4a03-8adb-37c2fb1c111b', 'event', 'A non-compacted event-stream style topic which may contain multiple types of values', 'delete', 3, 2629740000, 3, 3);
   end if;
 
   -- Transitions in data structures, this should go through one iteration,

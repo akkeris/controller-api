@@ -1,6 +1,5 @@
 select
   topic_acls.topic_acl,
-  topic_acls.topic,
   topic_acls.app,
   apps.name as app_name,
   topics.topic,
@@ -13,5 +12,6 @@ from topic_acls
 join apps on (topic_acls.app = apps.app)
 join topics on (topic_acls.topic = topics.topic)
 where
-  (topic_acls.topic_acl::varchar(128) = $1) and
+  (apps.app::varchar(128) = $1) and
+  (topics.topic::varchar(128) = $2) and
   topic_acls.deleted = false

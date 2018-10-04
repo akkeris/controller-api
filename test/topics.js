@@ -13,24 +13,32 @@ describe("CRUD actions for topics", function() {
   const clusterName = 'maru';
   const region = 'us-seattle';
   const cluster = clusterName + '-' + region;
-  const newTopicName = 'test' + new Date().getTime();
+  const newTopicName = 'test-' + new Date().getTime();
   let aclId, config;
 
   function analyzeResponse(err, data, expectedData){
     let res;
-    if (err){
+    if (err && expectedData != 'error' && typeof expectedData != number){
       expect.fail(0, 1, 'Received error: \n' + JSON.stringify(err));
     }
+    else if (expectedData == 'error'){
+      res = err; 
+    }
     else if (expectedData){
-      expect(data).to.be.a('string');
-      res = JSON.parse(data);
-      if (expectedData == 'array' || expectedData == 'object' || expectedData == 'number' || expectedData == 'boolean' || expectedData == 'string'){
-        expect(res).to.be.an(expectedData);
+      if (typeof expectedData == 'number'){
+        expect(err.code).to.equal(expectedData);
       }
-      else if (res != expectedData){
-        console.log('Expected:\n' + expectedData);
-        console.log('Received:\n' + res);
-        expect.fail(0, 1, 'Unexpected response.');
+      else {
+        expect(data).to.be.a('string');
+        res = JSON.parse(data);
+        if (expectedData == 'array' || expectedData == 'object' || expectedData == 'number' || expectedData == 'boolean' || expectedData == 'string'){
+          expect(res).to.be.an(expectedData);
+        }
+        else if (res != expectedData){
+          console.log('Expected:\n' + expectedData);
+          console.log('Received:\n' + res);
+          expect.fail(0, 1, 'Unexpected response.');
+        }
       }
     }
  
@@ -58,15 +66,31 @@ describe("CRUD actions for topics", function() {
   it ("gets topic configs", done => {
     httph.request('get', `http://localhost:5000/clusters/${cluster}/configs`, alamo_headers, null,
     (err, data) => {
-      let {configs} = analyzeResponse(err, data, 'object');
-      expect(configs).to.be.an('array');
-      expect(configs.length).to.be.greaterThan(0);
-      config = configs[0];
+      let res = analyzeResponse(err, data, 'array');
+      expect(res).to.be.an('array');
+      expect(res.length).to.be.greaterThan(0);
+      config = res[0];
       done();
     });
   });
 
-it ("creates a topic", done => {
+  it ("fails to create a topic with invalid name", done => {
+    httph.request('post', `http://localhost:5000/clusters/${cluster}/topics`, alamo_headers, {
+      region: 'us-seattle',
+      name: 'bad-' + newTopicName, 
+      config: config,
+      description: 'a topic for test',
+      cluster: cluster, 
+      organization: 'test',
+      config: 'state'
+    }, 
+    (err, data) => {
+      expect(err).to.not.be.null;
+      done();
+    })
+  });
+
+  it ("creates a topic", done => {
     httph.request('post', `http://localhost:5000/clusters/${cluster}/topics`, alamo_headers, {
       region: 'us-seattle',
       name: newTopicName, 
@@ -117,26 +141,61 @@ it ("creates a topic", done => {
     httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, null, 
     (err, data) => {
       let res = analyzeResponse(err, data, 'array');
-      expect(res.length).to.be.equal(1);
+      expect(res.length).to.equal(1);
       aclId = res[0].topic_acl;
       expect(aclId).to.be.a('string');
       done();
     });
   });
+  
+  let appAcls;
+  it ("gets an app's ACLs", done => {
+    httph.request('get', `http://localhost:5000/apps/api-default/topic-acls`, alamo_headers, null, 
+    (err, data) => {
+      let res = analyzeResponse(err, data, 'array');
+      appAcls = res.length;
+      expect(appAcls).to.be.greaterThan(0);
+      done();
+    });
+  });
 
   it ("deletes an ACL", done => {
-    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls/${aclId}`, alamo_headers, null, 
+    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls/api-default`, alamo_headers, null, 
     (err, data) => {
       analyzeResponse(err, data);
 
       // Make sure it's deleted.
       httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, null, 
-      (err, data) => {
-        let obj = analyzeResponse(err, data, 'array');
-        expect(obj.length).to.be.equal(0);
+        (err, data) => {
+          let obj = analyzeResponse(err, data, 'array');
+          expect(obj.length).to.equal(0);
+      });
+
+      // Make sure it is removed from the app's ACLs.
+      httph.request('get', `http://localhost:5000/apps/api-default/topic-acls`, alamo_headers, null, 
+        (err, data) => {
+          let res = analyzeResponse(err, data, 'array');
+          expect(res.length).to.equal(appAcls - 1);
       });
 
       done();
     });
-  })
+  });
+
+  it ("deletes a topic", done => {
+    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}`, alamo_headers, null, 
+    (err, data) => {
+      analyzeResponse(err, data);
+
+      // Make sure it's deleted.
+      httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}`, alamo_headers, null, 
+      (err, data) => {
+        let obj = analyzeResponse(err, data, 404);
+      });
+
+      done();
+    });
+  });
+
 });
+

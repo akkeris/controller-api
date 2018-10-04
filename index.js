@@ -50,6 +50,7 @@ let alamo = {
   topics:require('./lib/topics.js'),
   topic_acls:require('./lib/topic_acls.js'),
   topic_configs:require('./lib/topic_configs.js'),
+  topic_schemas:require('./lib/topic_schemas.js'),
   topic_clusters:require('./lib/topic_clusters.js')
 };
 
@@ -614,32 +615,46 @@ routes.add.get('/clusters$')
 
 // Topic configs
 routes.add.get('/clusters/([A-z0-9_.-]+)/configs$')
-          .run(alamo.topic_configs.list.bind(alamo.topic_configs.list, pg_pool))
+          .run(alamo.topic_configs.list.bind(null, pg_pool))
           .and.authorization([simple_key]);
 
 // Topics
 routes.add.get('/clusters/([A-z0-9_.-]+)/topics$')
-          .run(alamo.topics.list.bind(alamo.topics.list, pg_pool))
+          .run(alamo.topics.list.bind(null, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)$')
-          .run(alamo.topics.get.bind(alamo.topics.get, pg_pool))
+          .run(alamo.topics.get.bind(null, pg_pool))
           .and.authorization([simple_key]);
 routes.add.post('/clusters/([A-z0-9_.-]+)/topics$')
-          .run(alamo.topics.create.bind(alamo.topics.create, pg_pool))
+          .run(alamo.topics.create.bind(null, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)$')
+          .run(alamo.topics.delete.bind(null, pg_pool))
           .and.authorization([simple_key]);
 
 // Topic ACLs
 routes.add.get('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls$')
-          .run(alamo.topic_acls.list.bind(alamo.topic_acls.list, pg_pool))
+          .run(alamo.topic_acls.list_by_topic.bind(null, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls/([A-z0-9_.-]+)$')
-          .run(alamo.topic_acls.delete.bind(alamo.topic_acls.delete, pg_pool))
+          .run(alamo.topic_acls.delete.bind(null, pg_pool))
           .and.authorization([simple_key]);
 routes.add.post('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls$')
-          .run(alamo.topic_acls.create.bind(alamo.topic_acls.create, pg_pool))
+          .run(alamo.topic_acls.create.bind(null, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/topic-acls$')
-          .run(alamo.app_setups.http.definition.bind(alamo.app_setups.http.definition, pg_pool))
+          .run(alamo.topic_acls.list_by_app.bind(null, pg_pool))
+          .and.authorization([simple_key]);
+
+// Schemas
+routes.add.get('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/schemas$')
+          .run(alamo.topic_schemas.list_mappings.bind(null, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/schemas/([A-z0-9_.-]+)$')
+          .run(alamo.topic_schemas.delete_mapping.bind(null, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.post('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/schemas$')
+          .run(alamo.topic_schemas.create_mapping.bind(null, pg_pool))
           .and.authorization([simple_key]);
 
 // Audit

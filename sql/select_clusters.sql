@@ -4,6 +4,7 @@ select
   c.name,
   r.name as region_name,
   c.tags,
+  c.topic_name_regex,
   c.created,
   c.updated
 from clusters c

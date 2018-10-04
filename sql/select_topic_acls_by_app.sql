@@ -13,5 +13,5 @@ from topic_acls
 join apps on (topic_acls.app = apps.app)
 join topics on (topic_acls.topic = topics.topic)
 where
-  (topic_acls.topic_acl::varchar(128) = $1) and
+  (apps.app::varchar(128) = $1) and
   topic_acls.deleted = false

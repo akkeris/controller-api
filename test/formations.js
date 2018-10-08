@@ -157,7 +157,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
         expect(err).to.be.an('object');
         expect(data).to.be.null;
         expect(err.code).to.equal(422);
-        expect(err.message).to.equal('The type specified was invalid, it cannot contain spaces or special characters (alpha numeric only)');
+        expect(err.message).to.equal('The type specified was invalid, it cannot contain spaces or special characters (lower case alpha numeric only)');
         done();
       });
   });

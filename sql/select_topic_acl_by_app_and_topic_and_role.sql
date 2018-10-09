@@ -14,4 +14,5 @@ join topics on (topic_acls.topic = topics.topic)
 where
   (apps.app::varchar(128) = $1) and
   (topics.topic::varchar(128) = $2) and
+  (topic_acls.role::varchar(128) = $3) and
   topic_acls.deleted = false

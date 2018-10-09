@@ -18,7 +18,7 @@ describe("CRUD actions for topics", function() {
 
   function analyzeResponse(err, data, expectedData){
     let res;
-    if (err && expectedData != 'error' && typeof expectedData != number){
+    if (err && expectedData != 'error' && typeof expectedData != 'number'){
       expect.fail(0, 1, 'Received error: \n' + JSON.stringify(err));
     }
     else if (expectedData == 'error'){

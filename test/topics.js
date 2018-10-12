@@ -102,7 +102,8 @@ describe("CRUD actions for topics", function() {
     }, 
     (err, data) => {
       let res = analyzeResponse(err, data, 'object');
-      expect(res.id).to.be.a('string');
+      console.dir(res)
+      expect(res.name).to.be.a('string');
       done();
     })
   });

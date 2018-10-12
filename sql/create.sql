@@ -464,7 +464,7 @@ begin
     description text not null,
     partitions int not null,
     replicas int not null,
-    retention_ms int not null,
+    retention_ms bigint not null,
     cleanup_policy text not null,
     organization text not null,
     created timestamptz not null default now(),

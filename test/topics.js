@@ -126,6 +126,37 @@ describe("CRUD actions for topics", function() {
     });
   });
 
+  /*
+  it ("attaches a kafka addon", done => {
+    httph.request('post', `http://localhost:5000/apps/api-default/addons`, alamo_headers, {
+      plan: "kafka:maru"
+    }, 
+    (err, data) => {
+      let res = analyzeResponse(err, data, 'object');
+      done();
+    })
+  });
+
+  it ("assigns a key schema", done => {
+    httph.request('post', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/key-schema-mapping`, alamo_headers, {
+      keytype: "string"
+    }, 
+    (err, data) => {
+      let res = analyzeResponse(err, data, 'object');
+      done();
+    })
+  });
+
+  it ("assigns a value schema", done => {
+    httph.request('post', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/key-schema-mapping`, alamo_headers, {
+      keytype: "string"
+    }, 
+    (err, data) => {
+      let res = analyzeResponse(err, data, 'object');
+      done();
+    })
+  });
+
   it ("creates an ACL", done => {
     httph.request('post', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, {
       app: 'api-default', 
@@ -198,5 +229,6 @@ describe("CRUD actions for topics", function() {
     });
   });
 
+  */
 });
 

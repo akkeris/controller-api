@@ -1,6 +1,6 @@
 "use strict"
 
-require('./support/init.js');
+let support = require('./support/init.js');
 
 describe("CRUD actions for topics", function() {  
   this.timeout(10000);
@@ -13,7 +13,9 @@ describe("CRUD actions for topics", function() {
   const clusterName = 'maru';
   const region = 'us-seattle';
   const cluster = clusterName + '-' + region;
-  const newTopicName = 'test-' + new Date().getTime();
+  const date = new Date().getTime();
+  const newTopicName = 'test-' + date;
+  const newAppName = 'alamotest' + date.toString().substring(6);
   let aclId, config;
 
   function analyzeResponse(err, data, expectedData){
@@ -126,15 +128,18 @@ describe("CRUD actions for topics", function() {
     });
   });
 
-  /*
-  it ("attaches a kafka addon", done => {
-    httph.request('post', `http://localhost:5000/apps/api-default/addons`, alamo_headers, {
-      plan: "kafka:maru"
-    }, 
+  it ("makes new app and attaches kafka addon", done => {
+    httph.request('post', 'http://localhost:5000/apps', alamo_headers, {org: 'test', space: 'default', name: newAppName},
     (err, data) => {
-      let res = analyzeResponse(err, data, 'object');
-      done();
-    })
+      analyzeResponse(err, data, 'object');
+      httph.request('post', `http://localhost:5000/apps/${newAppName}-default/addons`, alamo_headers, {
+        plan: `kafka:${clusterName}`
+      }, 
+      (err, data) => {
+          analyzeResponse(err, data, 'object');
+        done();
+      })
+    });
   });
 
   it ("assigns a key schema", done => {
@@ -142,24 +147,24 @@ describe("CRUD actions for topics", function() {
       keytype: "string"
     }, 
     (err, data) => {
-      let res = analyzeResponse(err, data, 'object');
+      analyzeResponse(err, data);
       done();
     })
   });
 
   it ("assigns a value schema", done => {
-    httph.request('post', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/key-schema-mapping`, alamo_headers, {
-      keytype: "string"
+    httph.request('post', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/value-schema-mapping`, alamo_headers, {
+      schema: "Test"
     }, 
     (err, data) => {
-      let res = analyzeResponse(err, data, 'object');
+      analyzeResponse(err, data);
       done();
     })
   });
-
+  
   it ("creates an ACL", done => {
     httph.request('post', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, {
-      app: 'api-default', 
+      app: `${newAppName}-default`, 
       role: 'consumer'
     }, 
     (err, data) => {
@@ -168,13 +173,13 @@ describe("CRUD actions for topics", function() {
       done();
     })
   });
-
+  
   it ("gets a topic's ACLs", done => {
     httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, null, 
     (err, data) => {
       let res = analyzeResponse(err, data, 'array');
       expect(res.length).to.equal(1);
-      aclId = res[0].topic_acl;
+      aclId = res[0].id;
       expect(aclId).to.be.a('string');
       done();
     });
@@ -182,7 +187,7 @@ describe("CRUD actions for topics", function() {
   
   let appAcls;
   it ("gets an app's ACLs", done => {
-    httph.request('get', `http://localhost:5000/apps/api-default/topic-acls`, alamo_headers, null, 
+    httph.request('get', `http://localhost:5000/apps/${newAppName}-default/topic-acls`, alamo_headers, null, 
     (err, data) => {
       let res = analyzeResponse(err, data, 'array');
       appAcls = res.length;
@@ -190,45 +195,42 @@ describe("CRUD actions for topics", function() {
       done();
     });
   });
-
+  
   it ("deletes an ACL", done => {
-    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls/api-default`, alamo_headers, null, 
+    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls/${aclId}/role/consumer`, alamo_headers, null, 
     (err, data) => {
       analyzeResponse(err, data);
-
+      
       // Make sure it's deleted.
       httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, null, 
-        (err, data) => {
-          let obj = analyzeResponse(err, data, 'array');
-          expect(obj.length).to.equal(0);
+      (err, data) => {
+        let obj = analyzeResponse(err, data, 'array');
+        expect(obj.length).to.equal(0);
       });
-
+      
       // Make sure it is removed from the app's ACLs.
       httph.request('get', `http://localhost:5000/apps/api-default/topic-acls`, alamo_headers, null, 
-        (err, data) => {
-          let res = analyzeResponse(err, data, 'array');
-          expect(res.length).to.equal(appAcls - 1);
+      (err, data) => {
+        let res = analyzeResponse(err, data, 'array');
+        expect(res.length).to.equal(appAcls - 1);
+        done();
       });
-
-      done();
     });
   });
-
+  
   it ("deletes a topic", done => {
     httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}`, alamo_headers, null, 
     (err, data) => {
       analyzeResponse(err, data);
-
+      
       // Make sure it's deleted.
       httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}`, alamo_headers, null, 
       (err, data) => {
         let obj = analyzeResponse(err, data, 404);
+        done();
       });
-
-      done();
     });
   });
-
-  */
+  
 });
 

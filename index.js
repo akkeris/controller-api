@@ -313,6 +313,19 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
           .and.authorization([simple_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+
 
 // GET /apps/{app_name_or_id}/addons/{addon_name_or_id}/config ?
 

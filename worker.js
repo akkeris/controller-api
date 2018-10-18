@@ -5,6 +5,7 @@ const pg = require('pg');
 const query = require('./lib/query.js');
 const fs = require('fs');
 const git = require('./lib/git.js');
+const tasks = require('./lib/tasks.js');
 
 let curl = url.parse(process.env.DATABASE_URL);
 
@@ -31,6 +32,7 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   // Start timers
   releases.timers.begin(pg_pool)
   git.init_worker(pg_pool)
+  tasks.begin(pg_pool)
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()
   console.log(`Akkeris Controller API - Worker - (v${pkg.version}) Ready`)

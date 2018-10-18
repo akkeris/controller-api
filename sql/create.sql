@@ -447,6 +447,31 @@ begin
   create index if not exists favorites_username_i on favorites (username);
   create unique index if not exists favorites_username_ux on favorites (app, username);
 
+  if not exists (select 1 from pg_type where typname = 'task_action') then
+      create type task_action as enum('resync-addon-state', 'watch-addon-restore-status');
+  end if;
+  if not exists (select 1 from pg_type where typname = 'task_status') then
+      create type task_status as enum('pending', 'started', 'finished', 'failed');
+  end if;
+
+
+  create table if not exists tasks
+  (
+    task uuid not null primary key,
+    reference varchar(1024) not null,
+    action task_action not null,
+    status task_status not null default 'pending',
+    retries int not null default 0,
+    metadata text not null default '',
+    result text not null default '',
+    created timestamp with time zone not null default now(),
+    updated timestamp with time zone not null default now(),
+    started timestamp with time zone,
+    finished timestamp with time zone,
+    deleted bool not null default false
+  );
+
+
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then
     insert into regions 

@@ -39,8 +39,9 @@ let alamo = {
   pipelines:require('./lib/pipelines.js'),
   plugins:require('./lib/plugins.js'),
   previews:require('./lib/previews.js'),
-  sites:require('./lib/sites.js'),
   routes:require('./lib/routes.js'),
+  sites:require('./lib/sites.js'),
+  tasks:require('./lib/tasks.js'),
   hooks:require('./lib/hooks.js'),
   invoices:require('./lib/invoices.js'),
   favorites:require('./lib/favorites.js'),
@@ -75,6 +76,7 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
     await query(fs.readFileSync('./sql/create.sql').toString('utf8'), null, pg_pool, [])
     alamo.releases.timers.begin(pg_pool)
     alamo.git.init_worker(pg_pool)
+    alamo.tasks.begin(pg_pool)
   }
   if (!config.alamo_app_controller_url) {
     let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['api', 'default'])

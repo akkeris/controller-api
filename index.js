@@ -315,16 +315,31 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
           .and.authorization([simple_key]);
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
           .and.authorization([simple_key]);
 routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
           .and.authorization([simple_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
           .and.authorization([simple_key]);
+routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
 routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
           .and.authorization([simple_key]);
 

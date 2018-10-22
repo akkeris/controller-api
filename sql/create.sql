@@ -444,6 +444,44 @@ begin
     deleted boolean not null default false
   );
 
+  create table if not exists clusters (
+    cluster uuid not null primary key,
+    region uuid references regions("region"),
+    name text not null,
+    tags text not null default '',
+    topic_name_regex text not null default '^[a-z0-9]+(-[a-z0-9-]+)*$',
+    created timestamptz not null default now(),
+    updated timestamptz,
+    deleted boolean not null default false
+  );
+
+  create table if not exists topics (
+    topic uuid not null primary key,
+    cluster uuid references clusters("cluster"),
+    region uuid references regions("region"),
+    config text not null,
+    name text not null unique,
+    description text not null,
+    partitions int not null,
+    replicas int not null,
+    retention_ms bigint not null,
+    cleanup_policy text not null,
+    organization text not null,
+    created timestamptz not null default now(),
+    updated timestamptz,
+    deleted boolean not null default false
+  );
+
+  create table if not exists topic_acls (
+    topic_acl uuid not null primary key,
+    topic uuid not null references topics("topic"),
+    app uuid not null references apps("app"),
+    role text not null,
+    created timestamptz default now(),
+    updated timestamptz,
+    deleted boolean not null default false
+  );
+
   create index if not exists favorites_username_i on favorites (username);
   create unique index if not exists favorites_username_ux on favorites (app, username);
 
@@ -487,6 +525,13 @@ begin
       ('ffa8cf57-768e-5214-82fe-fda3f19353f3', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'ds1', false, true, '2016-08-25 12:51:09.371629', now(), false, false);
   end if;
 
+  -- create default cluster for topics
+  if (select count(*) from clusters where deleted = false) = 0 then
+    insert into clusters (cluster, region, name, topic_name_regex) values ('606ece73-4b9a-4454-8848-c33faadc3121', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'nonprod', '^(qa|dev|stg|test)(-[a-z0-9]+)+$');
+    insert into clusters (cluster, region, name, tags, topic_name_regex) values ('97ab5c4a-044b-47f8-a7dc-46ad02aec5ce', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'prod', 'prod', '^(?!(qa|dev|stg|test)-)[a-z0-9]+(-[a-z0-9]+)+$');
+    insert into clusters (cluster, region, name, topic_name_regex) values ('222b5c4e-011b-34a8-ab9c-123402aec5ff', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'maru', '^(qa|dev|stg|test)(-[a-z0-9]+)+$');
+  end if;
+  
   -- create default api and bootstrap data.
   if (select count(*) from apps where name='api' and deleted = false) = 0 then
     insert into organizations ( org, name ) values ( '0b26ccb5-83cc-4d33-a01f-100c383e0064', 'main');
@@ -509,7 +554,6 @@ begin
       ('52ef1ccc-de5d-4453-816b-bce5fb1cc8a5',
        'fa2b535d-de4d-4a14-be36-d44af53b59e3', '9ec219f0-9227-47cb-b570-f996d50b980a', 'Chrome');
   end if;
-
 
   -- Transitions in data structures, this should go through one iteration,
   -- ensure any alterations happen on the OBJECT ABOVE AS WELL! Otherwise

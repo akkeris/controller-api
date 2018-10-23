@@ -1,0 +1,1 @@
+select count(*) as count from tasks where status = 'started' and extract(hours from now() - started) > 24

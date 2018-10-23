@@ -39,8 +39,9 @@ let alamo = {
   pipelines:require('./lib/pipelines.js'),
   plugins:require('./lib/plugins.js'),
   previews:require('./lib/previews.js'),
-  sites:require('./lib/sites.js'),
   routes:require('./lib/routes.js'),
+  sites:require('./lib/sites.js'),
+  tasks:require('./lib/tasks.js'),
   hooks:require('./lib/hooks.js'),
   invoices:require('./lib/invoices.js'),
   favorites:require('./lib/favorites.js'),
@@ -80,6 +81,7 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
     await query(fs.readFileSync('./sql/create.sql').toString('utf8'), null, pg_pool, [])
     alamo.releases.timers.begin(pg_pool)
     alamo.git.init_worker(pg_pool)
+    alamo.tasks.begin(pg_pool)
   }
   if (!config.alamo_app_controller_url) {
     let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['api', 'default'])
@@ -318,6 +320,34 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
           .and.authorization([simple_key]);
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
+          .and.authorization([simple_key]);
+
 
 // GET /apps/{app_name_or_id}/addons/{addon_name_or_id}/config ?
 

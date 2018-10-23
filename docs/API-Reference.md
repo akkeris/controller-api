@@ -2166,9 +2166,12 @@ curl \
     "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
     "name": "alamo-postgresql",
     "state": "ga",
+    "description":"PostgreSQL 10",
+    "image_url":"https://www.example.com/image.png",
     "available_regions": ["us-seattle"],
     "supports_multiple_installations": true,
     "supports_sharing": true,
+    "supports_upgrading":true,
     "updated_at": "2016-08-09T12:00:00Z"
   },
   {
@@ -2178,9 +2181,11 @@ curl \
     "id": "b292c4f4-cadb-6525-adac-c61074069c65",
     "name": "alamo-redis",
     "state": "ga",
+    "description":"A redis cache",
     "available_regions": ["us-seattle"],
     "supports_multiple_installations": true,
     "supports_sharing": true,
+    "supports_upgrading":false,
     "updated_at": "2016-08-09T12:00:00Z"
   }
 ]
@@ -2211,9 +2216,13 @@ curl \
   "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
   "name": "alamo-postgresql",
   "state": "shutdown",
+  "description":"PostgreSQL 10",
+  "image_url":"https://www.example.com/image.png",
+  "image_url":null,
   "available_regions": ["us-seattle"],
   "supports_multiple_installations": true,
   "supports_sharing": true,
+  "supports_upgrading":true,
   "updated_at": "2016-08-09T12:00:00Z"
 }
 ```
@@ -2238,7 +2247,10 @@ curl \
 ```json
 [
   {
-    "attributes": {},
+    "attributes": {
+      "Custom Metadata":"true",
+      "other_data":"12345"
+    },
     "addon_service": {
       "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
       "name": "alamo-postgresql"
@@ -2253,14 +2265,18 @@ curl \
     "name": "alamo-postgresql:large",
     "price": {
       "cents": 75000,
-      "unit": "month"
+      "unit": "month",
+      "contract":false,
     },
     "space_default": false,
     "state": "public",
     "updated_at": "2016-08-09T12:00:00Z"
   },
   {
-    "attributes": {},
+    "attributes": {
+      "Custom Metadata":"true",
+      "other_data":"12345"
+    },
     "addon_service": {
       "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
       "name": "alamo-postgresql"
@@ -2275,14 +2291,18 @@ curl \
     "name": "alamo-postgresql:medium",
     "price": {
       "cents": 10000,
-      "unit": "month"
+      "unit": "month",
+      "contract":false,
     },
     "space_default": false,
     "state": "public",
     "updated_at": "2016-08-09T12:00:00Z"
   },
   {
-    "attributes": {},
+    "attributes": {
+      "Custom Metadata":"true",
+      "other_data":"12345"
+    },
     "addon_service": {
       "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
       "name": "alamo-postgresql"
@@ -2297,7 +2317,8 @@ curl \
     "name": "alamo-postgresql:small",
     "price": {
       "cents": 1500,
-      "unit": "month"
+      "unit": "month",
+      "contract":false,
     },
     "space_default": false,
     "state": "public",
@@ -2325,7 +2346,10 @@ curl \
 
 ```json
 {
-  "attributes": {},
+  "attributes": {
+    "Custom Metadata":"true",
+    "other_data":"12345"
+  },
   "addon_service": {
     "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
     "name": "alamo-postgresql"
@@ -2340,7 +2364,8 @@ curl \
   "name": "alamo-postgresql:medium",
   "price": {
     "cents": 10000,
-    "unit": "month"
+    "unit": "month",
+    "contract":false,
   },
   "space_default": false,
   "state": "shutdown",

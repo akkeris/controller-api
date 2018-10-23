@@ -1,0 +1,1 @@
+insert into tasks (task, reference, action, metadata) values (uuid_generate_v4(), $1, $2, $3) returning task

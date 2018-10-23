@@ -6,6 +6,7 @@ describe("CRUD actions for topics", function() {
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.TEST_MODE = "true"; // prevents creating actual topics. Since we can't delete them, we bail out before committing.
+  process.env.SKIP_KAFKA_TESTS = "true";
   process.env.AUTH_KEY = 'hello';
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
   const httph = require('../lib/http_helper.js');
@@ -17,6 +18,7 @@ describe("CRUD actions for topics", function() {
   const newTopicName = 'test-' + date;
   const newAppName = 'alamotest' + date.toString().substring(6);
   let aclId, config;
+  if(process.env.SKIP_KAFKA_TESTS) return
 
   function analyzeResponse(err, data, expectedData){
     let res;

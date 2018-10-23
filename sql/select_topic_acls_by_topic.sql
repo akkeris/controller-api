@@ -8,6 +8,7 @@ select
   topics.name as topic_name,
   topics.cluster,
   topic_acls.role,
+  topic_acls.consumer_group_name,
   topic_acls.created,
   topic_acls.updated
 from topic_acls

@@ -482,6 +482,14 @@ begin
     deleted boolean not null default false
   );
 
+  if not exists( SELECT NULL
+              FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE table_name = 'topic_acls'
+               AND table_schema = 'public'
+               AND column_name = 'consumer_group_name')  then
+    alter table topic_acls add column consumer_group_name text;
+  end if;
+
   create index if not exists favorites_username_i on favorites (username);
   create unique index if not exists favorites_username_ux on favorites (app, username);
 

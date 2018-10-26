@@ -80,56 +80,41 @@ describe("config-vars: creating, updating and deleting a config vars", function(
     });
   });
 
-  it("covers ensuring removing a config var that doesn't exist errors", async (done) => {
+  it("covers ensuring removing a config var that doesn't exist errors", async () => {
     try {
       let data = await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, Object.assign(alamo_headers, {"x-silent-error":"true"}), JSON.stringify({"REMOVE_NON_EXISTANT":null}));
-      done(new Error('The config var that was removed didnt exist but was removed anyway.'));
+      expect(true).to.be.false
     } catch (e) {
-      done()
     }
   });
 
-  it("covers adding empty value config vars", async (done) => {
-    try {
-      let data = await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, JSON.stringify({"EMPTY_CONFIG_VAR":""}));
-      let config_vars = JSON.parse(data);
-      expect(config_vars).to.be.a('object');
-      expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
-      expect(config_vars.FOO).to.equal("BAR");
-      expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
-      expect(config_vars.EMPTY_CONFIG_VAR).to.equal("");
-      done();
-    } catch (e) {
-      done(e)
-    }
+  it("covers adding empty value config vars", async () => {
+    let data = await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, JSON.stringify({"EMPTY_CONFIG_VAR":""}));
+    let config_vars = JSON.parse(data);
+    expect(config_vars).to.be.a('object');
+    expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
+    expect(config_vars.FOO).to.equal("BAR");
+    expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
+    expect(config_vars.EMPTY_CONFIG_VAR).to.equal("");
   });
-  it("covers getting empty value config vars", async (done) => {
-    try {
-      let data = await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, null);
-      let config_vars = JSON.parse(data);
-      expect(config_vars).to.be.a('object');
-      expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
-      expect(config_vars.FOO).to.equal("BAR");
-      expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
-      expect(config_vars.EMPTY_CONFIG_VAR).to.equal("");
-      done();
-    } catch (e) {
-      done(e)
-    }
+
+  it("covers getting empty value config vars", async () => {
+    let data = await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, null);
+    let config_vars = JSON.parse(data);
+    expect(config_vars).to.be.a('object');
+    expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
+    expect(config_vars.FOO).to.equal("BAR");
+    expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
+    expect(config_vars.EMPTY_CONFIG_VAR).to.equal("");
   });
-  it("covers updating empty value config vars", async (done) => {
-    try {
-      let data = await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, JSON.stringify({"EMPTY_CONFIG_VAR":"NOT EMPTY"}));
-      let config_vars = JSON.parse(data);
-      expect(config_vars).to.be.a('object');
-      expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
-      expect(config_vars.FOO).to.equal("BAR");
-      expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
-      expect(config_vars.EMPTY_CONFIG_VAR).to.equal("NOT EMPTY");
-      done();
-    } catch (e) {
-      done(e)
-    }
+  it("covers updating empty value config vars", async () => {
+    let data = await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, JSON.stringify({"EMPTY_CONFIG_VAR":"NOT EMPTY"}));
+    let config_vars = JSON.parse(data);
+    expect(config_vars).to.be.a('object');
+    expect(config_vars.PORT).to.equal(process.env.DEFAULT_PORT);
+    expect(config_vars.FOO).to.equal("BAR");
+    expect(config_vars.FOO_API_TOKEN).to.equal("[redacted]");
+    expect(config_vars.EMPTY_CONFIG_VAR).to.equal("NOT EMPTY");
   });
   it("covers adding url with sensitive vars", (done) => {
     setTimeout(() => {
@@ -146,17 +131,12 @@ describe("config-vars: creating, updating and deleting a config vars", function(
       });
     }, 1000);
   });
-  it("covers ensuring addon info does not leak config vars", async (done) => {
-    try {
-      let postgresdb = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${appname_brand_new}-default/addons`, alamo_headers, JSON.stringify({"plan":"alamo-postgresql:hobby"})));
-      let info = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/addons/${postgresdb.id}`, alamo_headers, null));
-      let cvs = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, null));
-      expect(info.config_vars.DATABASE_URL).to.equal(cvs.DATABASE_URL);
-      expect(info.config_vars.DATABASE_URL.includes('[redacted]')).to.equal(true);
-      done();
-    } catch (e) {
-      done(e);
-    }
+  it("covers ensuring addon info does not leak config vars", async () => {
+    let postgresdb = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${appname_brand_new}-default/addons`, alamo_headers, JSON.stringify({"plan":"alamo-postgresql:hobby"})));
+    let info = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/addons/${postgresdb.id}`, alamo_headers, null));
+    let cvs = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, null));
+    expect(info.config_vars.DATABASE_URL).to.equal(cvs.DATABASE_URL);
+    expect(info.config_vars.DATABASE_URL.includes('[redacted]')).to.equal(true);
   });
   it("covers updating config vars", (done) => {
     // update a config var

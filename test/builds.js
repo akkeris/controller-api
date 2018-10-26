@@ -47,7 +47,7 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
   });
 }
 
-const callback = require('./support/init.js')
+const support = require('./support/init.js')
 
 describe("builds: conversion between payload, response and database", function() {  
   this.timeout(300000);
@@ -162,63 +162,36 @@ describe("builds: conversion between payload, response and database", function()
     }, 5000);
   });
   
-  it("covers creating a build needing escaped characters", async function(done) {
+  it("covers creating a build needing escaped characters", async function() {
     this.timeout(0);
     let odd_payload = '{  "type": "service_account",  "project_id": "abcd-1113333",  "private_key_id": "abcd",  "private_key": "\t-----BEGIN NOT A PRIVATE KEY-----\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\nabcd\n-----END NOT A PRIVATE KEY-----\n",  "client_email": "abcd@abcd-111333.abcd.abcd.com",  "client_id": "1234556677",  "auth_uri": "https://aaa.abcd.com/o/oauth2/auth",  "token_uri": "https://aaa.abcd.com/o/oauth2/token",  "auth_provider_x509_cert_url":"https://www.abcdef.com/oauth2/v1/certs",  "client_x509_cert_url": "https://www.abcdef.com/robot/v1/metadata/x509/abcd%40abcde-111111.111.111abcd.com"}'
     await httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/config-vars', alamo_headers, JSON.stringify({"FOO":odd_payload}));
     let build_payload = {"sha":"123456","org":"ocatnner","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756","url":"data:base64,UEsDBAoAAAAAAPammUoAAAAAAAAAAAAAAAAIABwAc29tZWRpci9VVAkAAzAMAFlnDABZdXgLAAEEij3QXQQUAAAAUEsDBBQAAAAIAMaqTUrtS54nawAAAIUAAAASABwAc29tZWRpci9Eb2NrZXJmaWxlVVQJAAP0haJYMQwAWXV4CwABBIo90F0EFAAAAHML8vdVyMtPSbVKLErPz+MKCvVTyM1OySxS0C1Q0C8tLtIvLkrWTywo4Ar3D/J28QxCFXT2D4hU0EMVAxmRV5CrkJlXXJKYk8PlGhHgH+yqYGlgYMDl7OuiEK2gBJRW0lFQAsoXlSgpxAIAUEsDBBQAAAAIAMaqTUroz2k/cQEAAIUCAAAQABwAc29tZWRpci9pbmRleC5qc1VUCQAD9IWiWDEMAFl1eAsAAQSKPdBdBBQAAAB1UU1LAzEQve+vGPayWbrGrXgThQqFKtpKW71YkWV3WkNjopPZqmj/u5O2+AUGApnJzHtv3qRtQAhMpuY0SWrvAsMD8xMcA+FzawhVFuMsP0qeyNcYgka30uP+9Ho8vL/pXVz3pfbfr48PSAMyG7cQQG7JwaqyLcK8MhYbne44A9IKSZAima4JK8bJJqeUCCmkOeRwfALvCcS3fiHDOMCqUQdlWcD7WgQCmHms1i1ZbVyDr6O5ykSTIe8e0XGWwwnsdfMNyg8cdT4ZDXW0wS3M/E39GCff4K4BrRj1t+2/sbc9O6XoGiWJKHA7pfZOZbU1IqhP5CkrQCFRAcHXS+SvMbfhpj8bTKdX+13dhcOyhNOqgbFsBwPPaObizXYMiUUGIz6WkY3PHAtlZZX6QjWdTlQXbfcWtfULlb54Wor7LIBwm0Ln1z4Ho8l02LvsSzq9gyW+wd+KXxuXKjA7WkgLMFFZAd1SzrcF1gRGF3cnyU9QSwMEFAAAAAgAxqpNSkmwHUOYAAAA6QAAABQAHABzb21lZGlyL3BhY2thZ2UuanNvblVUCQAD9IWiWDEMAFl1eAsAAQSKPdBdBBQAAABVj7sOgzAMRXe+wvLAVCFYWasOnbuyRIkrXJWExgEhEP/eJCBVHX3O9WsrANCqgbAF/Ey8riR4SXAmL+xs4k1VV/VBDYn2PIbTHHBQnCu2hpbqdQ44ghLFFssEgvIh5awzBH/haANJlqR7Bx3evHe+BesgCZCRND+ZTIdQlkALB2gwdu55l5pC7/zvojdrspKfuj+uWOzFF1BLAQIeAwoAAAAAAPammUoAAAAAAAAAAAAAAAAIABgAAAAAAAAAEADtQQAAAABzb21lZGlyL1VUBQADMAwAWXV4CwABBIo90F0EFAAAAFBLAQIeAxQAAAAIAMaqTUrtS54nawAAAIUAAAASABgAAAAAAAEAAACkgUIAAABzb21lZGlyL0RvY2tlcmZpbGVVVAUAA/SFolh1eAsAAQSKPdBdBBQAAABQSwECHgMUAAAACADGqk1K6M9pP3EBAACFAgAAEAAYAAAAAAABAAAApIH5AAAAc29tZWRpci9pbmRleC5qc1VUBQAD9IWiWHV4CwABBIo90F0EFAAAAFBLAQIeAxQAAAAIAMaqTUpJsB1DmAAAAOkAAAAUABgAAAAAAAEAAACkgbQCAABzb21lZGlyL3BhY2thZ2UuanNvblVUBQAD9IWiWHV4CwABBIo90F0EFAAAAFBLBQYAAAAABAAEAFYBAACaAwAAAAA="};
-    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/builds', alamo_headers, JSON.stringify(build_payload), (err, build_info) => {
-      if(err) {
-        console.error(err);
-      }
-      expect(err).to.be.null;
-      expect(build_info).to.be.a('string');
-      let build_obj = JSON.parse(build_info);
-      expect(build_obj.id).to.be.a('string');
-      wait_for_build(httph, appname_brand_new + '-default', build_obj.id, (wait_err, building_info) => {
-        if(wait_err) {
-          console.error("Error waiting for build:", wait_err);
-        }
-        expect(wait_err).to.be.null;
-        expect(JSON.parse(building_info).status).to.equal('succeeded');
-        done();
-      });
-    });
+    let build_info = await httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/builds', alamo_headers, JSON.stringify(build_payload))
+    expect(build_info).to.be.a('string');
+    let build_obj = JSON.parse(build_info);
+    expect(build_obj.id).to.be.a('string');
+    let building_info = await support.wait_for_build(`${appname_brand_new}-default`, build_obj.id)
+    expect(building_info.status).to.equal('succeeded');
   })
 
   let build_id = null
-  it("covers creating a build with no hidden files", function(done) {
+  it("covers creating a build with no hidden files", async function() {
     this.timeout(0);
     let build_payload = {"sha":"123456","org":"ocatnner","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756","url":"data:base64,UEsDBAoAAAAAAPammUoAAAAAAAAAAAAAAAAIABwAc29tZWRpci9VVAkAAzAMAFlnDABZdXgLAAEEij3QXQQUAAAAUEsDBBQAAAAIAMaqTUrtS54nawAAAIUAAAASABwAc29tZWRpci9Eb2NrZXJmaWxlVVQJAAP0haJYMQwAWXV4CwABBIo90F0EFAAAAHML8vdVyMtPSbVKLErPz+MKCvVTyM1OySxS0C1Q0C8tLtIvLkrWTywo4Ar3D/J28QxCFXT2D4hU0EMVAxmRV5CrkJlXXJKYk8PlGhHgH+yqYGlgYMDl7OuiEK2gBJRW0lFQAsoXlSgpxAIAUEsDBBQAAAAIAMaqTUroz2k/cQEAAIUCAAAQABwAc29tZWRpci9pbmRleC5qc1VUCQAD9IWiWDEMAFl1eAsAAQSKPdBdBBQAAAB1UU1LAzEQve+vGPayWbrGrXgThQqFKtpKW71YkWV3WkNjopPZqmj/u5O2+AUGApnJzHtv3qRtQAhMpuY0SWrvAsMD8xMcA+FzawhVFuMsP0qeyNcYgka30uP+9Ho8vL/pXVz3pfbfr48PSAMyG7cQQG7JwaqyLcK8MhYbne44A9IKSZAima4JK8bJJqeUCCmkOeRwfALvCcS3fiHDOMCqUQdlWcD7WgQCmHms1i1ZbVyDr6O5ykSTIe8e0XGWwwnsdfMNyg8cdT4ZDXW0wS3M/E39GCff4K4BrRj1t+2/sbc9O6XoGiWJKHA7pfZOZbU1IqhP5CkrQCFRAcHXS+SvMbfhpj8bTKdX+13dhcOyhNOqgbFsBwPPaObizXYMiUUGIz6WkY3PHAtlZZX6QjWdTlQXbfcWtfULlb54Wor7LIBwm0Ln1z4Ho8l02LvsSzq9gyW+wd+KXxuXKjA7WkgLMFFZAd1SzrcF1gRGF3cnyU9QSwMEFAAAAAgAxqpNSkmwHUOYAAAA6QAAABQAHABzb21lZGlyL3BhY2thZ2UuanNvblVUCQAD9IWiWDEMAFl1eAsAAQSKPdBdBBQAAABVj7sOgzAMRXe+wvLAVCFYWasOnbuyRIkrXJWExgEhEP/eJCBVHX3O9WsrANCqgbAF/Ey8riR4SXAmL+xs4k1VV/VBDYn2PIbTHHBQnCu2hpbqdQ44ghLFFssEgvIh5awzBH/haANJlqR7Bx3evHe+BesgCZCRND+ZTIdQlkALB2gwdu55l5pC7/zvojdrspKfuj+uWOzFF1BLAQIeAwoAAAAAAPammUoAAAAAAAAAAAAAAAAIABgAAAAAAAAAEADtQQAAAABzb21lZGlyL1VUBQADMAwAWXV4CwABBIo90F0EFAAAAFBLAQIeAxQAAAAIAMaqTUrtS54nawAAAIUAAAASABgAAAAAAAEAAACkgUIAAABzb21lZGlyL0RvY2tlcmZpbGVVVAUAA/SFolh1eAsAAQSKPdBdBBQAAABQSwECHgMUAAAACADGqk1K6M9pP3EBAACFAgAAEAAYAAAAAAABAAAApIH5AAAAc29tZWRpci9pbmRleC5qc1VUBQAD9IWiWHV4CwABBIo90F0EFAAAAFBLAQIeAxQAAAAIAMaqTUpJsB1DmAAAAOkAAAAUABgAAAAAAAEAAACkgbQCAABzb21lZGlyL3BhY2thZ2UuanNvblVUBQAD9IWiWHV4CwABBIo90F0EFAAAAFBLBQYAAAAABAAEAFYBAACaAwAAAAA="};
-    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/builds', alamo_headers, JSON.stringify(build_payload), (err, build_info) => {
-      if(err) {
-        console.error(err);
-      }
-      expect(err).to.be.null;
-      expect(build_info).to.be.a('string');
-      let build_obj = JSON.parse(build_info);
-      expect(build_obj.id).to.be.a('string');
-      wait_for_build(httph, appname_brand_new + '-default', build_obj.id, (wait_err, building_info) => {
-        if(wait_err) {
-          console.error("Error waiting for build:", wait_err);
-        }
-        expect(wait_err).to.be.null;
-        expect(JSON.parse(building_info).status).to.equal('succeeded');
-        build_id = build_obj.id
-        done();
-      });
-    });
+    let build_info = await httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/builds', alamo_headers, JSON.stringify(build_payload))
+    expect(build_info).to.be.a('string');
+    let build_obj = JSON.parse(build_info);
+    expect(build_obj.id).to.be.a('string');
+    let building_info = await support.wait_for_build(appname_brand_new + '-default', build_obj.id)
+    expect(building_info.status).to.equal('succeeded');
+    build_id = build_obj.id
   });
 
-  it("covers querying the slug endpoint", async function(done) {
-    try {
-      expect(build_id).to.be.a('string')
-      let slug_info = JSON.parse(await httph.request('get', `http://localhost:5000/slugs/${build_id}`, alamo_headers, null))
-      expect(slug_info).to.be.an('object')
-      done()
-    } catch (e) {
-      done(e)
-    }
+  it("covers querying the slug endpoint", async function() {
+    expect(build_id).to.be.a('string')
+    let slug_info = JSON.parse(await httph.request('get', `http://localhost:5000/slugs/${build_id}`, alamo_headers, null))
+    expect(slug_info).to.be.an('object')
   })
 
   it("covers removing build app", (done) => {

@@ -4,32 +4,28 @@ const httph = require('../../lib/http_helper.js')
 const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", "x-elevated-access":"true"};
 let running_app = null
 
-before(function(done) {
+before(async function() {
   if(process.env.NGROK_TOKEN) {
-    let port = (process.env.PORT || 5000);
-    ngrok.connect({authtoken:process.env.NGROK_TOKEN, addr:port}, function(err, url) {
-      if(err) {
-        console.error("ERROR: Unable to establish NGROK connection:", err);
-      } else {
-        process.env.TEST_CALLBACK = url
-        process.env.ALAMO_APP_CONTROLLER_URL = url
-      }
+    try {
+      let port = (process.env.PORT || 5000);
+      let url = await ngrok.connect({authtoken:process.env.NGROK_TOKEN, addr:port})
+      process.env.TEST_CALLBACK = url
+      process.env.ALAMO_APP_CONTROLLER_URL = url
       running_app = require('../../index.js')
-      setTimeout(done, 500);
-    })
+    } catch (e) {
+      console.error("ERROR: Unable to establish NGROK connection:", err);
+    }
   } else {
     running_app = require('../../index.js')
-    setTimeout(done, 500);
   }
 })
 
-after(function(done) {
-  if(process.env.NGROK_TOKEN) {
-    ngrok.disconnect()
-    ngrok.kill()
-  }
-  running_app.server.close(() => {
-    done()
+after(async function() {
+  running_app.server.close(async () => {
+    if(process.env.NGROK_TOKEN) {
+      await ngrok.disconnect()
+      await ngrok.kill()
+    }
   });
 })
 

@@ -4,5 +4,6 @@ update tasks set
 	metadata = coalesce($4, metadata), 
 	result = coalesce($5, result), 
 	started = coalesce($6, started), 
-	finished = coalesce($7, finished) 
+	finished = coalesce($7, finished),
+	updated = now()
 where task = $1

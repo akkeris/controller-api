@@ -12,7 +12,7 @@ before(async function() {
       process.env.TEST_CALLBACK = url
       process.env.ALAMO_APP_CONTROLLER_URL = url
       running_app = require('../../index.js')
-    } catch (e) {
+    } catch (err) {
       console.error("ERROR: Unable to establish NGROK connection:", err);
     }
   } else {

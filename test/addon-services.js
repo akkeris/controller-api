@@ -4,7 +4,7 @@ process.env.DEFAULT_PORT = "5000";
 process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
-const init = require('./support/init.js')
+const support = require('./support/init.js')
 
 describe("addon services: plans, services listing and getting.", function() {  
   this.timeout(10000);
@@ -51,118 +51,66 @@ describe("addon services: plans, services listing and getting.", function() {
     expect(obj.updated_at).to.be.a('string')
   }
 
-  it("covers getting a list of services", (done) => {
-    httph.request('get', 'http://localhost:5000/addon-services', alamo_headers, null, 
-    (err, data) => {
-      if(err) {
-        console.error(err)
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let obj = JSON.parse(data)
-      expect(obj).to.be.an('array')
-      obj.forEach(validate_service)
-      setTimeout(done,1500);
-
-    });
+  it("covers getting a list of services", async () => {
+    await support.wait(1250);
+    let data = await httph.request('get', 'http://localhost:5000/addon-services', alamo_headers, null)
+    expect(data).to.be.a('string');
+    let obj = JSON.parse(data)
+    expect(obj).to.be.an('array')
+    obj.forEach(validate_service)
   });
-  it("covers getting a specific service (postgresql)", (done) => {
-    httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql', alamo_headers, null, 
-    (err, data) => {
-      if(err) {
-        console.error(err)
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let obj = JSON.parse(data);
-      expect(obj).to.be.an('object');
-      validate_service(obj)
-      done();
-    });
+  it("covers getting a specific service (postgresql)", async () => {
+    let data = await httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql', alamo_headers, null)
+    expect(data).to.be.a('string');
+    let obj = JSON.parse(data);
+    expect(obj).to.be.an('object');
+    validate_service(obj)
   });
-  it("covers getting a specific service (anomaly)", (done) => {
-    httph.request('get', 'http://localhost:5000/addon-services/anomaly', alamo_headers, null, 
-    (err, data) => {
-      if(err) {
-        console.error(err)
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let obj = JSON.parse(data);
-      expect(obj).to.be.an('object');
-      validate_service(obj)
-      done();
-    });
+  it("covers getting a specific service (anomaly)", async () => {
+    let data = await httph.request('get', 'http://localhost:5000/addon-services/anomaly', alamo_headers, null)
+    expect(data).to.be.a('string');
+    let obj = JSON.parse(data);
+    expect(obj).to.be.an('object');
+    validate_service(obj)
   });
-  it("covers getting a specific service (twilio)", (done) => {
-    httph.request('get', 'http://localhost:5000/addon-services/twilio', alamo_headers, null, 
-    (err, data) => {
-      if(err) {
-        console.error(err)
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let obj = JSON.parse(data);
-      expect(obj).to.be.an('object');
-      validate_service(obj)
-      done();
-    });
+  it("covers getting a specific service (twilio)", async () => {
+    let data = await httph.request('get', 'http://localhost:5000/addon-services/twilio', alamo_headers, null)
+    expect(data).to.be.a('string');
+    let obj = JSON.parse(data);
+    expect(obj).to.be.an('object');
+    validate_service(obj)
   });
-  it("covers getting a specific service's plans (postgresql)", (done) => {
-    setTimeout(function() {
-      httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql/plans', alamo_headers, null, 
-      (err, data) => {
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        let obj = JSON.parse(data);
-        expect(obj).to.be.an('array');
-        expect(obj[0]).to.be.an('object');
-        obj.forEach(validate_plan)
-        done();
-      });
-    },1250)
+  it("covers getting a specific service's plans (postgresql)", async () => {
+    let data = await httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql/plans', alamo_headers, null)
+    expect(data).to.be.a('string');
+    let obj = JSON.parse(data);
+    expect(obj).to.be.an('array');
+    expect(obj[0]).to.be.an('object');
+    obj.forEach(validate_plan)
   });
-  it("covers getting a specific service's plans (anomaly)", (done) => {
-    setTimeout(function() {
-      httph.request('get', 'http://localhost:5000/addon-services/anomaly/plans', alamo_headers, null, 
-      (err, data) => {
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        let obj = JSON.parse(data);
-        expect(obj).to.be.an('array');
-        expect(obj[0]).to.be.an('object');
-        obj.forEach(validate_plan)
-        done();
-      });
-    },1250)
+  it("covers getting a specific service's plans (anomaly)", async () => {
+    let data = await httph.request('get', 'http://localhost:5000/addon-services/anomaly/plans', alamo_headers, null)
+    expect(data).to.be.a('string');
+    let obj = JSON.parse(data);
+    expect(obj).to.be.an('array');
+    expect(obj[0]).to.be.an('object');
+    obj.forEach(validate_plan)
   });
-  it("covers getting a specific service's plans (twilio)", (done) => {
-    setTimeout(function() {
-      httph.request('get', 'http://localhost:5000/addon-services/twilio/plans', alamo_headers, null, 
-      (err, data) => {
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        let obj = JSON.parse(data);
-        expect(obj).to.be.an('array');
-        expect(obj[0]).to.be.an('object');
-        obj.forEach(validate_plan)
-        done();
-      });
-    },1250)
+  it("covers getting a specific service's plans (twilio)", async () => {
+    let data = await httph.request('get', 'http://localhost:5000/addon-services/twilio/plans', alamo_headers, null)
+    expect(data).to.be.a('string');
+    let obj = JSON.parse(data);
+    expect(obj).to.be.an('array');
+    expect(obj[0]).to.be.an('object');
+    obj.forEach(validate_plan)
   });
-  it("covers getting a specific service's plan", (done) => {
-    
-      httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql/plans/standard-0', alamo_headers, null, 
-      (err, data) => {
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        let obj = JSON.parse(data);
-        expect(obj).to.be.an('object');
-        expect(obj.provisioned_by).to.be.an('array');
-        validate_plan(obj)
-        done();
-      });
-    
+  it("covers getting a specific service's plan", async () => {
+    let data = await httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql/plans/standard-0', alamo_headers, null);
+    expect(data).to.be.a('string');
+    let obj = JSON.parse(data);
+    expect(obj).to.be.an('object');
+    expect(obj.provisioned_by).to.be.an('array');
+    validate_plan(obj)
   });
   it("covers ensuring a 404 is for unknown service ", (done) => {
     httph.request('get', 'http://localhost:5000/addon-services/doestexist', alamo_headers, null, 
@@ -182,18 +130,11 @@ describe("addon services: plans, services listing and getting.", function() {
       done();
     });
   });
-  it("covers getting a list of services (again, some services take time to register)", (done) => {
-    httph.request('get', 'http://localhost:5000/addon-services', alamo_headers, null, 
-    (err, data) => {
-      if(err) {
-        console.error(err)
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let obj = JSON.parse(data)
-      expect(obj).to.be.an('array')
-      obj.forEach(validate_service)
-      done();
-    });
+  it("covers getting a list of services (again, some services take time to register)", async () => {
+    let data = await httph.request('get', 'http://localhost:5000/addon-services', alamo_headers, null)
+    expect(data).to.be.a('string');
+    let obj = JSON.parse(data)
+    expect(obj).to.be.an('array')
+    obj.forEach(validate_service)
   });
 });

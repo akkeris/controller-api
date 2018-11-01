@@ -2388,6 +2388,7 @@ Creates a new addon from a service plan.
 |   Name       |       Type      | Description                                                                                   | Example                                                 |
 |:------------:|:---------------:|-----------------------------------------------------------------------------------------------|---------------------------------------------------------|
 |    plan      | required string | The id (uuid) of the service plan to create, this can be obtained from /addon-services/{addon_name_or_id}/plans                               | akkeris                                                |
+| attachment.name | optional string | The name for the attachment, and thus the prefix used for config vars if the addon is secondary.  Must be alphanumeric.                          |  mycoolname                                                |
 
 **CURL Example**
 
@@ -2396,7 +2397,7 @@ curl \
   -H 'Authorization: ...' \
   -X POST \
   https://apps.akkeris.io/apps/app-space/addons \
-  -d '{"plan":"a91d7641-a61e-fb09-654e-2def7c9f162d"}'
+  -d '{"plan":"a91d7641-a61e-fb09-654e-2def7c9f162d", "attachment":{"name":"mycoolname"}}'
 ```
 
 **201 "Created" Response**
@@ -2415,7 +2416,7 @@ curl \
   "config_vars": [],
   "created_at": "2016-08-11T20:16:45.820Z",
   "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
-  "name": "62dc0fd3-2cba-4925-8fca-d1129d296d2c-api:alamo-postgresql-1470946605820",
+  "name": "mycoolname",
   "plan": {
     "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
     "name": "alamo-postgresql:small"
@@ -2521,9 +2522,9 @@ curl \
 
 ### Update an Addon ##
 
-Addons can be updated to promote (and subsequently demote) an addon of the same type.  When adding multiple addon's such as a database with the environment variable `DATABASE_URL` the second or non-primary addon has the environment variable prefixed with the addon name. For example if the addon's name is `alamo-postgres-abcdef-1235` and its a secondary (non-primary) database the environment variable would be `ABCDEF_12345_DATABASE_URL`.  The primary database always has non-prefixed environment variables, such as `DATABASE_URL`.  Updating an addon to be primary will cause an existing primary addon of the same type to become a secondary (non-primary) addon. 
+Addons can be updated to promote (and subsequently demote) an addon of the same type.  When adding multiple addon's such as a database with the environment variable `DATABASE_URL` the second or non-primary addon has the environment variable prefixed with the addon name. For example if the addon's name is `alamo-postgres-abcdef-1235` and its a secondary (non-primary) database the environment variable would be `ABCDEF_12345_DATABASE_URL`.  The primary database always has non-prefixed environment variables, such as `DATABASE_URL`.  Updating an addon to be primary will cause an existing primary addon of the same type to become a secondary (non-primary) addon.  Updating the attachment.name property will change the name of the addon, and thus change the prefix used for `DATABASE_URL` as well.
 
-`GET /apps/{appname}/addons/{addon_id}`
+`PATCH /apps/{appname}/addons/{addon_id}`
 
 **CURL Example**
 
@@ -2531,7 +2532,7 @@ Addons can be updated to promote (and subsequently demote) an addon of the same 
 curl \
   -H 'Authorization: ...' \
   -X PATCH \
-  https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false}'
+  https://apps.akkeris.io/apps/app-space/addons/mycoolname -d '{"primary":false, "attachment":{"name":"mynewcoolname"}}'
 ```
 
 **200 "OK" Response**
@@ -2550,7 +2551,7 @@ curl \
   "config_vars": [],
   "created_at": "2016-08-11T20:16:45.820Z",
   "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
-  "name": "alamo-postgres-abcdef-1235",
+  "name": "mynewcoolname",
   "plan": {
     "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
     "name": "alamo-postgresql:small"
@@ -2723,7 +2724,7 @@ Promote an addon attachment to the primary addon for its service type.
 curl \
   -H 'Authorization: ...' \
   -X PATCH \
-  https://apps.akkeris.io/apps/app-space/addon-attachments/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false}'
+  https://apps.akkeris.io/apps/app-space/addon-attachments/myoldname -d '{"primary":false, "name":"mynewname"}'
 ```
 
 **200 "OK" Response**
@@ -2756,7 +2757,7 @@ curl \
   "created_at": "2016-08-11T20:16:45.820Z",
   "updated_at": "2016-08-11T20:16:45.820Z",
   "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
-  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837",
+  "name":"myoldname",
   "primary":false
 }
 ```
@@ -2775,7 +2776,7 @@ curl \
   -H 'Authorization: ...' \
   -X POST \
   https://apps.akkeris.io/apps/app-space/addon-attachments
-  -d '{"addon":"5feef9bb-2bed-4b62-bdf5-e31691fab88c", "app":"app-space"}'
+  -d '{"addon":"5feef9bb-2bed-4b62-bdf5-e31691fab88c", "app":"app-space", "name":"some-name"}'
 ```
 
 **200 "OK" Response**
@@ -2808,7 +2809,7 @@ curl \
   "created_at": "2016-08-11T20:16:45.820Z",
   "updated_at": "2016-08-11T20:16:45.820Z",
   "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
-  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+  "name":"some-name"
 }
 ```
 

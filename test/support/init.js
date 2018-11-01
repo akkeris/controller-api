@@ -12,7 +12,7 @@ before(async function() {
       process.env.TEST_CALLBACK = url
       process.env.ALAMO_APP_CONTROLLER_URL = url
       running_app = require('../../index.js')
-    } catch (e) {
+    } catch (err) {
       console.error("ERROR: Unable to establish NGROK connection:", err);
     }
   } else {
@@ -106,10 +106,14 @@ async function create_build(app, image, port) {
   return build
 }
 
-async function create_addon(app, service, plan) {
+async function create_addon(app, service, plan, name) {
   let plan_id = JSON.parse(await httph.request('get', `http://localhost:5000/addon-services/${service}/plans`, alamo_headers, null))
     .filter((x) => x.name === `${service}:${plan}`)[0].id
-  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/addons`, alamo_headers, JSON.stringify({"plan":plan_id})));
+  let payload = {"plan":plan_id}
+  if(name) {
+    payload.attachment = {"name":name}
+  }
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/addons`, alamo_headers, JSON.stringify(payload)));
 }
 
 async function is_running(app, type) {

@@ -17,6 +17,7 @@ describe("addons multiple: test the ability to promote and primary/secondary add
   let testapp2 = null
   let postgres1_testapp1 = null
   let postgres2_testapp1 = null
+  let postgres3_testapp1 = null
   let postgres3_testapp2 = null
   let postgres1_dburl = null
   let postgres2_dburl = null
@@ -28,9 +29,6 @@ describe("addons multiple: test the ability to promote and primary/secondary add
   it("setup: provision resources", async () => {
     testapp1 = await test.create_test_app("preview")
     testapp2 = await test.create_test_app("preview")
-    //let build1 = await test.create_build(testapp1, "docker://docker.io/akkeris/test-sample:latest", 2000)
-    //let build2 = await test.create_build(testapp2, "docker://docker.io/akkeris/test-sample:latest", 2000)
-    //await Promise.all([test.wait_for_build(testapp1.key, build1.id),test.wait_for_build(testapp2.key, build2.id)])
     postgres1_testapp1 = await test.create_addon(testapp1, 'alamo-postgresql', 'hobby')
     let vars = await test.get_config_vars(testapp1)
     let prefix = postgres1_testapp1.name.split('-').slice(2).join('-').replace(/-/g, '_').replace(/ /g, '').replace(/[^a-zA-Z0-9\_]/g, '').trim().toUpperCase()
@@ -41,6 +39,7 @@ describe("addons multiple: test the ability to promote and primary/secondary add
     expect(info1.primary).to.equal(true)
 
     postgres2_testapp1 = await test.create_addon(testapp1, 'alamo-postgresql', 'hobby')
+    postgres3_testapp1 = await test.create_addon(testapp1, 'alamo-postgresql', 'hobby', 'foobar')
   })
 
   it("ensure multiple addons are allowed on one app", async () => {
@@ -57,10 +56,27 @@ describe("addons multiple: test the ability to promote and primary/secondary add
     
     let info1 = JSON.parse(await request('get', `http://localhost:5000/apps/${testapp1.id}/addons/${postgres1_testapp1.id}`, test.alamo_headers, null))
     let info2 = JSON.parse(await request('get', `http://localhost:5000/apps/${testapp1.id}/addons/${postgres2_testapp1.id}`, test.alamo_headers, null))
+    let info3 = JSON.parse(await request('get', `http://localhost:5000/apps/${testapp1.id}/addons/${postgres3_testapp1.id}`, test.alamo_headers, null))
 
     expect(info1.primary).to.equal(true)
     expect(info2.primary).to.equal(false)
+    expect(info3.primary).to.equal(false)
   })
+
+  it("ensure naming addons affect the prefix they're given", async () => {
+    let info1 = await test.get_config_vars(testapp1)
+    expect(postgres3_testapp1.config_vars['FOOBAR_DATABASE_URL']).to.be.a('string')
+    expect(info1.FOOBAR_DATABASE_URL).to.be.a('string')
+    expect(postgres3_testapp1.config_vars['FOOBAR_DATABASE_URL']).to.equal(info1.FOOBAR_DATABASE_URL)
+  })
+
+  it("ensure renaming addons works", async () => {
+    await request('patch', `http://localhost:5000/apps/${testapp1.id}/addons/${postgres3_testapp1.id}`, test.alamo_headers, JSON.stringify({"attachment":{"name":"feebar"}}))
+    let info1 = await test.get_config_vars(testapp1)
+    expect(info1.FEEBAR_DATABASE_URL).to.be.a('string')
+    expect(postgres3_testapp1.config_vars['FOOBAR_DATABASE_URL']).to.equal(info1.FEEBAR_DATABASE_URL)
+    await test.delete_addon(testapp1, postgres3_testapp1)
+  });
 
   if(process.env.SMOKE_TESTS) {
     it("ensure workers see config changes", async () => {

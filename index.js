@@ -666,6 +666,9 @@ routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)$')
 routes.add.get('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls$')
           .run(alamo.topic_acls.list_by_topic.bind(null, pg_pool))
           .and.authorization([simple_key]);
+routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls/([A-z0-9_.-]+)/role/(producer|consumer)/consumers/([A-z0-9_.-]+)$')
+          .run(alamo.topic_acls.delete_consumer.bind(null, pg_pool))
+          .and.authorization([simple_key]);
 routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls/([A-z0-9_.-]+)/role/(producer|consumer)$')
           .run(alamo.topic_acls.delete.bind(null, pg_pool))
           .and.authorization([simple_key]);

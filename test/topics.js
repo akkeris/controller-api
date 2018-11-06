@@ -6,7 +6,7 @@ describe("CRUD actions for topics", function() {
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.TEST_MODE = "true"; // prevents creating actual topics. Since we can't delete them, we bail out before committing.
-  process.env.SKIP_KAFKA_TESTS = "true";
+  // process.env.SKIP_KAFKA_TESTS = "true";
   process.env.AUTH_KEY = 'hello';
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
   const httph = require('../lib/http_helper.js');
@@ -17,7 +17,7 @@ describe("CRUD actions for topics", function() {
   const date = new Date().getTime();
   const newTopicName = 'test-' + date;
   const newAppName = 'alamotest' + date.toString().substring(6);
-  let aclId, config;
+  let aclIdConsumer, aclIdProducer, config;
   if(process.env.SKIP_KAFKA_TESTS) return
 
   function analyzeResponse(err, data, expectedData){
@@ -138,7 +138,7 @@ describe("CRUD actions for topics", function() {
         plan: `kafka:${clusterName}`
       }, 
       (err, data) => {
-          analyzeResponse(err, data, 'object');
+        analyzeResponse(err, data, 'object');
         done();
       })
     });
@@ -164,15 +164,31 @@ describe("CRUD actions for topics", function() {
     })
   });
   
-  it ("creates an ACL", done => {
+  let cgName =`${newTopicName}-cg`
+  it ("creates a consumer ACL", done => {
     httph.request('post', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, {
       app: `${newAppName}-default`, 
-      role: 'consumer'
+      role: 'consumer',
+      consumerGroupName: cgName
     }, 
     (err, data) => {
       let res = analyzeResponse(err, data, 'object');
+      aclIdConsumer = res.id
       expect(res.id).to.be.a('string');
       expect(res.consumerGroupName).to.be.a('string');
+      done();
+    })
+  });
+
+  it ("creates a producer ACL", done => {
+    httph.request('post', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, {
+      app: `${newAppName}-default`, 
+      role: 'producer'
+    }, 
+    (err, data) => {
+      let res = analyzeResponse(err, data, 'object');
+      aclIdProducer = res.id
+      expect(res.id).to.be.a('string');
       done();
     })
   });
@@ -181,9 +197,20 @@ describe("CRUD actions for topics", function() {
     httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, null, 
     (err, data) => {
       let res = analyzeResponse(err, data, 'array');
-      expect(res.length).to.equal(1);
-      aclId = res[0].id;
-      expect(aclId).to.be.a('string');
+      expect(res.length).to.equal(2);
+      var aclId1 = res[0].id;
+      var aclId2 = res[1].id;
+      if(res[0].consumerGroupName) {
+        let consumerGroupName = res[0].consumerGroupName;
+        expect(aclId1).to.equal(aclIdConsumer)
+        expect(aclId2).to.equal(aclIdProducer)
+        expect(consumerGroupName).to.equal(cgName)
+      } else {
+        let consumerGroupName = res[1].consumerGroupName;
+        expect(aclId2).to.equal(aclIdConsumer)
+        expect(aclId1).to.equal(aclIdProducer)
+        expect(consumerGroupName).to.equal(cgName)  
+      }
       done();
     });
   });
@@ -199,8 +226,30 @@ describe("CRUD actions for topics", function() {
     });
   });
   
+  it ("deletes an ACL with consumer group name", done => {
+    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls/${newAppName}-default/role/consumer/consumers/${cgName}`, alamo_headers, null, 
+    (err, data) => {
+      analyzeResponse(err, data);
+      
+      // Make sure it's deleted.
+      httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, null, 
+      (err, data) => {
+        let obj = analyzeResponse(err, data, 'array');
+        expect(obj.length).to.equal(1);
+      });
+      
+      // Make sure it is removed from the app's ACLs.
+      httph.request('get', `http://localhost:5000/apps/${newAppName}-default/topic-acls`, alamo_headers, null, 
+      (err, data) => {
+        let res = analyzeResponse(err, data, 'array');
+        expect(res.length).to.equal(appAcls - 1);
+        done();
+      });
+    });
+  });
+  
   it ("deletes an ACL", done => {
-    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls/${aclId}/role/consumer`, alamo_headers, null, 
+    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls/${newAppName}-default/role/producer`, alamo_headers, null, 
     (err, data) => {
       analyzeResponse(err, data);
       
@@ -212,10 +261,10 @@ describe("CRUD actions for topics", function() {
       });
       
       // Make sure it is removed from the app's ACLs.
-      httph.request('get', `http://localhost:5000/apps/api-default/topic-acls`, alamo_headers, null, 
+      httph.request('get', `http://localhost:5000/apps/${newAppName}-default/topic-acls`, alamo_headers, null, 
       (err, data) => {
         let res = analyzeResponse(err, data, 'array');
-        expect(res.length).to.equal(appAcls - 1);
+        expect(res.length).to.equal(appAcls - 2);
         done();
       });
     });

@@ -1818,7 +1818,7 @@ curl \
   "enabled":false
 },
 {
-  "description":"When a pull request is received, automatically create a preview site and applicaiton (web dyno only) with the same config as the development application.",
+  "description":"When a pull request is received, automatically create a preview site and application (web dyno only) with the same config as the development application.",
   "doc_url":"/features/preview",
   "id":"8e7ec5d2-c410-4d04-8d5e-db7746c40b44",
   "state":"beta",

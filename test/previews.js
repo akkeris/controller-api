@@ -1,61 +1,13 @@
 
 "use strict"
 
-process.env.TEST_MODE = "true"
-const init = require('./support/init.js');
 describe("preview apps: ensure preview apps work appropriately", function() {
   this.timeout(10 * 60 * 1000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
   process.env.DEFAULT_PORT = "5000";
-
-  function wait_for_build(httph, app, build_id, callback, iteration) {
-    iteration = iteration || 1;
-    if(iteration === 1) {
-      process.stdout.write("    ~ Waiting for build");
-    }
-    httph.request('get', 'http://localhost:5000/apps/' + app + '/builds/' + build_id, alamo_headers, null, (err, data) => {
-      if(err && err.code === 423) {
-        process.stdout.write(".");
-        setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-      } else if(err) {
-        callback(err, null);
-      } else {
-        let build_info = JSON.parse(data);
-        if(build_info.status === 'pending' || build_info.status === 'queued') {
-          process.stdout.write(".");
-          setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-        } else {
-          process.stdout.write("\n");
-          callback(null, data);
-        }
-      }
-    });
-  }
-
-  function wait_for_app_content(httph, app, content, callback, iteration) {
-    iteration = iteration || 1;
-    if(iteration === 1) {
-      process.stdout.write("    ~ Waiting for app to turn up");
-    }
-    if(iteration === 120) {
-      process.stdout.write("\n");
-      callback({code:0, message:"Timeout waiting for app to turn up."});
-    }
-    setTimeout(function() {
-      httph.request('get', 'https://' + app + process.env.ALAMO_BASE_DOMAIN, {'X-Timeout':1500}, null, (err, data) => {
-        if(err || data.indexOf(content) === -1) {
-          process.stdout.write(".");
-          setTimeout(wait_for_app_content.bind(null, httph, app, content, callback, (iteration + 1)), 250);
-          //callback(err, null);
-        } else {
-          process.stdout.write("\n");
-          callback(null, data);
-        }
-      });
-    },500);
-  }
-
+  process.env.TEST_MODE = "true"
+  const init = require('./support/init.js');
   const fs = require('fs')
   const httph = require('../lib/http_helper.js')
   const git = require('../lib/git.js')

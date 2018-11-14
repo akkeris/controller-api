@@ -4564,7 +4564,7 @@ The `dynos` array contains the dyno(s) which were affected by this event.
 ### Released Event Payload
 
 
-This event occurs when an app has a new version and is now available for requests.  This differs from the `release` hook in that the release is the start in which a deployment begins but not when the new version is ready, running and requests are being routed to it.
+This event occurs when an app has a new version and is now available for requests.  This differs from the `release` hook in that the release is the start in which a deployment begins but not when the new version is ready, running and requests are being routed to it. This will fire for each dyno in your formation, for example if you have a `web` and `worker` dyno type and 3 `web` dynos this released event would fire twice, once for `web` after both dynos are up and running and the old instances are being stopped, then the `worker`. You can distinguish which dyno has released by looking at the dyno.type field.
 
 `POST [callback end point]`
 
@@ -4579,6 +4579,9 @@ This event occurs when an app has a new version and is now available for request
    },
    "key":"yourappname-default",
    "action":"released",
+   "dyno":{
+    "type":"web"
+   },
    "slug":{  
       "image":"docker.akkeris.io/org/yourappname-08b17a6f-f2e7-4698-b60a-6f89f6f2f00c:0.4",
       "source_blob":{  

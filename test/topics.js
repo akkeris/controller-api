@@ -144,6 +144,17 @@ describe("CRUD actions for topics", function() {
     });
   });
 
+  it ("attach kafka addon twice fails", done => {
+    httph.request('post', `http://localhost:5000/apps/${newAppName}-default/addons`, alamo_headers, {
+      plan: `kafka:${clusterName}`
+    }, 
+    (err, data) => {
+      let error = analyzeResponse(err, data, 'error');
+      expect(error.message).to.equal("This addon is already created and attached to this application and cannot be used twice.");      
+      done();
+    })
+  });
+
   it ("assigns a key schema", done => {
     httph.request('post', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/key-schema-mapping`, alamo_headers, {
       keytype: "string"

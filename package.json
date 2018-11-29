@@ -1,6 +1,6 @@
 {
   "name": "akkeris-controller-api",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Central API for controlling apps in akkeris",
   "main": "index.js",
   "scripts": {

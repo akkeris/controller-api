@@ -539,6 +539,9 @@ begin
     insert into clusters (cluster, region, name, tags, topic_name_regex) values ('97ab5c4a-044b-47f8-a7dc-46ad02aec5ce', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'prod', 'prod', '^(?!(qa|dev|stg|test)-)[a-z0-9]+(-[a-z0-9]+)+$');
     insert into clusters (cluster, region, name, topic_name_regex) values ('222b5c4e-011b-34a8-ab9c-123402aec5ff', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'maru', '^(qa|dev|stg|test)(-[a-z0-9]+)+$');
   end if;
+
+  -- drop unique constraint on table name
+  ALTER TABLE topics DROP CONSTRAINT IF EXISTS topics_name_key;
   
   -- create default api and bootstrap data.
   if (select count(*) from apps where name='api' and deleted = false) = 0 then

@@ -689,7 +689,7 @@ routes.add.get('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/schemas$')
 routes.add.post('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/key-schema-mapping$')
           .run(alamo.topic_schemas.create_key_mapping.bind(null, pg_pool))
           .and.authorization([simple_key]);
-          routes.add.post('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/value-schema-mapping$')
+routes.add.post('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/value-schema-mapping$')
           .run(alamo.topic_schemas.create_value_mapping.bind(null, pg_pool))
           .and.authorization([simple_key]);
 

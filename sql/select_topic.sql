@@ -21,5 +21,5 @@ join
   regions on (regions.region = clusters.region)
 where
   (topics.name::varchar(128) = $1 or topics.topic::varchar(128) = $1) and
-  (clusters.cluster::varchar(128) = $2 or clusters.name::varchar(128) || '-' || regions.name::varchar(128) = $2) and
+  (clusters.cluster::varchar(128) = $2 or clusters.name::varchar(128) = $2 or clusters.name::varchar(128) || '-' || regions.name::varchar(128) = $2) and
   topics.deleted = false

@@ -1,5 +1,6 @@
 const ngrok = require('ngrok')
 const util = require('util')
+const fs = require('fs')
 const httph = require('../../lib/http_helper.js')
 const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", "x-elevated-access":"true"};
 let running_app = null
@@ -106,6 +107,22 @@ async function create_build(app, image, port) {
   return build
 }
 
+async function create_fake_formation(app) {
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"type":"web","command":"what", "quantity":1, "size":"scout", "healthcheck":"/what"})))
+}
+
+async function fake_github_notice(app, pr_file) {
+  const git = require('../../lib/git.js')
+  let incoming = fs.readFileSync(pr_file).toString('utf8')
+  let hash = git.calculate_hash("testing", incoming)
+  let headers = {'x-github-event':'pull_request', 'x-hub-signature':hash}
+  return await httph.request('post', `http://localhost:5000/apps/${app.id}/builds/auto/github`, Object.assign(headers,alamo_headers), incoming)
+}
+
+async function get_previews(app) {
+   return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/previews`, alamo_headers, null))
+}
+
 async function create_addon(app, service, plan, name) {
   let plan_id = JSON.parse(await httph.request('get', `http://localhost:5000/addon-services/${service}/plans`, alamo_headers, null))
     .filter((x) => x.name === `${service}:${plan}`)[0].id
@@ -166,6 +183,14 @@ async function create_app_content(content, space, app) {
   return Object.assign(app, {slug:build_info});
 }
 
+async function enable_feature(app, feature) {
+  await httph.request('patch', `http://localhost:5000/apps/${app.id}/features/${feature}`, alamo_headers, {"enabled":true}, null)
+}
+
+async function disable_feature(app, feature) {
+  await httph.request('patch', `http://localhost:5000/apps/${app.id}/features/${feature}`, alamo_headers, {"enabled":false}, null)
+}
+
 async function addon_info(app, addon) {
   return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/addons/${addon.id}`, alamo_headers, null))
 }
@@ -184,8 +209,44 @@ async function remove_app(app) {
   }
 }
 
+async function remove_site(site) {
+  try {
+    return JSON.parse(await httph.request('delete', `http://localhost:5000/sites/${site.id}`, alamo_headers, null))
+  } catch (e) {
+    console.error("Cannot remove test site:", site)
+    console.error(e)
+  }
+}
+
+async function create_test_site() {
+  let site_name = "alamotest" + Math.floor(Math.random() * 10000)
+  return JSON.parse(await httph.request('post', 'http://localhost:5000/sites', alamo_headers, JSON.stringify({"domain":site_name})))
+}
+
+async function add_to_site(site, app, source, target) {
+  return JSON.parse(await httph.request('post', `http://localhost:5000/routes`, alamo_headers, JSON.stringify({"site":site.id, "app":app.id, "target_path":target, "source_path":source})))
+}
+
+async function setup_auto_build(app, repo, branch, username, token) {
+  await httph.request('post', `http://localhost:5000/apps/${app.id}/builds/auto`, alamo_headers, JSON.stringify({repo, branch, status_check:"true", auto_deploy:"true", username, token}))
+  await enable_feature(app, 'auto-release')
+}
+
+async function get_routes(app) {
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/routes`, alamo_headers, null))
+}
+
 module.exports = {
+  get_routes,
+  create_fake_formation,
+  get_previews,
+  fake_github_notice,
   wait,
+  add_to_site,
+  create_test_site,
+  remove_site,
+  enable_feature,
+  disable_feature,
   wait_for_apptype,
   is_running,
   create_formation,
@@ -204,5 +265,6 @@ module.exports = {
   delete_app,
   create_build,
   create_addon,
-  create_test_app_with_content
+  create_test_app_with_content,
+  setup_auto_build
 }

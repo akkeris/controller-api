@@ -5,6 +5,7 @@ select
   sites.tags,
   sites.region,
   sites.domain,
+  sites.preview,
   apps.name as app_name,
   spaces.name as space_name,
   routes.source_path, 

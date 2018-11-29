@@ -1,13 +1,13 @@
 {
   "name": "akkeris-controller-api",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Central API for controlling apps in akkeris",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "test": "./node_modules/.bin/_mocha --exit",
     "tests": "./node_modules/.bin/_mocha --exit test/*.js",
-    "coverage": "export DEFAULT_PORT=5000; istanbul cover _mocha --exit -- -u exports -R spec ; cat coverage/lcov.info | ./node_modules/.bin/codacy-coverage",
+    "coverage": "export DEFAULT_PORT=5000; ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --exit -u exports -R spec ; cat coverage/lcov.info | ./node_modules/.bin/codacy-coverage",
     "jenkins-test": "export DEFAULT_PORT=5000; export NODE_ENV=dev; JUNIT_REPORT_PATH=./report.xml mocha --colors --reporter mocha-jenkins-reporter"
   },
   "author": "",

@@ -5,6 +5,7 @@ select
   sites.tags,
   sites.region,
   sites.domain,
+  sites.preview,
   apps.name as app_name,
   spaces.name as space_name,
   routes.source_path, 
@@ -24,5 +25,6 @@ where
   )
   and routes.pending = true
   and routes.deleted = false
+  and sites.deleted = false
   and apps.deleted = false
   and spaces.deleted = false

@@ -8,7 +8,7 @@ describe("CRUD actions for topics", function() {
   process.env.TEST_MODE = "true"; // prevents creating actual topics. Since we can't delete them, we bail out before committing.
   // process.env.SKIP_KAFKA_TESTS = "true";
   process.env.AUTH_KEY = 'hello';
-  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
+  const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test"};
   const httph = require('../lib/http_helper.js');
   const expect = require('chai').expect;
   const clusterName = 'maru';
@@ -16,6 +16,7 @@ describe("CRUD actions for topics", function() {
   const cluster = clusterName + '-' + region;
   const date = new Date().getTime();
   const newTopicName = 'test-' + date;
+  const stgTopicName = 'stg-' + date;
   const newAppName = 'alamotest' + date.toString().substring(6);
   let aclIdConsumer, aclIdProducer, config;
   if(process.env.SKIP_KAFKA_TESTS) return
@@ -279,6 +280,30 @@ describe("CRUD actions for topics", function() {
         done();
       });
     });
+  });
+  
+  it ("throws 403 when elevated access is not given", done => {
+    // Create a stage topic.
+    httph.request('post', `http://localhost:5000/clusters/${cluster}/topics`, alamo_headers, {
+      region: 'us-seattle',
+      name: stgTopicName, 
+      config: config,
+      description: 'a topic for test',
+      cluster: cluster, 
+      organization: 'test',
+      config: 'state'
+    }, 
+    (err, data) => {
+      let res = analyzeResponse(err, data, 'object');
+      expect(res.name).to.be.a('string');
+      httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}`, alamo_headers, null, 
+      (err1, data1) => {
+        let error = analyzeResponse(err1, data1, 'error');
+        expect(error.code).to.equal(403)
+        expect(error.message).to.equal(`Deletion of topic '${stgTopicName}' in cluster '${clusterName}' can only be done with elevated access`)
+        done();
+      });
+    })
   });
   
   it ("deletes a topic", done => {

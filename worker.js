@@ -32,7 +32,6 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   console.log('Any database migrations have completed.')
   // Start timers
   releases.timers.begin(pg_pool)
-  git.init_worker(pg_pool)
   tasks.begin(pg_pool)
   addon_services.timers.begin(pg_pool)
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));

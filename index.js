@@ -80,7 +80,6 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
     // Run any database migrations necessary.
     await query(fs.readFileSync('./sql/create.sql').toString('utf8'), null, pg_pool, [])
     alamo.releases.timers.begin(pg_pool)
-    alamo.git.init_worker(pg_pool)
     alamo.tasks.begin(pg_pool)
   }
   if (!config.alamo_app_controller_url) {
@@ -211,18 +210,18 @@ routes.add.get('/slugs/([A-z0-9\\-\\_\\.]+)$')
 
 // -- auto build with github, get and post. should github be mounted to auto?
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto$')
-          .run(alamo.git.autobuild.bind(alamo.git.autobuild, pg_pool))
+          .run(alamo.git.http.autobuild.create.bind(alamo.git.http.autobuild.create, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')
-          .run(alamo.git.info.bind(alamo.git.info, pg_pool))
+          .run(alamo.git.http.autobuild.get.bind(alamo.git.http.autobuild.get, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')
-          .run(alamo.git.autobuild_remove.bind(alamo.git.autobuild_remove, pg_pool))
+          .run(alamo.git.http.autobuild.delete.bind(alamo.git.http.autobuild.delete, pg_pool))
           .and.authorization([simple_key]);
 
 // -- Github callbacks, no auth but authenticated through
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')
-          .run(alamo.git.webhook.bind(alamo.git.webhook, pg_pool));
+          .run(alamo.git.http.webhook.bind(alamo.git.http.webhook, pg_pool));
 // -- Build callbacks
 routes.add.post('/builds/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.builds.http.status_change.bind(alamo.builds.http.status_change, pg_pool));

@@ -156,6 +156,8 @@ begin
     deleted boolean not null default false
   );
 
+  create index if not exists previews_target_deleted_idx on previews (target) where NOT deleted;
+
   create table if not exists formations (
     "formation" uuid not null primary key,
     app uuid references apps("app"),
@@ -219,6 +221,7 @@ begin
   );
 
   create index if not exists auto_builds_created_idx on auto_builds (created);
+  create index if not exists auto_builds_app_deleted_idx on auto_builds (app) where NOT deleted;
 
   create table if not exists builds (
     build uuid not null primary key,
@@ -268,12 +271,14 @@ begin
     description text not null default '',
     trigger release_trigger not null default 'unknown',
     trigger_notes text not null default '',
+    scm_metadata text, -- generally used to store id's for github deployments
     version integer not null default 1,
     deleted boolean not null default false
   );
 
   create index if not exists releases_app_idx on releases (app);
   create index if not exists releases_created_idx on releases (created);
+  create index if not exists releases_created_by_app_idx on releases (created, app) where created is not null;
   create index if not exists releases_build_idx on releases (build);
 
   create table if not exists pipelines (
@@ -566,22 +571,12 @@ begin
        'fa2b535d-de4d-4a14-be36-d44af53b59e3', '9ec219f0-9227-47cb-b570-f996d50b980a', 'Chrome');
   end if;
 
-  -- Transitions in data structures, this should go through one iteration,
-  -- ensure any alterations happen on the OBJECT ABOVE AS WELL! Otherwise
-  -- when these are periodically removed it won't happen on new installations.
   if not exists (SELECT NULL 
               FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'service_attachments'
-              AND column_name = 'primary'
+             WHERE table_name = 'releases'
+              AND column_name = 'scm_metadata'
               and table_schema = 'public') then
-    alter table service_attachments add column "primary" boolean not null default true;
-  end if;
-  if not exists (SELECT NULL 
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'service_attachments'
-              AND column_name = 'secondary_configvar_map_ids'
-              and table_schema = 'public') then
-    alter table service_attachments add column secondary_configvar_map_ids text default null;
+    alter table releases add column scm_metadata text;
   end if;
 
 

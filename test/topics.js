@@ -320,5 +320,27 @@ describe("CRUD actions for topics", function() {
     });
   });
   
+  it ("deletes a topic with elevated access", done => {
+    alamo_headers['x-elevated-access'] = 'true'
+    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}`, alamo_headers, null, 
+    (err, data) => {
+      analyzeResponse(err, data);
+      
+      // Make sure it's deleted.
+      httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}`, alamo_headers, null, 
+      (err, data) => {
+        let obj = analyzeResponse(err, data, 404);
+        done();
+      });
+    });
+  });
+
+  it("ensure we clean up after ourselves", (done) => {
+    httph.request('delete', 'http://localhost:5000/apps/' + newAppName + '-default', alamo_headers, null, (err, data) => {
+      expect(err).to.be.null;
+      done();
+    });
+  });
+  
 });
 

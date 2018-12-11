@@ -9,6 +9,7 @@ describe("CRUD actions for topics", function() {
   // process.env.SKIP_KAFKA_TESTS = "true";
   process.env.AUTH_KEY = 'hello';
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test"};
+  const elevated_alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
   const httph = require('../lib/http_helper.js');
   const expect = require('chai').expect;
   const clusterName = 'maru';
@@ -113,6 +114,24 @@ describe("CRUD actions for topics", function() {
     })
   });
 
+  it ("creates a stage topic", done => {
+    httph.request('post', `http://localhost:5000/clusters/${cluster}/topics`, alamo_headers, {
+      region: 'us-seattle',
+      name: stgTopicName, 
+      config: config,
+      description: 'a topic for test',
+      cluster: cluster, 
+      organization: 'test',
+      config: 'state'
+    }, 
+    (err, data) => {
+      let res = analyzeResponse(err, data, 'object');
+      console.dir(res)
+      expect(res.name).to.be.a('string');
+      done();
+    });
+  });
+
   it ("lists topics", done => {
     httph.request('get', `http://localhost:5000/clusters/${cluster}/topics`, alamo_headers, null, 
     (err, data) => {
@@ -204,6 +223,18 @@ describe("CRUD actions for topics", function() {
       done();
     })
   });
+
+  it ("creates a producer ACL for stage topic", done => {
+    httph.request('post', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}/acls`, alamo_headers, {
+      app: `${newAppName}-default`, 
+      role: 'producer'
+    }, 
+    (err, data) => {
+      let res = analyzeResponse(err, data, 'object');
+      expect(res.id).to.be.a('string');
+      done();
+    });
+  });
   
   it ("gets a topic's ACLs", done => {
     httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}/acls`, alamo_headers, null, 
@@ -283,27 +314,13 @@ describe("CRUD actions for topics", function() {
   });
   
   it ("throws 403 when elevated access is not given", done => {
-    // Create a stage topic.
-    httph.request('post', `http://localhost:5000/clusters/${cluster}/topics`, alamo_headers, {
-      region: 'us-seattle',
-      name: stgTopicName, 
-      config: config,
-      description: 'a topic for test',
-      cluster: cluster, 
-      organization: 'test',
-      config: 'state'
-    }, 
-    (err, data) => {
-      let res = analyzeResponse(err, data, 'object');
-      expect(res.name).to.be.a('string');
-      httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}`, alamo_headers, null, 
-      (err1, data1) => {
-        let error = analyzeResponse(err1, data1, 'error');
-        expect(error.code).to.equal(403)
-        expect(error.message).to.equal(`Deletion of topic '${stgTopicName}' in cluster '${clusterName}' can only be done with elevated access`)
-        done();
-      });
-    })
+    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}`, alamo_headers, null, 
+    (err1, data1) => {
+      let error = analyzeResponse(err1, data1, 'error');
+      expect(error.code).to.equal(403)
+      expect(error.message).to.equal(`Deletion of topic '${stgTopicName}' in cluster '${clusterName}' can only be done with elevated access`)
+      done();
+    });
   });
   
   it ("deletes a topic", done => {
@@ -320,27 +337,33 @@ describe("CRUD actions for topics", function() {
     });
   });
   
+  it("ensure we clean up after ourselves", (done) => {
+    //delete app
+    httph.request('delete', 'http://localhost:5000/apps/' + newAppName + '-default', elevated_alamo_headers, null, (err, data) => {
+      expect(err).to.be.null;
+      //ensure all acls are deleted
+      httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}/acls`, alamo_headers, null,  
+      (err, data) => {
+        let res = analyzeResponse(err, data, 'array');
+        appAcls = res.length;
+        expect(appAcls).to.equal(0);
+        done();
+      });
+    });
+  });
+
   it ("deletes a topic with elevated access", done => {
-    alamo_headers['x-elevated-access'] = 'true'
-    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}`, alamo_headers, null, 
+    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}`, elevated_alamo_headers, null, 
     (err, data) => {
       analyzeResponse(err, data);
       
       // Make sure it's deleted.
-      httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}`, alamo_headers, null, 
+      httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}`, alamo_headers, null, 
       (err, data) => {
         let obj = analyzeResponse(err, data, 404);
         done();
       });
     });
   });
-
-  it("ensure we clean up after ourselves", (done) => {
-    httph.request('delete', 'http://localhost:5000/apps/' + newAppName + '-default', alamo_headers, null, (err, data) => {
-      expect(err).to.be.null;
-      done();
-    });
-  });
-  
 });
 

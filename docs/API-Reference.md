@@ -55,6 +55,7 @@ curl \
   },
   "created_at":"2016-07-18T14:55:38.190Z",
   "git_url":"",
+  "git_branch":"",
   "id":"4f739e5e-4cf7-11e6-beb8-9e71128cae77",
   "maintenance":false,
   "name":"events",
@@ -521,7 +522,7 @@ To get an existing apps blue print it can be fetched and subsequently modifed, t
 curl \
   -H 'Authorization: ...' \
   -X GET \
-  https://apps.akkeris.io/apps/event-perf-dev/app-setups
+  https://apps.akkeris.io/apps/app-space/app-setups
 ```
 
 **200 "Created" Response**
@@ -531,10 +532,10 @@ curl \
   "app": {
     "locked": false,
     "name": "event",
-    "organization": "performance",
+    "organization": "someorg",
     "region": "us-seattle",
     "personal": false,
-    "space": "perf-dev",
+    "space": "space",
     "stack": "ds1"
   },
   "env": {
@@ -572,18 +573,9 @@ curl \
     }
   },
   "addons": {
-    "platformjws-tokens": {
-      "plan": "platformjws-tokens:qa"
-    },
     "alamo-memcached": {
       "plan": "alamo-memcached:medium"
     },
-    "lang-db": {
-      "plan": "lang-db:dev"
-    },
-    "perf-db": {
-      "plan": "perf-db:dev"
-    }
   },
   "attachments": [],
   "source_blob": {
@@ -594,11 +586,11 @@ curl \
   "log-drains": [
     {
       "url": "syslog+tls://logs.app.com:40841",
-      "token": "event-perf-dev"
+      "token": "app-space"
     },
     {
-      "url": "syslog://metrics-syslog-collector-ds1.akkeris.io:9000",
-      "token": "event-perf-dev"
+      "url": "syslog://metrics.akkeris.io:9000",
+      "token": "app-space"
     }
   ],
   "pipeline-couplings": [],
@@ -2532,7 +2524,7 @@ Addons can be updated to promote (and subsequently demote) an addon of the same 
 curl \
   -H 'Authorization: ...' \
   -X PATCH \
-  https://apps.akkeris.io/apps/app-space/addons/mycoolname -d '{"primary":false, "attachment":{"name":"mynewcoolname"}}'
+  https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false, "attachment":{"name":"mynewcoolname"}}'
 ```
 
 **200 "OK" Response**
@@ -2724,7 +2716,7 @@ Promote an addon attachment to the primary addon for its service type.
 curl \
   -H 'Authorization: ...' \
   -X PATCH \
-  https://apps.akkeris.io/apps/app-space/addon-attachments/myoldname -d '{"primary":false, "name":"mynewname"}'
+  https://apps.akkeris.io/apps/app-space/addon-attachments/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false, "name":"mynewname"}'
 ```
 
 **200 "OK" Response**
@@ -4234,7 +4226,11 @@ The following is fired to the webhook url during a release success or failure ev
     "description":"Auto Deploy of 31202984"
   },
   "build":{
-    "id":"8bdbac4b-6a5e-09e1-ef3a-08084a904622"
+    "id":"8bdbac4b-6a5e-09e1-ef3a-08084a904622",
+    "result":"succeeded",
+    "repo":"https://github.com/akkeris/foo.git",
+    "commit":"7edbac4b6a5e09e1ef3a08084a904621",
+    "branch":"master"
   }
 }
 ```
@@ -4261,6 +4257,7 @@ The following is fired to the webhook url during a build pending, success or fai
     "result":"pending|succeeded|failed",
     "created_at":"2016-08-09T12:00:00Z",
     "repo":"https://github.com/akkeris/bar.git",
+    "branch":"master",
     "commit":"7edbac4b6a5e09e1ef3a08084a904621"
   }
 }
@@ -4586,7 +4583,7 @@ This event occurs when an app has a new version and is now available for request
       "image":"docker.akkeris.io/org/yourappname-08b17a6f-f2e7-4698-b60a-6f89f6f2f00c:0.4",
       "source_blob":{  
          "checksum":"12345",
-         "url":"https://github.com/org/repo/commits/abcde3234fdsadf32342efasdf23432",
+         "url":null,
          "version":"Optional Version Info",
          "commit":"abcde3234fdsadf32342efasdf23432",
          "author":"John Smith",

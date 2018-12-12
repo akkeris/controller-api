@@ -62,7 +62,7 @@ describe("secure keys: creating, attaching and deleting", function() {
 
   let addon_attachment = null
   it("covers adding first secure key to second app", async () => {
-    addon_attachment = JSON.parse(await request('post', `http://localhost:5000/apps/${second_app}-preview/addon-attachments`, alamo_headers, JSON.stringify({"addon":addon.name, "app":`${second_app}-preview`, "force":true, "name":"securekey"})))
+    addon_attachment = JSON.parse(await request('post', `http://localhost:5000/apps/${second_app}-preview/addon-attachments`, alamo_headers, JSON.stringify({"addon":addon.id, "app":`${second_app}-preview`, "force":true, "name":"securekey"})))
     let config_vars = JSON.parse(await request('get', `http://localhost:5000/apps/${second_app}-preview/config-vars`, alamo_headers, null))
     expect(config_vars.SECURE_KEY).to.equal(addon.config_vars.SECURE_KEY)
     expect(config_vars.KEEP_ME).to.equal(unique_var2)

@@ -163,9 +163,9 @@ describe("addons attachments:", function() {
     expect(release_info).to.be.a('string');
   })
 
-  it("covers attaching memcachier to the second test app by name, ensures prod=prod apps can attach", async () => {
+  it("covers attaching memcachier to the second test app by id, ensures prod=prod apps can attach", async () => {
     expect(appname_second_id).to.be.a("string");
-    let data = await httph.request('post', 'http://localhost:5000/addon-attachments', alamo_headers, JSON.stringify({"addon":memcached_response.name, "app":appname_second_id, "force":true, "name":"memcachier"}));
+    let data = await httph.request('post', 'http://localhost:5000/addon-attachments', alamo_headers, JSON.stringify({"addon":memcached_response.id, "app":appname_second_id, "force":true, "name":"memcachier"}));
     expect(data).to.be.a('string');
     data = JSON.parse(data);
     memcached_addon_attachment_id = data.id;
@@ -185,10 +185,10 @@ describe("addons attachments:", function() {
     await httph.request('post', 'http://localhost:5000/apps/' + appname_third_new + '-preview/formation', alamo_headers, JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}));
   });
 
-  it("covers attaching memcachier to the third test app by name, ensures prod!=non-prod apps can attach", async () => {
+  it("covers attaching memcachier to the third test app by id, ensures prod!=non-prod apps can attach", async () => {
     try {
       expect(appname_second_id).to.be.a("string");
-      let data = await httph.request('post', 'http://localhost:5000/addon-attachments', Object.assign({"x-silent-error":"true"}, alamo_headers), JSON.stringify({"addon":memcached_response.name, "app":appname_third_id, "name":"memcachier"}));
+      let data = await httph.request('post', 'http://localhost:5000/addon-attachments', Object.assign({"x-silent-error":"true"}, alamo_headers), JSON.stringify({"addon":memcached_response.id, "app":appname_third_id, "name":"memcachier"}));
       throw new Error('this should not have worked.');
     } catch (e) {
       expect(e.code).to.equal(409)

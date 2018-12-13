@@ -132,7 +132,7 @@ describe("config-vars: creating, updating and deleting a config vars", function(
     }, 1000);
   });
   it("covers ensuring addon info does not leak config vars", async () => {
-    let postgresdb = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${appname_brand_new}-default/addons`, alamo_headers, JSON.stringify({"plan":"alamo-postgresql:hobby"})));
+    let postgresdb = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${appname_brand_new}-default/addons`, alamo_headers, JSON.stringify({"plan":"akkeris-postgresql:hobby"})));
     let info = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/addons/${postgresdb.id}`, alamo_headers, null));
     let cvs = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars`, alamo_headers, null));
     expect(info.config_vars.DATABASE_URL).to.equal(cvs.DATABASE_URL);

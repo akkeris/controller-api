@@ -60,7 +60,7 @@ describe("addon services: plans, services listing and getting.", function() {
     obj.forEach(validate_service)
   });
   it("covers getting a specific service (postgresql)", async () => {
-    let data = await httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql', alamo_headers, null)
+    let data = await httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql', alamo_headers, null)
     expect(data).to.be.a('string');
     let obj = JSON.parse(data);
     expect(obj).to.be.an('object');
@@ -81,7 +81,7 @@ describe("addon services: plans, services listing and getting.", function() {
     validate_service(obj)
   });
   it("covers getting a specific service's plans (postgresql)", async () => {
-    let data = await httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql/plans', alamo_headers, null)
+    let data = await httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql/plans', alamo_headers, null)
     expect(data).to.be.a('string');
     let obj = JSON.parse(data);
     expect(obj).to.be.an('array');
@@ -105,7 +105,7 @@ describe("addon services: plans, services listing and getting.", function() {
     obj.forEach(validate_plan)
   });
   it("covers getting a specific service's plan", async () => {
-    let data = await httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql/plans/standard-0', alamo_headers, null);
+    let data = await httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql/plans/standard-0', alamo_headers, null);
     expect(data).to.be.a('string');
     let obj = JSON.parse(data);
     expect(obj).to.be.an('object');
@@ -122,7 +122,7 @@ describe("addon services: plans, services listing and getting.", function() {
     });
   });
   it("covers ensuring a 404 is for unknown plan ", (done) => {
-    httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql/plans/doesnotexist', alamo_headers, null, 
+    httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql/plans/doesnotexist', alamo_headers, null, 
     (err, data) => {
       expect(err).to.be.an('object');
       expect(err.code).to.equal(404);

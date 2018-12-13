@@ -29,7 +29,7 @@ describe("addons multiple: test the ability to promote and primary/secondary add
   it("setup: provision resources", async () => {
     testapp1 = await test.create_test_app("preview")
     testapp2 = await test.create_test_app("preview")
-    postgres1_testapp1 = await test.create_addon(testapp1, 'alamo-postgresql', 'hobby')
+    postgres1_testapp1 = await test.create_addon(testapp1, 'akkeris-postgresql', 'hobby')
     let vars = await test.get_config_vars(testapp1)
     let prefix = postgres1_testapp1.name.split('-').slice(2).join('-').replace(/-/g, '_').replace(/ /g, '').replace(/[^a-zA-Z0-9\_]/g, '').trim().toUpperCase()
     expect(vars[prefix + '_DATABASE_URL']).to.be.undefined
@@ -38,8 +38,8 @@ describe("addons multiple: test the ability to promote and primary/secondary add
     let info1 = JSON.parse(await request('get', `http://localhost:5000/apps/${testapp1.id}/addons/${postgres1_testapp1.id}`, test.alamo_headers, null))
     expect(info1.primary).to.equal(true)
 
-    postgres2_testapp1 = await test.create_addon(testapp1, 'alamo-postgresql', 'hobby')
-    postgres3_testapp1 = await test.create_addon(testapp1, 'alamo-postgresql', 'hobby', 'foobar')
+    postgres2_testapp1 = await test.create_addon(testapp1, 'akkeris-postgresql', 'hobby')
+    postgres3_testapp1 = await test.create_addon(testapp1, 'akkeris-postgresql', 'hobby', 'foobar')
   })
 
   it("ensure you can attach, then create, then remove the attached one", async () => {
@@ -47,7 +47,7 @@ describe("addons multiple: test the ability to promote and primary/secondary add
     let vars = await test.get_config_vars(testapp2)
     let attachment_database_url = vars.DATABASE_URL
     expect(attachment_database_url).to.be.a('string')
-    let tmp_pg = await test.create_addon(testapp2, 'alamo-postgresql', 'hobby')
+    let tmp_pg = await test.create_addon(testapp2, 'akkeris-postgresql', 'hobby')
     vars = await test.get_config_vars(testapp2)
     let prefix = tmp_pg.name.split('-').slice(2).join('-').replace(/-/g, '_').replace(/ /g, '').replace(/[^a-zA-Z0-9\_]/g, '').trim().toUpperCase()
     expect(vars.DATABASE_URL).to.equal(attachment_database_url)
@@ -150,7 +150,7 @@ describe("addons multiple: test the ability to promote and primary/secondary add
   })
 
   it("ensure attached addons and owned addons can co-exist", async () => {
-    postgres3_testapp2 = await test.create_addon(testapp2, 'alamo-postgresql', 'hobby')
+    postgres3_testapp2 = await test.create_addon(testapp2, 'akkeris-postgresql', 'hobby')
     attached_testapp2 = await test.attach_addon(testapp2, postgres2_testapp1)
 
     let prefix = attached_testapp2.name.split('-').slice(2).join('-').replace(/-/g, '_').replace(/ /g, '').replace(/[^a-zA-Z0-9\_]/g, '').trim().toUpperCase()

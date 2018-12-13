@@ -76,7 +76,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   })
 
   it("setup a sharable (and attached) addon", async () => {
-    let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-preview/addons`, alamo_headers, JSON.stringify({"plan":"alamo-postgresql:hobby"}))
+    let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-preview/addons`, alamo_headers, JSON.stringify({"plan":"akkeris-postgresql:hobby"}))
     if(process.env.SMOKE_TESTS) {
       let attach = await httph.request('post', `http://localhost:5000/addon-attachments`, alamo_headers, JSON.stringify({"app":`${app_name}-preview`, "addon":addon_attach.id}))
     }
@@ -220,7 +220,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   it("ensure new preview app attaches sharable addons, rather than creating a new one", async () => {
     let attachments = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${preview_app.app.id}/addon-attachments`, alamo_headers, null))
     let addons = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app_name}-preview/addons`, alamo_headers, null))
-    addons = addons.filter((x) => x.addon_service.name === 'alamo-postgresql')
+    addons = addons.filter((x) => x.addon_service.name === 'akkeris-postgresql')
     expect(addons.length).to.equal(1)
     attachments = attachments.filter((x) => x.addon.id === addons[0].id)
     expect(attachments.length).to.equal(1)

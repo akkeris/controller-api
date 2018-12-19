@@ -23,6 +23,7 @@ let alamo = {
   app_setups:require('./lib/app-setups.js'),
   builds:require('./lib/builds.js'),
   certificates:require('./lib/certificates.js'),
+  consumer_groups:require('./lib/consumer_groups.js'),
   dynos:require('./lib/dynos.js'),
   events:require('./lib/events.js'),
   features:require('./lib/features.js'),
@@ -678,6 +679,21 @@ routes.add.post('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls$')
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/topic-acls$')
           .run(alamo.topic_acls.list_by_app.bind(null, pg_pool))
           .and.authorization([simple_key]);
+
+//Consumer Groups
+routes.add.get('/clusters/([A-z0-9_.-]+)/consumer-groups$')
+          .run(alamo.consumer_groups.list.bind(null, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/clusters/([A-z0-9_.-]+)/consumer-groups/([A-z0-9_.-]+)/offsets$')
+          .run(alamo.consumer_groups.offsets.bind(null, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/clusters/([A-z0-9_.-]+)/consumer-groups/([A-z0-9_.-]+)/members$')
+          .run(alamo.consumer_groups.members.bind(null, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.post('/clusters/([A-z0-9_.-]+)/consumer-groups/([A-z0-9_.-]+)/seek$')
+          .run(alamo.consumer_groups.seek.bind(null, pg_pool))
+          .and.authorization([simple_key]);
+
 
 // Schemas
 routes.add.get('/clusters/([A-z0-9_.-]+)/schemas$')

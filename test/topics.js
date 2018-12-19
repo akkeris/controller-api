@@ -312,8 +312,48 @@ describe("CRUD actions for topics", function() {
       });
     });
   });
-  
-  it ("throws 403 when elevated access is not given", done => {
+
+  let cg;
+  it("lists consumer groups", done => {
+    httph.request('get', `http://localhost:5000/clusters/${cluster}/consumer-groups`, alamo_headers, null,
+      (err, data) => {
+        let res = analyzeResponse(err, data, 'array');
+        console.log(`consumer groups : ${JSON.stringify(res)}`)
+        if(res.length > 0) cg=res[0]
+        done();
+      }
+    );
+  });
+
+  it("lists consumer group offsets", done => {
+    if(cg) {
+      httph.request('get', `http://localhost:5000/clusters/${cluster}/consumer-groups/${cg}/offsets`, alamo_headers, null,
+        (err, data) => {
+          let res = analyzeResponse(err, data, 'array');
+          console.log(`Consumer group ${cg} offsets: ${JSON.stringify(res)}`)
+          done();
+        }
+      );
+    } else {
+      done()
+    }
+  });
+
+  it("lists consumer group members", done => {
+    if(cg) {
+      httph.request('get', `http://localhost:5000/clusters/${cluster}/consumer-groups/${cg}/members`, alamo_headers, null,
+        (err, data) => {
+          let res = analyzeResponse(err, data, 'array');
+          console.log(`Consumer group ${cg} members: ${JSON.stringify(res)}`)
+          done();
+        }
+      );
+    } else {
+      done()
+    }
+  });
+
+  it ("throws 403 when elevated access is not given to delete non qa topic", done => {
     httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}`, alamo_headers, null, 
     (err1, data1) => {
       let error = analyzeResponse(err1, data1, 'error');

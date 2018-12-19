@@ -20,6 +20,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
 
   const webhook_pr_push_before_pr = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-push-before-pr.json').toString('utf8'))
   const webhook_pr_opened = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-opened.json').toString('utf8'))
+  const webhook_pr_fail_public_fork = JSON.parse(fs.readFileSync('./test/support/github-webhook-fail-public-fork.json').toString('utf8'))
   const webhook_pr_opened_to_wrong_branch = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-opened-to-wrong-branch.json').toString('utf8'))
   const webhook_pr_second_push_on_pr = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-second-push-on-pr.json').toString('utf8'))
   const webhook_pr_syncronize = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-syncronize.json').toString('utf8'))
@@ -130,6 +131,19 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     let headers = {'x-github-event':'push', 'x-hub-signature':hash}
     let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-preview/builds/auto/github`, headers, incoming)
     expect(data.toString('utf8')).to.equal('This webhook took place on a branch that isnt of interest.')
+    let previews = await httph.request('get', `http://localhost:5000/apps/${app_name}-preview/previews`, alamo_headers, null)
+    previews = JSON.parse(previews.toString())
+    expect(previews).to.be.an('array')
+    expect(previews.length).to.equal(0)
+  })
+
+
+  it("ensure a PR request from an outside repository does not create a preview app", async function() {
+    let incoming = JSON.stringify(webhook_pr_fail_public_fork)
+    let hash = git.calculate_hash("testing", incoming)
+    let headers = {'x-github-event':'pull_request', 'x-hub-signature':hash}
+    let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-preview/builds/auto/github`, headers, incoming)
+    expect(data.toString('utf8')).to.equal('{"code":201,"message":"Roger that, message received."}')
     let previews = await httph.request('get', `http://localhost:5000/apps/${app_name}-preview/previews`, alamo_headers, null)
     previews = JSON.parse(previews.toString())
     expect(previews).to.be.an('array')

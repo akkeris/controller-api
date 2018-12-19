@@ -46,7 +46,7 @@ async function wait_for_app_content(url, content, path) {
     }
   }
   process.stdout.write(`    ~ Waiting for ${url} to turn up`);
-  for(let i = 0; i < 120; i++) {
+  for(let i = 0; i < 180; i++) {
     try {
       let data = await httph.request('get', url, {'X-Timeout':1500, 'x-silent-error':'true'}, null);
       if(content && data && data.indexOf(content) === -1) {
@@ -65,7 +65,7 @@ async function wait_for_app_content(url, content, path) {
 
 async function wait_for_build(app, build_id) {
   process.stdout.write(`    ~ Waiting for build ${app} ${build_id}`);
-  for(let i=0; i < 120; i++) {
+  for(let i=0; i < 180; i++) {
     try {
       let build_info = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app}/builds/${build_id}`, alamo_headers, null));
       if(build_info.status === 'pending' || build_info.status === 'queued') {
@@ -103,8 +103,7 @@ async function create_build(app, image, port) {
   if(port) {
     await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"scout", "quantity":1, "type":"web", "command":null, "port":port}))
   }
-  let build = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/builds`, alamo_headers, JSON.stringify({"org":"test", "checksum":"", "url":image}))); 
-  return build
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/builds`, alamo_headers, JSON.stringify({"org":"test", "checksum":"", "url":image}))); 
 }
 
 async function create_fake_formation(app) {
@@ -175,6 +174,11 @@ async function get_config_vars(app) {
   return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, null))
 }
 
+async function create_test_build(app) {
+  await httph.request('patch', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, {"RETURN_VALUE":"TESTING"});
+  return await create_build(app, "docker://docker.io/akkeris/test-sample:latest", 2000);
+}
+
 async function create_app_content(content, space, app) {
   await httph.request('patch', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, {"RETURN_VALUE":content});
   let build_info = await create_build(app, "docker://docker.io/akkeris/test-sample:latest", 2000);
@@ -218,6 +222,42 @@ async function remove_site(site) {
   }
 }
 
+async function add_hook(app, url, events, secret, active) {
+  if(typeof(active) === 'undefined' || active === null) {
+    active = true
+  }
+  let hook_payload = JSON.stringify({
+    url,
+    events,
+    active:true,
+    secret
+  })
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/hooks`, alamo_headers, hook_payload))
+}
+
+async function update_hook(app, hook_id, url, active) {
+  if(typeof(active) === 'undefined' || active === null) {
+    active = true
+  }
+  return JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${app.id}/hooks/${hook_id}`, alamo_headers, JSON.stringify({url, active})))
+}
+
+async function get_hook_results(app, hook_id) {
+  return await httph.request('get', `http://localhost:5000/apps/${app.id}/hooks/${hook_id}/results`, alamo_headers, null)
+}
+
+async function get_hook(app, hook_id) {
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/hooks/${hook_id}`, alamo_headers, null));
+}
+
+async function get_hooks(app) {
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/hooks`, alamo_headers, null));
+}
+
+async function remove_hook(app, hook_id) {
+  return await httph.request('delete', `http://localhost:5000/apps/${app.id}/hooks/${hook_id}`, alamo_headers, null)
+}
+
 async function create_test_site() {
   let site_name = "alamotest" + Math.floor(Math.random() * 10000)
   return JSON.parse(await httph.request('post', 'http://localhost:5000/sites', alamo_headers, JSON.stringify({"domain":site_name})))
@@ -237,6 +277,13 @@ async function get_routes(app) {
 }
 
 module.exports = {
+  get_hook_results,
+  create_test_build,
+  add_hook,
+  get_hooks,
+  get_hook,
+  update_hook,
+  remove_hook,
   get_routes,
   create_fake_formation,
   get_previews,

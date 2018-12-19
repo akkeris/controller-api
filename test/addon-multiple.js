@@ -30,6 +30,7 @@ describe("addons multiple: test the ability to promote and primary/secondary add
     testapp1 = await test.create_test_app("preview")
     testapp2 = await test.create_test_app("preview")
     postgres1_testapp1 = await test.create_addon(testapp1, 'akkeris-postgresql', 'standard-0')
+    expect(postgres1_testapp1.config_vars['DATABASE_URL']).to.be.a('string')
     let vars = await test.get_config_vars(testapp1)
     let prefix = postgres1_testapp1.name.split('-').slice(2).join('-').replace(/-/g, '_').replace(/ /g, '').replace(/[^a-zA-Z0-9\_]/g, '').trim().toUpperCase()
     expect(vars[prefix + '_DATABASE_URL']).to.be.undefined

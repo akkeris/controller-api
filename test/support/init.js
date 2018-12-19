@@ -1,6 +1,7 @@
 const ngrok = require('ngrok')
 const util = require('util')
 const fs = require('fs')
+const http = require('http');
 const httph = require('../../lib/http_helper.js')
 const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hello", "x-username":"test", "x-elevated-access":"true"};
 let running_app = null
@@ -46,7 +47,7 @@ async function wait_for_app_content(url, content, path) {
     }
   }
   process.stdout.write(`    ~ Waiting for ${url} to turn up`);
-  for(let i = 0; i < 120; i++) {
+  for(let i = 0; i < 180; i++) {
     try {
       let data = await httph.request('get', url, {'X-Timeout':1500, 'x-silent-error':'true'}, null);
       if(content && data && data.indexOf(content) === -1) {
@@ -65,7 +66,7 @@ async function wait_for_app_content(url, content, path) {
 
 async function wait_for_build(app, build_id) {
   process.stdout.write(`    ~ Waiting for build ${app} ${build_id}`);
-  for(let i=0; i < 120; i++) {
+  for(let i=0; i < 180; i++) {
     try {
       let build_info = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app}/builds/${build_id}`, alamo_headers, null));
       if(build_info.status === 'pending' || build_info.status === 'queued') {
@@ -103,8 +104,7 @@ async function create_build(app, image, port) {
   if(port) {
     await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"scout", "quantity":1, "type":"web", "command":null, "port":port}))
   }
-  let build = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/builds`, alamo_headers, JSON.stringify({"org":"test", "checksum":"", "url":image}))); 
-  return build
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/builds`, alamo_headers, JSON.stringify({"org":"test", "checksum":"", "url":image}))); 
 }
 
 async function create_fake_formation(app) {
@@ -175,6 +175,11 @@ async function get_config_vars(app) {
   return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, null))
 }
 
+async function create_test_build(app) {
+  await httph.request('patch', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, {"RETURN_VALUE":"TESTING"});
+  return await create_build(app, "docker://docker.io/akkeris/test-sample:latest", 2000);
+}
+
 async function create_app_content(content, space, app) {
   await httph.request('patch', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, {"RETURN_VALUE":content});
   let build_info = await create_build(app, "docker://docker.io/akkeris/test-sample:latest", 2000);
@@ -218,6 +223,42 @@ async function remove_site(site) {
   }
 }
 
+async function add_hook(app, url, events, secret, active) {
+  if(typeof(active) === 'undefined' || active === null) {
+    active = true
+  }
+  let hook_payload = JSON.stringify({
+    url,
+    events,
+    active:true,
+    secret
+  })
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/hooks`, alamo_headers, hook_payload))
+}
+
+async function update_hook(app, hook_id, url, active) {
+  if(typeof(active) === 'undefined' || active === null) {
+    active = true
+  }
+  return JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${app.id}/hooks/${hook_id}`, alamo_headers, JSON.stringify({url, active})))
+}
+
+async function get_hook_results(app, hook_id) {
+  return await httph.request('get', `http://localhost:5000/apps/${app.id}/hooks/${hook_id}/results`, alamo_headers, null)
+}
+
+async function get_hook(app, hook_id) {
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/hooks/${hook_id}`, alamo_headers, null));
+}
+
+async function get_hooks(app) {
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/hooks`, alamo_headers, null));
+}
+
+async function remove_hook(app, hook_id) {
+  return await httph.request('delete', `http://localhost:5000/apps/${app.id}/hooks/${hook_id}`, alamo_headers, null)
+}
+
 async function create_test_site() {
   let site_name = "alamotest" + Math.floor(Math.random() * 10000)
   return JSON.parse(await httph.request('post', 'http://localhost:5000/sites', alamo_headers, JSON.stringify({"domain":site_name})))
@@ -236,7 +277,46 @@ async function get_routes(app) {
   return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/routes`, alamo_headers, null))
 }
 
+function create_callback_server(port = 8001) {
+  let hook_data = null;
+  let hook_listener = http.createServer(function(req, res) {
+    let y = Buffer.alloc(0)
+    req.on('data', (x) => { y = Buffer.concat([y,x]) })
+    req.on('end', () => { hook_data = JSON.parse(y.toString('utf8')); })
+    res.end()
+  }).on('clientError', (err, socket) => console.error('client socket error:', err) );
+  hook_listener.wait_for_callback = async function (type, desc) {
+    process.stdout.write(`    ~ Waiting for ${type} hook ${desc}`);
+    for(let i=0; i < 600; i++) {
+      if(i % 10 === 0) {
+        process.stdout.write(".");
+      }
+      if(hook_data !== null && hook_data.action === type) {
+        let hd = hook_data
+        hook_data = null
+        process.stdout.write('\n')
+        return hd
+      } else if (hook_data !== null && hook_data.action !== type) {
+        hook_data = null
+      }
+      await new Promise((r) => setTimeout(r, 100))
+    }
+    process.stdout.write('\n')
+    throw new Error('Did not receive data from hook, waited for 60 seconds.')
+  }
+  hook_listener.listen(port);
+  return hook_listener
+}
+
 module.exports = {
+  create_callback_server,
+  get_hook_results,
+  create_test_build,
+  add_hook,
+  get_hooks,
+  get_hook,
+  update_hook,
+  remove_hook,
   get_routes,
   create_fake_formation,
   get_previews,

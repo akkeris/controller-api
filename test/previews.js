@@ -20,6 +20,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
 
   const webhook_pr_push_before_pr = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-push-before-pr.json').toString('utf8'))
   const webhook_pr_opened = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-opened.json').toString('utf8'))
+  const webhook_pr_fail_public_fork = JSON.parse(fs.readFileSync('./test/support/github-webhook-fail-public-fork.json').toString('utf8'))
   const webhook_pr_opened_to_wrong_branch = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-opened-to-wrong-branch.json').toString('utf8'))
   const webhook_pr_second_push_on_pr = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-second-push-on-pr.json').toString('utf8'))
   const webhook_pr_syncronize = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-syncronize.json').toString('utf8'))
@@ -76,7 +77,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   })
 
   it("setup a sharable (and attached) addon", async () => {
-    let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-preview/addons`, alamo_headers, JSON.stringify({"plan":"alamo-postgresql:hobby"}))
+    let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-preview/addons`, alamo_headers, JSON.stringify({"plan":"akkeris-postgresql:hobby"}))
     if(process.env.SMOKE_TESTS) {
       let attach = await httph.request('post', `http://localhost:5000/addon-attachments`, alamo_headers, JSON.stringify({"app":`${app_name}-preview`, "addon":addon_attach.id}))
     }
@@ -130,6 +131,19 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     let headers = {'x-github-event':'push', 'x-hub-signature':hash}
     let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-preview/builds/auto/github`, headers, incoming)
     expect(data.toString('utf8')).to.equal('This webhook took place on a branch that isnt of interest.')
+    let previews = await httph.request('get', `http://localhost:5000/apps/${app_name}-preview/previews`, alamo_headers, null)
+    previews = JSON.parse(previews.toString())
+    expect(previews).to.be.an('array')
+    expect(previews.length).to.equal(0)
+  })
+
+
+  it("ensure a PR request from an outside repository does not create a preview app", async function() {
+    let incoming = JSON.stringify(webhook_pr_fail_public_fork)
+    let hash = git.calculate_hash("testing", incoming)
+    let headers = {'x-github-event':'pull_request', 'x-hub-signature':hash}
+    let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-preview/builds/auto/github`, headers, incoming)
+    expect(data.toString('utf8')).to.equal('{"code":201,"message":"Roger that, message received."}')
     let previews = await httph.request('get', `http://localhost:5000/apps/${app_name}-preview/previews`, alamo_headers, null)
     previews = JSON.parse(previews.toString())
     expect(previews).to.be.an('array')
@@ -220,7 +234,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   it("ensure new preview app attaches sharable addons, rather than creating a new one", async () => {
     let attachments = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${preview_app.app.id}/addon-attachments`, alamo_headers, null))
     let addons = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app_name}-preview/addons`, alamo_headers, null))
-    addons = addons.filter((x) => x.addon_service.name === 'alamo-postgresql')
+    addons = addons.filter((x) => x.addon_service.name === 'akkeris-postgresql')
     expect(addons.length).to.equal(1)
     attachments = attachments.filter((x) => x.addon.id === addons[0].id)
     expect(attachments.length).to.equal(1)

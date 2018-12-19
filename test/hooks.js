@@ -5,53 +5,16 @@ process.env.DEFAULT_PORT = "5000";
 process.env.AUTH_KEY = 'hello';
 process.env.ENCRYPT_KEY = 'hello';
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
-const http = require('http');
-
-function create_callback_server(port = 8001) {
-  let hook_data = null;
-  let hook_listener = http.createServer(function(req, res) {
-    let y = Buffer.alloc(0)
-    req.on('data', (x) => { y = Buffer.concat([y,x]) })
-    req.on('end', () => { hook_data = JSON.parse(y.toString('utf8')); })
-    res.end()
-  }).on('clientError', (err, socket) => console.error('client socket error:', err) );
-  hook_listener.wait_for_callback = async function (type, desc) {
-    process.stdout.write(`    ~ Waiting for ${type} hook ${desc}`);
-    for(let i=0; i < 600; i++) {
-      if(i % 10 === 0) {
-        process.stdout.write(".");
-      }
-      if(hook_data !== null && hook_data.action === type) {
-        let hd = hook_data
-        hook_data = null
-        process.stdout.write('\n')
-        return hd
-      } else if (hook_data !== null && hook_data.action !== type) {
-        hook_data = null
-      }
-      await new Promise((r) => setTimeout(r, 100))
-    }
-    process.stdout.write('\n')
-    throw new Error('Did not receive data from hook, waited for 60 seconds.')
-  }
-  hook_listener.listen(port);
-
-
-  return hook_listener
-}
-
-
 const test = require('./support/init.js');
 
 describe("hooks:", function() {
   this.timeout(100000);
-  let server = create_callback_server()
+  let server = test.create_callback_server()
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
   let appname_brand_new = "alamotest" + Math.floor(Math.random() * 10000);
   let build_id = null;
   let placed_hooks = false;
-
 
   let testapp = null
 

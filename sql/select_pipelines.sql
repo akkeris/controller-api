@@ -4,3 +4,5 @@ from
   pipelines
 where
   deleted = false
+order by
+  name, created

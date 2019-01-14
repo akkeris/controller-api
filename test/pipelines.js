@@ -11,7 +11,7 @@ function wait_for_app_content(httph, app, content, callback, iteration) {
   if(iteration === 1) {
     process.stdout.write("    ~ Waiting for app to turn up");
   }
-  if(iteration === 120) {
+  if(iteration === 180) {
     process.stdout.write("\n");
     callback({code:0, message:"Timeout waiting for app to turn up."});
   }

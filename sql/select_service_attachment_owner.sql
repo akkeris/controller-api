@@ -22,6 +22,6 @@ from
   join spaces on spaces.space = apps.space and spaces.deleted = false
 where
   service_attachments.deleted = false
-  and (service_attachments.service::varchar(128) = $1 or service_attachments.name = $1)
+  and service_attachments.service::varchar(128) = $1
   and service_attachments.owned = true
   and service_attachments.deleted = false

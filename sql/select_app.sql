@@ -15,13 +15,13 @@ select
   organizations.org org_uuid, 
   apps.url, 
   (select repo from auto_builds where apps.app = auto_builds.app and auto_builds.deleted = false limit 1) repo,
+  (select branch from auto_builds where apps.app = auto_builds.app and auto_builds.deleted = false limit 1) repo_branch,
   (select max(created) from releases where apps.app = releases.app limit 1) released,
   (select preview from previews where apps.app = previews.target and previews.deleted = false limit 1) preview
 from 
   apps 
     join spaces on apps.space = spaces.space 
     join organizations on apps.org = organizations.org
-    left join auto_builds on apps.app = auto_builds.app and auto_builds.deleted = false
     join stacks on spaces.stack = stacks.stack and stacks.deleted = false
     join regions on regions.region = stacks.region and regions.deleted = false
 where 

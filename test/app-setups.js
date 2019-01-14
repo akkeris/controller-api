@@ -154,8 +154,8 @@ describe("app-setups:", function() {
         expect(data.app).to.be.an('object');
         expect(data.app.id).to.be.a('string');
         if(data.progress === 1) {
-          expect(data.status).to.equal("succeeded")
           clearInterval(intv)
+          expect(data.status).to.equal("succeeded")
           done();
         }
       });

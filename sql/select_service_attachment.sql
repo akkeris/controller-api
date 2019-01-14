@@ -16,7 +16,8 @@ select
   spaces.name space,
   service_attachments.owned,
   service_attachments.created,
-  service_attachments.updated
+  service_attachments.updated,
+  service_attachments.secondary_configvar_map_ids
 from
   service_attachments
   join services on service_attachments.service = services.service and services.deleted = false
@@ -42,7 +43,6 @@ where
   service_attachments.deleted = false
   and (
         (apps.app::varchar(128) = $1 and (service_attachments.service_attachment::varchar(128) = $2 or service_attachments.name = $2)) or 
-        (service_attachments.service_attachment::varchar(128) = $1 and $2 is null) or 
-        (service_attachments.name = $1 and $2 is null) 
+        (service_attachments.service_attachment::varchar(128) = $1 and $2 is null)
       )
   and services.deleted = false

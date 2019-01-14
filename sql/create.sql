@@ -156,6 +156,8 @@ begin
     deleted boolean not null default false
   );
 
+  create index if not exists previews_target_deleted_idx on previews (target) where NOT deleted;
+
   create table if not exists formations (
     "formation" uuid not null primary key,
     app uuid references apps("app"),
@@ -219,6 +221,7 @@ begin
   );
 
   create index if not exists auto_builds_created_idx on auto_builds (created);
+  create index if not exists auto_builds_app_deleted_idx on auto_builds (app) where NOT deleted;
 
   create table if not exists builds (
     build uuid not null primary key,
@@ -268,12 +271,14 @@ begin
     description text not null default '',
     trigger release_trigger not null default 'unknown',
     trigger_notes text not null default '',
+    scm_metadata text, -- generally used to store id's for github deployments
     version integer not null default 1,
     deleted boolean not null default false
   );
 
   create index if not exists releases_app_idx on releases (app);
   create index if not exists releases_created_idx on releases (created);
+  create index if not exists releases_created_by_app_idx on releases (created, app) where created is not null;
   create index if not exists releases_build_idx on releases (build);
 
   create table if not exists pipelines (
@@ -444,8 +449,79 @@ begin
     deleted boolean not null default false
   );
 
+  create table if not exists clusters (
+    cluster uuid not null primary key,
+    region uuid references regions("region"),
+    name text not null,
+    tags text not null default '',
+    topic_name_regex text not null default '^[a-z0-9]+(-[a-z0-9-]+)*$',
+    created timestamptz not null default now(),
+    updated timestamptz,
+    deleted boolean not null default false
+  );
+
+  create table if not exists topics (
+    topic uuid not null primary key,
+    cluster uuid references clusters("cluster"),
+    region uuid references regions("region"),
+    config text not null,
+    name text not null unique,
+    description text not null,
+    partitions int not null,
+    replicas int not null,
+    retention_ms bigint not null,
+    cleanup_policy text not null,
+    organization text not null,
+    created timestamptz not null default now(),
+    updated timestamptz,
+    deleted boolean not null default false
+  );
+
+  create table if not exists topic_acls (
+    topic_acl uuid not null primary key,
+    topic uuid not null references topics("topic"),
+    app uuid not null references apps("app"),
+    role text not null,
+    created timestamptz default now(),
+    updated timestamptz,
+    deleted boolean not null default false
+  );
+
+  if not exists( SELECT NULL
+              FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE table_name = 'topic_acls'
+               AND table_schema = 'public'
+               AND column_name = 'consumer_group_name')  then
+    alter table topic_acls add column consumer_group_name text;
+  end if;
+
   create index if not exists favorites_username_i on favorites (username);
   create unique index if not exists favorites_username_ux on favorites (app, username);
+
+  if not exists (select 1 from pg_type where typname = 'task_action') then
+      create type task_action as enum('resync-addon-state', 'watch-addon-restore-status');
+  end if;
+  if not exists (select 1 from pg_type where typname = 'task_status') then
+      create type task_status as enum('pending', 'started', 'finished', 'failed');
+  end if;
+
+
+  create table if not exists tasks
+  (
+    task uuid not null primary key,
+    reference varchar(1024) not null,
+    action task_action not null,
+    status task_status not null default 'pending',
+    retries int not null default 0,
+    metadata text not null default '',
+    result text not null default '',
+    created timestamp with time zone not null default now(),
+    updated timestamp with time zone not null default now(),
+    started timestamp with time zone,
+    finished timestamp with time zone,
+    deleted bool not null default false
+  );
+
 
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then
@@ -462,6 +538,16 @@ begin
       ('ffa8cf57-768e-5214-82fe-fda3f19353f3', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'ds1', false, true, '2016-08-25 12:51:09.371629', now(), false, false);
   end if;
 
+  -- create default cluster for topics
+  if (select count(*) from clusters where deleted = false) = 0 then
+    insert into clusters (cluster, region, name, topic_name_regex) values ('606ece73-4b9a-4454-8848-c33faadc3121', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'nonprod', '^(qa|dev|stg|test)(-[a-z0-9]+)+$');
+    insert into clusters (cluster, region, name, tags, topic_name_regex) values ('97ab5c4a-044b-47f8-a7dc-46ad02aec5ce', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'prod', 'prod', '^(?!(qa|dev|stg|test)-)[a-z0-9]+(-[a-z0-9]+)+$');
+    insert into clusters (cluster, region, name, topic_name_regex) values ('222b5c4e-011b-34a8-ab9c-123402aec5ff', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'maru', '^(qa|dev|stg|test)(-[a-z0-9]+)+$');
+  end if;
+
+  -- drop unique constraint on table name
+  ALTER TABLE topics DROP CONSTRAINT IF EXISTS topics_name_key;
+  
   -- create default api and bootstrap data.
   if (select count(*) from apps where name='api' and deleted = false) = 0 then
     insert into organizations ( org, name ) values ( '0b26ccb5-83cc-4d33-a01f-100c383e0064', 'main');
@@ -485,23 +571,12 @@ begin
        'fa2b535d-de4d-4a14-be36-d44af53b59e3', '9ec219f0-9227-47cb-b570-f996d50b980a', 'Chrome');
   end if;
 
-
-  -- Transitions in data structures, this should go through one iteration,
-  -- ensure any alterations happen on the OBJECT ABOVE AS WELL! Otherwise
-  -- when these are periodically removed it won't happen on new installations.
   if not exists (SELECT NULL 
               FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'service_attachments'
-              AND column_name = 'primary'
+             WHERE table_name = 'releases'
+              AND column_name = 'scm_metadata'
               and table_schema = 'public') then
-    alter table service_attachments add column "primary" boolean not null default true;
-  end if;
-  if not exists (SELECT NULL 
-              FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'service_attachments'
-              AND column_name = 'secondary_configvar_map_ids'
-              and table_schema = 'public') then
-    alter table service_attachments add column secondary_configvar_map_ids text default null;
+    alter table releases add column scm_metadata text;
   end if;
 
 

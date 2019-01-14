@@ -43,22 +43,17 @@ npm start
 
 ## Testing and Developing Locally ##
 
-1. Create a database for the controller
+1. Setup the database
 
 ```
 brew install postgresql
 createdb controller-api
 export DATABASE_URL=postgres://localhost:5432/controller-api
-```
-
-2. Seed test data
-
-```
 cat sql/create.sql | psql $DATABASE_URL
 cat sql/create_testing.sql | psql $DATABASE_URL
 ```
 
-3. Set the environment variables above, also save DATABASE_URL as part of your config/environment. There are some additional options that should be set when developing locally or testing.  Some of these are optional. The tests that run are integration tests that require real services setup. See the setting up section above for additional required environment variables.
+2. Set the environment variables above, also save DATABASE_URL as part of your config/environment. There are some additional options that should be set when developing locally or testing.  Some of these are optional. The tests that run are integration tests that require real services setup. See the setting up section above for additional required environment variables.
 
 * `TEST_REGION` - the region to test, e.g., us-seattle, eu-ireland
 * `NGROK_TOKEN` - When testing a public URI is needed to test callbacks from other integrated systems, get a token at www.ngrok.com and place it in this envirionment variable.
@@ -73,16 +68,17 @@ cat sql/create_testing.sql | psql $DATABASE_URL
 * `BUILD_SHUTTLE_URL` - The build shuttle is a small footprint API that manages specific build system such as jenkins. (see https://github.com/akkeris/buildshuttle).  This has no default.
 * `APPKIT_API_URL` - Public URI (https://somehost/) for the appkit api in front of this api, generally appkit api url that handles user account/authorization (defaults to http://localhost:5000)
 * `TEST_ONPREM_POSTGRES` - whether to test the onprem postgres brokers.
-4. Run the entire test suite:
+
+3. Run the entire test suite:
 
 ```
-npm test
+npm run tests
 ```
 
-5. OR, run an individual test manually:
+OR, run an individual test manually:
 
 ```
-./node_modules/.bin/_mocha test/[test_to_run.js]
+npm test test/test_to_run.js
 ```
 
 ## Contributing ##

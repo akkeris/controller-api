@@ -55,6 +55,7 @@ curl \
   },
   "created_at":"2016-07-18T14:55:38.190Z",
   "git_url":"",
+  "git_branch":"",
   "id":"4f739e5e-4cf7-11e6-beb8-9e71128cae77",
   "maintenance":false,
   "name":"events",
@@ -521,7 +522,7 @@ To get an existing apps blue print it can be fetched and subsequently modifed, t
 curl \
   -H 'Authorization: ...' \
   -X GET \
-  https://apps.akkeris.io/apps/event-perf-dev/app-setups
+  https://apps.akkeris.io/apps/app-space/app-setups
 ```
 
 **200 "Created" Response**
@@ -531,10 +532,10 @@ curl \
   "app": {
     "locked": false,
     "name": "event",
-    "organization": "performance",
+    "organization": "someorg",
     "region": "us-seattle",
     "personal": false,
-    "space": "perf-dev",
+    "space": "space",
     "stack": "ds1"
   },
   "env": {
@@ -572,18 +573,9 @@ curl \
     }
   },
   "addons": {
-    "platformjws-tokens": {
-      "plan": "platformjws-tokens:qa"
-    },
     "alamo-memcached": {
       "plan": "alamo-memcached:medium"
     },
-    "lang-db": {
-      "plan": "lang-db:dev"
-    },
-    "perf-db": {
-      "plan": "perf-db:dev"
-    }
   },
   "attachments": [],
   "source_blob": {
@@ -594,11 +586,11 @@ curl \
   "log-drains": [
     {
       "url": "syslog+tls://logs.app.com:40841",
-      "token": "event-perf-dev"
+      "token": "app-space"
     },
     {
-      "url": "syslog://metrics-syslog-collector-ds1.akkeris.io:9000",
-      "token": "event-perf-dev"
+      "url": "syslog://metrics.akkeris.io:9000",
+      "token": "app-space"
     }
   ],
   "pipeline-couplings": [],
@@ -2166,9 +2158,12 @@ curl \
     "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
     "name": "alamo-postgresql",
     "state": "ga",
+    "description":"PostgreSQL 10",
+    "image_url":"https://www.example.com/image.png",
     "available_regions": ["us-seattle"],
     "supports_multiple_installations": true,
     "supports_sharing": true,
+    "supports_upgrading":true,
     "updated_at": "2016-08-09T12:00:00Z"
   },
   {
@@ -2178,9 +2173,11 @@ curl \
     "id": "b292c4f4-cadb-6525-adac-c61074069c65",
     "name": "alamo-redis",
     "state": "ga",
+    "description":"A redis cache",
     "available_regions": ["us-seattle"],
     "supports_multiple_installations": true,
     "supports_sharing": true,
+    "supports_upgrading":false,
     "updated_at": "2016-08-09T12:00:00Z"
   }
 ]
@@ -2211,9 +2208,13 @@ curl \
   "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
   "name": "alamo-postgresql",
   "state": "shutdown",
+  "description":"PostgreSQL 10",
+  "image_url":"https://www.example.com/image.png",
+  "image_url":null,
   "available_regions": ["us-seattle"],
   "supports_multiple_installations": true,
   "supports_sharing": true,
+  "supports_upgrading":true,
   "updated_at": "2016-08-09T12:00:00Z"
 }
 ```
@@ -2238,7 +2239,10 @@ curl \
 ```json
 [
   {
-    "attributes": {},
+    "attributes": {
+      "Custom Metadata":"true",
+      "other_data":"12345"
+    },
     "addon_service": {
       "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
       "name": "alamo-postgresql"
@@ -2253,14 +2257,18 @@ curl \
     "name": "alamo-postgresql:large",
     "price": {
       "cents": 75000,
-      "unit": "month"
+      "unit": "month",
+      "contract":false,
     },
     "space_default": false,
     "state": "public",
     "updated_at": "2016-08-09T12:00:00Z"
   },
   {
-    "attributes": {},
+    "attributes": {
+      "Custom Metadata":"true",
+      "other_data":"12345"
+    },
     "addon_service": {
       "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
       "name": "alamo-postgresql"
@@ -2275,14 +2283,18 @@ curl \
     "name": "alamo-postgresql:medium",
     "price": {
       "cents": 10000,
-      "unit": "month"
+      "unit": "month",
+      "contract":false,
     },
     "space_default": false,
     "state": "public",
     "updated_at": "2016-08-09T12:00:00Z"
   },
   {
-    "attributes": {},
+    "attributes": {
+      "Custom Metadata":"true",
+      "other_data":"12345"
+    },
     "addon_service": {
       "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
       "name": "alamo-postgresql"
@@ -2297,7 +2309,8 @@ curl \
     "name": "alamo-postgresql:small",
     "price": {
       "cents": 1500,
-      "unit": "month"
+      "unit": "month",
+      "contract":false,
     },
     "space_default": false,
     "state": "public",
@@ -2325,7 +2338,10 @@ curl \
 
 ```json
 {
-  "attributes": {},
+  "attributes": {
+    "Custom Metadata":"true",
+    "other_data":"12345"
+  },
   "addon_service": {
     "id": "01bb60d2-f2bb-64c0-4c8b-ead731a690bc",
     "name": "alamo-postgresql"
@@ -2340,7 +2356,8 @@ curl \
   "name": "alamo-postgresql:medium",
   "price": {
     "cents": 10000,
-    "unit": "month"
+    "unit": "month",
+    "contract":false,
   },
   "space_default": false,
   "state": "shutdown",
@@ -2363,6 +2380,7 @@ Creates a new addon from a service plan.
 |   Name       |       Type      | Description                                                                                   | Example                                                 |
 |:------------:|:---------------:|-----------------------------------------------------------------------------------------------|---------------------------------------------------------|
 |    plan      | required string | The id (uuid) of the service plan to create, this can be obtained from /addon-services/{addon_name_or_id}/plans                               | akkeris                                                |
+| attachment.name | optional string | The name for the attachment, and thus the prefix used for config vars if the addon is secondary.  Must be alphanumeric.                          |  mycoolname                                                |
 
 **CURL Example**
 
@@ -2371,7 +2389,7 @@ curl \
   -H 'Authorization: ...' \
   -X POST \
   https://apps.akkeris.io/apps/app-space/addons \
-  -d '{"plan":"a91d7641-a61e-fb09-654e-2def7c9f162d"}'
+  -d '{"plan":"a91d7641-a61e-fb09-654e-2def7c9f162d", "attachment":{"name":"mycoolname"}}'
 ```
 
 **201 "Created" Response**
@@ -2390,7 +2408,7 @@ curl \
   "config_vars": [],
   "created_at": "2016-08-11T20:16:45.820Z",
   "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
-  "name": "62dc0fd3-2cba-4925-8fca-d1129d296d2c-api:alamo-postgresql-1470946605820",
+  "name": "mycoolname",
   "plan": {
     "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
     "name": "alamo-postgresql:small"
@@ -2496,9 +2514,9 @@ curl \
 
 ### Update an Addon ##
 
-Addons can be updated to promote (and subsequently demote) an addon of the same type.  When adding multiple addon's such as a database with the environment variable `DATABASE_URL` the second or non-primary addon has the environment variable prefixed with the addon name. For example if the addon's name is `alamo-postgres-abcdef-1235` and its a secondary (non-primary) database the environment variable would be `ABCDEF_12345_DATABASE_URL`.  The primary database always has non-prefixed environment variables, such as `DATABASE_URL`.  Updating an addon to be primary will cause an existing primary addon of the same type to become a secondary (non-primary) addon. 
+Addons can be updated to promote (and subsequently demote) an addon of the same type.  When adding multiple addon's such as a database with the environment variable `DATABASE_URL` the second or non-primary addon has the environment variable prefixed with the addon name. For example if the addon's name is `alamo-postgres-abcdef-1235` and its a secondary (non-primary) database the environment variable would be `ABCDEF_12345_DATABASE_URL`.  The primary database always has non-prefixed environment variables, such as `DATABASE_URL`.  Updating an addon to be primary will cause an existing primary addon of the same type to become a secondary (non-primary) addon.  Updating the attachment.name property will change the name of the addon, and thus change the prefix used for `DATABASE_URL` as well.
 
-`GET /apps/{appname}/addons/{addon_id}`
+`PATCH /apps/{appname}/addons/{addon_id}`
 
 **CURL Example**
 
@@ -2506,7 +2524,7 @@ Addons can be updated to promote (and subsequently demote) an addon of the same 
 curl \
   -H 'Authorization: ...' \
   -X PATCH \
-  https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false}'
+  https://apps.akkeris.io/apps/app-space/addons/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false, "attachment":{"name":"mynewcoolname"}}'
 ```
 
 **200 "OK" Response**
@@ -2525,7 +2543,7 @@ curl \
   "config_vars": [],
   "created_at": "2016-08-11T20:16:45.820Z",
   "id": "5feef9bb-2bed-4b62-bdf5-e31691fab88c",
-  "name": "alamo-postgres-abcdef-1235",
+  "name": "mynewcoolname",
   "plan": {
     "id": "a91d7641-a61e-fb09-654e-2def7c9f162d",
     "name": "alamo-postgresql:small"
@@ -2698,7 +2716,7 @@ Promote an addon attachment to the primary addon for its service type.
 curl \
   -H 'Authorization: ...' \
   -X PATCH \
-  https://apps.akkeris.io/apps/app-space/addon-attachments/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false}'
+  https://apps.akkeris.io/apps/app-space/addon-attachments/5feef9bb-2bed-4b62-bdf5-e31691fab88c -d '{"primary":false, "name":"mynewname"}'
 ```
 
 **200 "OK" Response**
@@ -2731,7 +2749,7 @@ curl \
   "created_at": "2016-08-11T20:16:45.820Z",
   "updated_at": "2016-08-11T20:16:45.820Z",
   "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
-  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837",
+  "name":"myoldname",
   "primary":false
 }
 ```
@@ -2750,7 +2768,7 @@ curl \
   -H 'Authorization: ...' \
   -X POST \
   https://apps.akkeris.io/apps/app-space/addon-attachments
-  -d '{"addon":"5feef9bb-2bed-4b62-bdf5-e31691fab88c", "app":"app-space"}'
+  -d '{"addon":"5feef9bb-2bed-4b62-bdf5-e31691fab88c", "app":"app-space", "name":"some-name"}'
 ```
 
 **200 "OK" Response**
@@ -2783,7 +2801,7 @@ curl \
   "created_at": "2016-08-11T20:16:45.820Z",
   "updated_at": "2016-08-11T20:16:45.820Z",
   "id":"663ef9bb-2bed-4b62-bdf5-e31691fab555",
-  "name":"a1c1643-b51e-bb00-334e-2def7c9f162d:alamo-postgresql-18837"
+  "name":"some-name"
 }
 ```
 
@@ -4208,7 +4226,11 @@ The following is fired to the webhook url during a release success or failure ev
     "description":"Auto Deploy of 31202984"
   },
   "build":{
-    "id":"8bdbac4b-6a5e-09e1-ef3a-08084a904622"
+    "id":"8bdbac4b-6a5e-09e1-ef3a-08084a904622",
+    "result":"succeeded",
+    "repo":"https://github.com/akkeris/foo.git",
+    "commit":"7edbac4b6a5e09e1ef3a08084a904621",
+    "branch":"master"
   }
 }
 ```
@@ -4235,6 +4257,7 @@ The following is fired to the webhook url during a build pending, success or fai
     "result":"pending|succeeded|failed",
     "created_at":"2016-08-09T12:00:00Z",
     "repo":"https://github.com/akkeris/bar.git",
+    "branch":"master",
     "commit":"7edbac4b6a5e09e1ef3a08084a904621"
   }
 }
@@ -4538,7 +4561,7 @@ The `dynos` array contains the dyno(s) which were affected by this event.
 ### Released Event Payload
 
 
-This event occurs when an app has a new version and is now available for requests.  This differs from the `release` hook in that the release is the start in which a deployment begins but not when the new version is ready, running and requests are being routed to it.
+This event occurs when an app has a new version and is now available for requests.  This differs from the `release` hook in that the release is the start in which a deployment begins but not when the new version is ready, running and requests are being routed to it. This will fire for each dyno in your formation, for example if you have a `web` and `worker` dyno type and 3 `web` dynos this released event would fire twice, once for `web` after both dynos are up and running and the old instances are being stopped, then the `worker`. You can distinguish which dyno has released by looking at the dyno.type field.
 
 `POST [callback end point]`
 
@@ -4553,11 +4576,14 @@ This event occurs when an app has a new version and is now available for request
    },
    "key":"yourappname-default",
    "action":"released",
+   "dyno":{
+    "type":"web"
+   },
    "slug":{  
       "image":"docker.akkeris.io/org/yourappname-08b17a6f-f2e7-4698-b60a-6f89f6f2f00c:0.4",
       "source_blob":{  
          "checksum":"12345",
-         "url":"https://github.com/org/repo/commits/abcde3234fdsadf32342efasdf23432",
+         "url":null,
          "version":"Optional Version Info",
          "commit":"abcde3234fdsadf32342efasdf23432",
          "author":"John Smith",

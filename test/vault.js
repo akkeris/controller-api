@@ -88,7 +88,7 @@ describe("vault: provisioning, etc", function() {
         validate_service(obj)
         done();
       });
-    }, 20000);
+    }, 40000);
   });
 
   it("covers getting vault plans", (done) => {

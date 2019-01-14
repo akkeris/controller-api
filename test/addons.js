@@ -215,14 +215,14 @@ describe("addons: provisioning postgres, redis, influx, and cassandra services."
   });
   
   it("covers getting a postgres plans", (done) => {
-    httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresql/plans', alamo_headers, null, 
+    httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql/plans', alamo_headers, null, 
     (err, data) => {
       expect(err).to.be.null;
       expect(data).to.be.a('string');
       let obj = JSON.parse(data);
       expect(obj).to.be.an('array');
       obj.forEach(function(plan) {
-        if(plan.name === "alamo-postgresql:hobby") {
+        if(plan.name === "akkeris-postgresql:hobby") {
           postgres_plan = plan;
         }
       });
@@ -233,14 +233,14 @@ describe("addons: provisioning postgres, redis, influx, and cassandra services."
 
   if (process.env.TEST_ONPREM_POSTGRES) {
     it("covers getting a postgres onprem plans", (done) => {
-      httph.request('get', 'http://localhost:5000/addon-services/alamo-postgresqlonprem/plans', alamo_headers, null,
+      httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql/plans', alamo_headers, null,
       (err, data) => {
         expect(err).to.be.null;
         expect(data).to.be.a('string');
         let obj = JSON.parse(data);
         expect(obj).to.be.an('array');
         obj.forEach(function(plan) {
-          if(plan.name === "alamo-postgresqlonprem:shared") {
+          if(plan.name === "akkeris-postgresql:onprem-0") {
             postgresonprem_plan = plan;
           }
         });

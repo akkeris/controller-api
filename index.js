@@ -66,7 +66,7 @@ let db_conf = {
   host:curl.hostname,
   database:((curl.path.indexOf('?') > -1) ? curl.path.substring(1,curl.path.indexOf("?")) : curl.path).replace(/^\//, ''),
   port:curl.port,
-  max:10,
+  max:40,
   idleTimeoutMillis:30000,
   ssl:false
 };

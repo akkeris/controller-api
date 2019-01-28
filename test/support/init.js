@@ -47,7 +47,7 @@ async function wait_for_app_content(url, content, path) {
     }
   }
   process.stdout.write(`    ~ Waiting for ${url} to turn up`);
-  for(let i = 0; i < 180; i++) {
+  for(let i = 0; i < 210; i++) {
     try {
       let data = await httph.request('get', url, {'X-Timeout':1500, 'x-silent-error':'true'}, null);
       if(content && data && data.indexOf(content) === -1) {
@@ -66,7 +66,7 @@ async function wait_for_app_content(url, content, path) {
 
 async function wait_for_build(app, build_id) {
   process.stdout.write(`    ~ Waiting for build ${app} ${build_id}`);
-  for(let i=0; i < 180; i++) {
+  for(let i=0; i < 210; i++) {
     try {
       let build_info = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app}/builds/${build_id}`, alamo_headers, null));
       if(build_info.status === 'pending' || build_info.status === 'queued') {

@@ -656,8 +656,14 @@ routes.add.get('/clusters/([A-z0-9_.-]+)/topics$')
 routes.add.get('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)$')
           .run(alamo.topics.get.bind(null, pg_pool))
           .and.authorization([simple_key]);
+routes.add.get('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/preview$')
+          .run(alamo.topics.preview.bind(null, pg_pool))
+          .and.authorization([simple_key]);
 routes.add.post('/clusters/([A-z0-9_.-]+)/topics$')
           .run(alamo.topics.create.bind(null, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.post('/clusters/([A-z0-9_.-]+)/topics/recreate$')
+          .run(alamo.topics.recreate.bind(null, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)$')
           .run(alamo.topics.delete.bind(null, pg_pool))

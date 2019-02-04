@@ -377,21 +377,6 @@ describe("CRUD actions for topics", function() {
     });
   });
   
-  it("ensure we clean up after ourselves", (done) => {
-    //delete app
-    httph.request('delete', 'http://localhost:5000/apps/' + newAppName + '-default', elevated_alamo_headers, null, (err, data) => {
-      expect(err).to.be.null;
-      //ensure all acls are deleted
-      httph.request('get', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}/acls`, alamo_headers, null,  
-      (err, data) => {
-        let res = analyzeResponse(err, data, 'array');
-        appAcls = res.length;
-        expect(appAcls).to.equal(0);
-        done();
-      });
-    });
-  });
-
   it ("deletes a topic with elevated access", done => {
     httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}`, elevated_alamo_headers, null, 
     (err, data) => {
@@ -403,6 +388,80 @@ describe("CRUD actions for topics", function() {
         let obj = analyzeResponse(err, data, 404);
         done();
       });
+    });
+  });
+
+  it("recreates a topic with key, value schema mappings and ACLs", async function() {
+    //create a topic
+    let testTopicName = 'test-' + date;
+    console.log(`create topic ${testTopicName}`)
+    let consumerGroupName = `${testTopicName}-cg` 
+    try {
+      let create_resp = await httph.request('post', 
+        `http://localhost:5000/clusters/${cluster}/topics`, 
+        alamo_headers, 
+        JSON.stringify({
+          region: 'us-seattle',
+          name: testTopicName, 
+          config: config,
+          description: 'a topic for test',
+          cluster: cluster, 
+          organization: 'test',
+          config: 'state'
+        })); 
+      //create a value mapping
+      let value_mapping_resp = await httph.request('post', 
+        `http://localhost:5000/clusters/${cluster}/topics/${testTopicName}/value-schema-mapping`, 
+        alamo_headers, JSON.stringify({schema: "Test"}));
+
+      //create a key mapping 
+      let key_mapping_resp = await httph.request('post', 
+        `http://localhost:5000/clusters/${cluster}/topics/${testTopicName}/key-schema-mapping`, 
+        alamo_headers, JSON.stringify({ keytype: "string"})); 
+
+      //create an acl
+      let acl_response = await httph.request('post', 
+        `http://localhost:5000/clusters/${cluster}/topics/${testTopicName}/acls`, 
+        alamo_headers, 
+        JSON.stringify({
+          app: `${newAppName}-default`, 
+          role: 'consumer',
+          consumerGroupName: consumerGroupName
+        })) 
+
+      // recreate topic
+      let recreate_response = await httph.request('post', 
+        `http://localhost:5000/clusters/${cluster}/topics/recreate`, 
+        alamo_headers, {
+          region: 'us-seattle',
+          name: testTopicName, 
+          config: config,
+          description: 'a topic for test',
+          cluster: cluster, 
+          organization: 'test',
+          config: 'state'
+        })
+      let recreate = JSON.parse(recreate_response)
+      expect(recreate.subscriptions.length).to.equal(1);
+      expect(recreate.subscriptions[0].app_name).to.equal(newAppName);
+      expect(recreate.subscriptions[0].topic_name).to.equal(testTopicName);
+      expect(recreate.subscriptions[0].role).to.equal("consumer");
+      expect(recreate.subscriptions[0].consumer_group_name).to.equal(consumerGroupName);
+      expect(recreate.key_mapping).to.equal("string");
+      expect(recreate.schemas).to.equal("Test");
+
+      //delete topic
+      let res = await httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${testTopicName}`, elevated_alamo_headers, null)
+    } catch(e) {
+      expect(false, `recreate failed with ${JSON.stringify(e)}`)
+    }
+  });
+
+  it("ensure we clean up after ourselves", (done) => {
+    //delete app
+    httph.request('delete', 'http://localhost:5000/apps/' + newAppName + '-default', elevated_alamo_headers, null, (err, data) => {
+      expect(err).to.be.null;
+      done();
     });
   });
 });

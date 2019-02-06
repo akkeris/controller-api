@@ -352,16 +352,6 @@ describe("CRUD actions for topics", function() {
       done()
     }
   });
-
-  it ("throws 403 when elevated access is not given to delete non qa topic", done => {
-    httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${stgTopicName}`, alamo_headers, null, 
-    (err1, data1) => {
-      let error = analyzeResponse(err1, data1, 'error');
-      expect(error.code).to.equal(403)
-      expect(error.message).to.equal(`Deletion of topic '${stgTopicName}' in cluster '${clusterName}' can only be done with elevated access`)
-      done();
-    });
-  });
   
   it ("deletes a topic", done => {
     httph.request('delete', `http://localhost:5000/clusters/${cluster}/topics/${newTopicName}`, alamo_headers, null, 

@@ -13,5 +13,5 @@ from
     join apps as target_app on previews.target = target_app.app and target_app.deleted = false
     join spaces on target_app.space = spaces.space and spaces.deleted = false
 where
-  previews.source = $1 and
-  previews.deleted = false
+  previews.created < now() - interval '7 days' -- we allow up to 5 business days, or 7 calendar days. 
+  and previews.deleted = false

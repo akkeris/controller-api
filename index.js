@@ -82,6 +82,7 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
     await query(fs.readFileSync('./sql/create.sql').toString('utf8'), null, pg_pool, [])
     alamo.releases.timers.begin(pg_pool)
     alamo.tasks.begin(pg_pool)
+    alamo.previews.timers.begin(pg_pool)
   }
   if (!config.alamo_app_controller_url) {
     let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['api', 'default'])

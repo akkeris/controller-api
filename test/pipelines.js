@@ -133,7 +133,26 @@ describe("pipelines", function() {
       });
     });
   });
-
+  
+  it("ensure non-existant pipeline couplings return a 404.", function(done) {
+    httph.request('get', 'http://localhost:5000/pipelines/non-existant-pipeline/pipeline-couplings', alamo_headers, null, function(err, data) {
+      expect(err).to.be.an('object');
+      expect(err.code).to.equal(404);
+      expect(data).to.be.null;
+      done();
+    })
+  });
+  
+  it("ensure pipeline couplings return a blank array if pipeline exists without couplings.", function(done) {
+    httph.request('get', 'http://localhost:5000/pipelines/test-pipeline/pipeline-couplings', alamo_headers, null, function(err, data) {
+      expect(err).to.be.null
+      data = JSON.parse(data);
+      expect(data).to.be.an('array');
+      expect(data.length).to.equal(0);
+      done();
+    })
+  });
+  
   it("covers getting pipline", function(done) {
     httph.request('get','http://localhost:5000/pipelines/test-pipeline', alamo_headers, null, function(err, data) {
       if(err) {
@@ -896,5 +915,4 @@ describe("pipelines", function() {
         done();
       });
   });
-
 });

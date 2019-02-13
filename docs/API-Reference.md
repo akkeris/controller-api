@@ -3832,11 +3832,13 @@ A service, app or other addon may use webhooks to listen to various events that 
 
 `POST /apps/{appname_or_id}/hooks`
 
-```
+```json
 {
   "url":"https://somecallback/url",
   "events":[
     "release",
+    "released",
+    "preview-released",
     "build",
     "formation_change",
     "logdrain_change",
@@ -3856,6 +3858,8 @@ A service, app or other addon may use webhooks to listen to various events that 
   "url":"https://somecallback/url",
   "events":[
     "release",
+    "released",
+    "preview-released",
     "build",
     "formation_change",
     "logdrain_change",
@@ -3883,6 +3887,8 @@ Note any of these fields may be provided or left out and a partial update is app
   "url":"https://somecallback/url",
   "events":[
     "release",
+    "released",
+    "preview-released",
     "build",
     "formation_change",
     "logdrain_change",
@@ -3901,6 +3907,8 @@ Note any of these fields may be provided or left out and a partial update is app
   "url":"https://somecallback/url",
   "events":[
     "release",
+    "released",
+    "preview-released",
     "build",
     "formation_change",
     "logdrain_change",
@@ -3928,6 +3936,8 @@ Upon successfully being updated the API responds with 200 and the body contains 
   "url":"https://somecallback/url",
   "events":[
     "release",
+    "released",
+    "preview-released",
     "build",
     "formation_change",
     "logdrain_change",
@@ -3955,6 +3965,8 @@ Upon successful deletion the API responds with 200.
   "url":"https://somecallback/url",
   "events":[
     "release",
+    "released",
+    "preview-released",
     "build",
     "formation_change",
     "logdrain_change",
@@ -4189,6 +4201,7 @@ The following events exist for hooks to listen to:
 * config_change
 * destroy
 * preview
+* preview-released
 * released
 * crashed
 
@@ -4331,7 +4344,7 @@ The occurs when there is a scale event or a new formation type is created.
 
 ### Preview App Created Event Payload
 
-The occurs when a forked preview app is created.
+The occurs when a forked preview app is created. This event fires on the app that the preview app was created on.  This event fires prior to the preview app being released and ready. For notifications of a release on a preview app see the `preview-released` webhook.
 
 `POST [callback end point]`
 
@@ -4385,6 +4398,50 @@ The occurs when a forked preview app is created.
       "compliance": []
     }
   ]
+}
+```
+
+
+### Preview App Released Event Payload
+
+The occurs when a forked preview app is released. This will fire when any code, configuration or addon change happens on any of the app's previews. The payload is similar to the `released` payload but contains an additional field `source_app` that contians the app that created the preview app.  Note that this event fires on the `source_app` and not on the preview app, this is intentional so that testing suites can be notified when a preview app of the `source_app` have been released and are ready to be tested, the payload (outside of `source_app`) describes the preview app that was released.
+
+
+`POST [callback end point]`
+
+```json
+{
+   "source_app":{
+      "name":"originalapp",
+      "id":"55b17a6f-f2e7-4698-b60a-5f89f6f33021"
+   },
+   "app":{
+      "name":"yourappname",
+      "id":"08b17a6f-f2e7-4698-b60a-6f89f6f2f00c"
+   },
+   "space":{  
+      "name":"default"
+   },
+   "key":"yourappabcde-default",
+   "action":"preview-released",
+   "dyno":{
+      "type":"web"
+   },
+   "slug":{  
+      "image":"docker.akkeris.io/org/yourappname-08b17a6f-f2e7-4698-b60a-6f89f6f2f00c:0.4",
+      "source_blob":{  
+         "checksum":"12345",
+         "url":null,
+         "version":"Optional Version Info",
+         "commit":"abcde3234fdsadf32342efasdf23432",
+         "author":"John Smith",
+         "repo":"https://github.com/org/repo",
+         "branch":"my_branch",
+         "message":"My commit message"
+      },
+      "id":"44bc0cf4-b3fa-415c-99ef-c8a0b6f7364a"
+   },
+   "released_at":"2018-08-23T15:38:16.010Z"
 }
 ```
 

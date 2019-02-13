@@ -105,6 +105,7 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   alamo.git.init(pg_pool)
   alamo.routes.init(pg_pool)
   alamo.topic_acls.init(pg_pool)
+  alamo.previews.init(pg_pool)
 
   common.init();
 

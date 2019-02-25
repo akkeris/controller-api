@@ -7,7 +7,8 @@ const fs = require('fs');
 const git = require('./lib/git.js');
 const tasks = require('./lib/tasks.js');
 const addon_services = require('./lib/addon-services.js');
-const previews = require('./lib/previews.js')
+const previews = require('./lib/previews.js');
+const common = require ('./lib/common.js');
 
 let curl = url.parse(process.env.DATABASE_URL);
 

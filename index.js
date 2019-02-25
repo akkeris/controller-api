@@ -84,6 +84,7 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
     alamo.tasks.begin(pg_pool)
     alamo.previews.timers.begin(pg_pool)
   }
+  common.init(pg_pool);
   if (!config.alamo_app_controller_url) {
     let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['api', 'default'])
     assert.ok(records.length > 0, 'Unable to determine ALAMO_APP_CONTROLLER_URL, either set the environment variable ALAMO_APP_CONTROLLER_URL or ensure theres a record for api-default in the apps table.')
@@ -102,12 +103,10 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   alamo.formations.timers.begin(pg_pool)
   alamo.addon_services.timers.begin(pg_pool)
   // Initialize Events
-  alamo.git.init(pg_pool)
-  alamo.routes.init(pg_pool)
-  alamo.topic_acls.init(pg_pool)
-  alamo.previews.init(pg_pool)
-
-  common.init();
+  alamo.git.init(pg_pool);
+  alamo.routes.init(pg_pool);
+  alamo.topic_acls.init(pg_pool);
+  alamo.previews.init(pg_pool);
 
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()

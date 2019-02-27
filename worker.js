@@ -7,6 +7,8 @@ const fs = require('fs');
 const git = require('./lib/git.js');
 const tasks = require('./lib/tasks.js');
 const addon_services = require('./lib/addon-services.js');
+const previews = require('./lib/previews.js');
+const common = require ("./lib/common.js");
 
 let curl = url.parse(process.env.DATABASE_URL);
 
@@ -31,10 +33,12 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   await query(fs.readFileSync('./sql/create.sql').toString('utf8'), null, pg_pool, [])
   console.log('Any database migrations have completed.')
   // Start timers
+  common.init(pg_pool);
   releases.timers.begin(pg_pool)
   git.init(pg_pool)
   tasks.begin(pg_pool)
   addon_services.timers.begin(pg_pool)
+  previews.timers.begin(pg_pool)
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()
   console.log(`Akkeris Controller API - Worker - (v${pkg.version}) Ready`)

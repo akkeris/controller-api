@@ -66,7 +66,7 @@ let db_conf = {
   host:curl.hostname,
   database:((curl.path.indexOf('?') > -1) ? curl.path.substring(1,curl.path.indexOf("?")) : curl.path).replace(/^\//, ''),
   port:curl.port,
-  max:10,
+  max:40,
   idleTimeoutMillis:30000,
   ssl:false
 };
@@ -82,7 +82,9 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
     await query(fs.readFileSync('./sql/create.sql').toString('utf8'), null, pg_pool, [])
     alamo.releases.timers.begin(pg_pool)
     alamo.tasks.begin(pg_pool)
+    alamo.previews.timers.begin(pg_pool)
   }
+  common.init(pg_pool);
   if (!config.alamo_app_controller_url) {
     let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['api', 'default'])
     assert.ok(records.length > 0, 'Unable to determine ALAMO_APP_CONTROLLER_URL, either set the environment variable ALAMO_APP_CONTROLLER_URL or ensure theres a record for api-default in the apps table.')
@@ -101,11 +103,10 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   alamo.formations.timers.begin(pg_pool)
   alamo.addon_services.timers.begin(pg_pool)
   // Initialize Events
-  alamo.git.init(pg_pool)
-  alamo.routes.init(pg_pool)
-  alamo.topic_acls.init(pg_pool)
-
-  common.init();
+  alamo.git.init(pg_pool);
+  alamo.routes.init(pg_pool);
+  alamo.topic_acls.init(pg_pool);
+  alamo.previews.init(pg_pool);
 
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()
@@ -656,8 +657,14 @@ routes.add.get('/clusters/([A-z0-9_.-]+)/topics$')
 routes.add.get('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)$')
           .run(alamo.topics.get.bind(null, pg_pool))
           .and.authorization([simple_key]);
+routes.add.get('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/preview$')
+          .run(alamo.topics.preview.bind(null, pg_pool))
+          .and.authorization([simple_key]);
 routes.add.post('/clusters/([A-z0-9_.-]+)/topics$')
           .run(alamo.topics.create.bind(null, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.post('/clusters/([A-z0-9_.-]+)/topics/recreate$')
+          .run(alamo.topics.recreate.bind(null, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)$')
           .run(alamo.topics.delete.bind(null, pg_pool))

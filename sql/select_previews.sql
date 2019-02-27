@@ -11,6 +11,7 @@ select
 from
   previews
     join apps as target_app on previews.target = target_app.app and target_app.deleted = false
+    join spaces on target_app.space = spaces.space and spaces.deleted = false
 where
   previews.source = $1 and
   previews.deleted = false

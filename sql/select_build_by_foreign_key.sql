@@ -17,7 +17,8 @@ select
   builds.description, 
   builds.deleted,
   builds.auto_build, 
-  builds.foreign_build_key, 
+  builds.foreign_build_key,
+  builds.foreign_build_system, 
   organizations.name org, 
   apps.name, 
   spaces.name space,
@@ -29,8 +30,9 @@ from
     join spaces on apps.space = spaces.space 
     join organizations on apps.org = organizations.org 
 where 
-  builds.foreign_build_key = $1 and 
-  apps.app = $2 and
+  builds.foreign_build_key = $1 and
+  builds.foreign_build_system = $2 and
+  apps.app = $3 and
   apps.deleted = false and 
   builds.deleted = false and 
   spaces.deleted = false and 

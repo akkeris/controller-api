@@ -481,6 +481,7 @@ begin
     topic_acl uuid not null primary key,
     topic uuid not null references topics("topic"),
     app uuid not null references apps("app"),
+    consumer_group_name text,
     role text not null,
     created timestamptz default now(),
     updated timestamptz,
@@ -489,10 +490,10 @@ begin
 
   if not exists( SELECT NULL
               FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'topic_acls'
+             WHERE table_name = 'builds'
                AND table_schema = 'public'
-               AND column_name = 'consumer_group_name')  then
-    alter table topic_acls add column consumer_group_name text;
+               AND column_name = 'foreign_build_system')  then
+    alter table builds add column foreign_build_system varchar(128) default '0';
   end if;
 
   create index if not exists favorites_username_i on favorites (username);

@@ -17,7 +17,9 @@
 * `[STACKNAME]_STACK_API` - The URI for the stack api by the name of STACKNAME, for example if a stack exists called FOO the uri for the stack api must be set at FOO_STACK_API
 * `[REGIONNAME]_REGION_API` - The URI for the regional api by the name of REGIONNAME, for example if a region exists called us-seattle the uri for the stack api must be set at US_SEATTLE_REGION_API
 * `DOCKER_REGISTRY_HOST` - The host for storing image sources. E.g., docker.hostname.com, This has no default.
-* `DOCKER_REPO` - The repo in DOCKER_REGISTRY_HOST to store gold master build images (changing this also requires changing jenkins_build_template.xml and existing build templates in jenkins). This has no default.
+* `DOCKER_REGISTRY_ORG` - The organization in `DOCKER_REGISTRY_HOST` to store gold master build images. This has no default.
+* `DOCKER_REGISTRY_AUTH` - The JSON object that is either `{"username":"..", "password":"..", "email":"...", "serveraddress":"..."}` note that email/serveraddress are optional, or if a token auth it could be `{"identitytoken":"..."}`. See [docker authorization](https://docs.docker.com/engine/api/v1.39/#section/Authentication) for more information.
+* `NEW_BUILD_SHUTTLE` - Whether to use the format of the new buildshuttle.
 
 ### Optional Environment Variables
 * `TWILIO_AUTH_KEY` - The master sid:token for the twilio account.

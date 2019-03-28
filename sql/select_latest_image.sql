@@ -7,6 +7,7 @@ select
   releases.version,
   builds.build,
   builds.foreign_build_key,
+  builds.foreign_build_system,
   building_app.app build_app,
   building_app.name build_app_name,
   building_org.name build_org_name

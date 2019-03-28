@@ -18,6 +18,7 @@ select
   builds.deleted,
   builds.auto_build, 
   builds.foreign_build_key,
+  builds.foreign_build_system,
   builds.author,
   builds.message,
   organizations.name org, 

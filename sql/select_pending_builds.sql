@@ -18,22 +18,19 @@ select
   builds.deleted,
   builds.auto_build, 
   builds.foreign_build_key,
-  builds.foreign_build_system, 
-  organizations.name org, 
-  apps.name, 
+  builds.foreign_build_system,
+  organizations.name org,
+  apps.name,
   spaces.name space,
   builds.author,
   builds.message
-from 
+from
   builds 
     join apps on builds.app = apps.app
     join spaces on apps.space = spaces.space 
     join organizations on apps.org = organizations.org 
-where 
-  builds.foreign_build_key = $1 and
-  builds.foreign_build_system = $2 and
-  apps.app = $3 and
-  apps.deleted = false and 
-  builds.deleted = false and 
-  spaces.deleted = false and 
-  organizations.deleted = false
+where
+  builds.status = 'pending' and
+  ((apps.name::varchar(128) || '-' || spaces.name::varchar(128)) = $1 or apps.app::varchar(128) = $1) and
+  apps.deleted = false and builds.deleted = false and spaces.deleted = false and organizations.deleted = false
+order by builds.updated asc

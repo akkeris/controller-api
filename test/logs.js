@@ -52,6 +52,19 @@ describe("logs: ensure we can pull app logs", function() {
       });
   });
 
+  it("covers not allowing duplicate log drains", (done) => {
+    httph.request('post', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', alamo_headers,
+      JSON.stringify({"url":"syslog+tls://logs.abcd.com:40481"}),
+      (err, data) => {
+        if(err) {
+          expect(err.code).to.equal(400);
+          expect(err.message).to.equal('The requested log drain already exists on this application.');
+          return done();
+        }
+        expect(true).to.equal(false);
+      });
+  });
+
   it("covers listing log drain", (done) => {
     expect(id).to.be.a('string');
     httph.request('get', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', alamo_headers, null,

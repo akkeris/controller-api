@@ -31,14 +31,14 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   let addon_attach = null
   if(process.env.SMOKE_TESTS) {
     it("setup dummy app", async () => {
-      let req_data = JSON.stringify({org:"test", space:"preview", name:app_dummy_name, size:"scout", quantity:1, "type":"web", port:9000})
+      let req_data = JSON.stringify({org:"test", space:"preview", name:app_dummy_name, size:"gp1", quantity:1, "type":"web", port:9000})
       let data = await httph.request('post', 'http://localhost:5000/apps', alamo_headers, req_data)
       addon_attach = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app_dummy_name}-preview/addons`, alamo_headers, JSON.stringify({"plan":"amazon-s3:basic"})))
     })
   }
 
   it("setup an app", async () => {
-    let req_data = JSON.stringify({org:"test", space:"preview", name:app_name, size:"constellation", quantity:1, "type":"web", port:9000})
+    let req_data = JSON.stringify({org:"test", space:"preview", name:app_name, size:"gp2", quantity:1, "type":"web", port:9000})
     let data = await httph.request('post', 'http://localhost:5000/apps', alamo_headers, req_data)
     await httph.request('patch', `http://localhost:5000/apps/${app_name}-preview/config-vars`, alamo_headers, JSON.stringify({FOO:"GAZI"}))
   })
@@ -63,11 +63,11 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   })
 
   it("setup the formation", async () => {
-    let data = JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${app_name}-preview/formation`, alamo_headers, JSON.stringify([{"type":"web","command":"what", "quantity":2, "size":"constellation", "healthcheck":"/what"}])))
+    let data = JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${app_name}-preview/formation`, alamo_headers, JSON.stringify([{"type":"web","command":"what", "quantity":2, "size":"gp2", "healthcheck":"/what"}])))
     expect(data.length).to.equal(1)
     expect(data[0].command).to.equal("what")
     expect(data[0].quantity).to.equal(2)
-    expect(data[0].size).to.equal("constellation")
+    expect(data[0].size).to.equal("gp2")
     expect(data[0].healthcheck).to.equal("/what")
   })
 
@@ -200,7 +200,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     expect(data[0].type).to.equal("web")
     expect(data[0].command).to.equal("what")
     expect(data[0].quantity).to.equal(1)
-    expect(data[0].size).to.equal("constellation")
+    expect(data[0].size).to.equal("gp2")
     expect(data[0].healthcheck).to.equal("/what")
   })
 
@@ -353,7 +353,7 @@ describe("preview apps: ensure preview apps work appropriately", function() {
 
   let prod_app_name = app_name.substring(0, app_name.length - 1) + 'p'
   it("setup a prod-space app", async () => {
-    let req_data = JSON.stringify({org:"test", space:"default", name:prod_app_name, size:"constellation", quantity:1, "type":"web", port:9000})
+    let req_data = JSON.stringify({org:"test", space:"default", name:prod_app_name, size:"gp2", quantity:1, "type":"web", port:9000})
     let data = await httph.request('post', 'http://localhost:5000/apps', alamo_headers, req_data)
       
     let payload = JSON.stringify({repo:"https://github.com/akkeris/preview-app-test-repo", branch:"master", status_check:"true", auto_deploy:"true", username:"test", token:"ab832239defaa3298438abb"})

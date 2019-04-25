@@ -22,7 +22,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   it("Ensures organization is required.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({name:"testing123", space:"testing123", size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({name:"testing123", space:"testing123", size:"gp2", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -33,7 +33,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   it("Ensures app name is required.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"testing123", space:"testing123", size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({org:"testing123", space:"testing123", size:"gp2", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -44,7 +44,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   it("Ensures space name is required.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"testing123", name:"testing123", size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({org:"testing123", name:"testing123", size:"gp2", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -66,7 +66,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   it("Ensures apps cannot be created with duplicate names.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"test", space:"default", name:"api", size:"constellation"}),
+      JSON.stringify({org:"test", space:"default", name:"api", size:"gp2"}),
       (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -77,7 +77,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   it("Ensures apps cannot be created with brackets in names.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"test", space:"default", name:"[fugazi]", size:"constellation"}),
+      JSON.stringify({org:"test", space:"default", name:"[fugazi]", size:"gp2"}),
       (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -89,7 +89,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   //todo: correct app names (no dashes, alpha numeric only)
   it("Ensures we can create an app.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"test", space:"default", name:"alamotestapp", size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({org:"test", space:"default", name:"alamotestapp", size:"gp2", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         if(err) {
           console.error(err);

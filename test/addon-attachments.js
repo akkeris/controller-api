@@ -27,7 +27,7 @@ describe("addons attachments:", function() {
     expect(data).to.be.a('string');
     let app_url = JSON.parse(data).web_url;
     expect(app_url).to.be.a('string');
-    await httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers, JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}))
+    await httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers, JSON.stringify({size:"gp2", quantity:1, "type":"web", port:5000}))
   });
 
   it("covers getting a memcached plans", async () => {
@@ -150,7 +150,7 @@ describe("addons attachments:", function() {
     expect(data).to.be.a('string');
     data = JSON.parse(data);
     appname_second_id = data.id;
-    await httph.request('post', 'http://localhost:5000/apps/' + appname_second_new + '-default/formation', alamo_headers, JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}));
+    await httph.request('post', 'http://localhost:5000/apps/' + appname_second_new + '-default/formation', alamo_headers, JSON.stringify({size:"gp2", quantity:1, "type":"web", port:5000}));
   });
 
   it("covers creating dependent build for second test app", async () => {
@@ -182,7 +182,7 @@ describe("addons attachments:", function() {
     expect(data).to.be.a('string');
     data = JSON.parse(data);
     appname_third_id = data.id;
-    await httph.request('post', 'http://localhost:5000/apps/' + appname_third_new + '-preview/formation', alamo_headers, JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}));
+    await httph.request('post', 'http://localhost:5000/apps/' + appname_third_new + '-preview/formation', alamo_headers, JSON.stringify({size:"gp2", quantity:1, "type":"web", port:5000}));
   });
 
   it("covers attaching memcachier to the third test app by id, ensures prod!=non-prod apps can attach", async () => {

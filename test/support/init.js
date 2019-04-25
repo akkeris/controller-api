@@ -97,18 +97,18 @@ async function delete_app(app) {
 }
 
 async function create_formation(app, type, command) {
-  return await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"scout", "quantity":1, "type":type, "command":command}))
+  return await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"gp1", "quantity":1, "type":type, "command":command}))
 }
 
 async function create_build(app, image, port) {
   if(port) {
-    await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"scout", "quantity":1, "type":"web", "command":null, "port":port}))
+    await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"gp1", "quantity":1, "type":"web", "command":null, "port":port}))
   }
   return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/builds`, alamo_headers, JSON.stringify({"org":"test", "checksum":"", "url":image}))); 
 }
 
 async function create_fake_formation(app) {
-  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"type":"web","command":"what", "quantity":1, "size":"scout", "healthcheck":"/what"})))
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"type":"web","command":"what", "quantity":1, "size":"gp1", "healthcheck":"/what"})))
 }
 
 async function fake_github_notice(app, pr_file) {

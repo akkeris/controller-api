@@ -63,7 +63,7 @@ describe("hooks:", function() {
     expect(placed_hooks).to.equal(true);
     let release_hook_success = false;
     let formation_payload_promise = server.wait_for_callback('formation_change', 'to fire')
-    let formation_payload = JSON.stringify([{"type":"web","quantity":2,"size":"constellation"}])
+    let formation_payload = JSON.stringify([{"type":"web","quantity":2,"size":"gp2"}])
     let formation_info = await httph.request('patch', `http://localhost:5000/apps/${testapp.id}/formation`, alamo_headers, formation_payload)
     expect(formation_info).to.be.a('string');
     let payload = await formation_payload_promise

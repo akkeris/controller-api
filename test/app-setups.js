@@ -98,7 +98,7 @@ describe("app-setups:", function() {
       "formation": {
         "web": {
           "quantity": 1,
-          "size": "scout",
+          "size": "gp1",
           "command": null,
           "port":5000
         }
@@ -207,7 +207,7 @@ describe("app-setups:", function() {
       expect(formation[0]).to.be.an('object');
       expect(formation[0].command).to.be.null;
       expect(formation[0].quantity).to.equal(1);
-      expect(formation[0].size).to.equal('scout');
+      expect(formation[0].size).to.equal('gp1');
       expect(formation[0].type).to.equal('web');
       done();
     });
@@ -236,7 +236,7 @@ describe("app-setups:", function() {
       expect(data.formation).to.be.an('object');
       expect(data.formation.web).to.be.an('object');
       expect(data.formation.web.quantity).to.equal(1);
-      expect(data.formation.web.size).to.equal('scout');
+      expect(data.formation.web.size).to.equal('gp1');
       expect(data.formation.web.command).to.be.null;
       expect(data.source_blob).to.be.an('object');
       expect(data.source_blob.checksum).to.be.a('string');

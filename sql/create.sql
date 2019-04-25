@@ -559,10 +559,10 @@ begin
       ( 'fa2b535d-de4d-4a14-be36-d44af53b59e3', 'api',
         '565c9b0c-986e-455b-93c8-a146d8d49132', '0b26ccb5-83cc-4d33-a01f-100c383e0064', 'https://api.abcd.abcd.io' );
     insert into formations ( formation, app, type, quantity, port, size, price ) values
-      ( 'fa2b535d-de4d-4a14-be36-d44af53b5955', 'fa2b535d-de4d-4a14-be36-d44af53b59e3', 'web', 1, 5000, 'constellation', 6000 );
+      ( 'fa2b535d-de4d-4a14-be36-d44af53b5955', 'fa2b535d-de4d-4a14-be36-d44af53b59e3', 'web', 1, 5000, 'gp2', 6000 );
     insert into formation_changes ( formation_change, formation, app, type, quantity, port, size, price ) values
       ( 'fa2b535d-de4d-4a14-be36-d44af53b5977', 'fa2b535d-de4d-4a14-be36-d44af53b5955', 'fa2b535d-de4d-4a14-be36-d44af53b59e3',
-        'web', 1, 5000, 'constellation', 6000 );
+        'web', 1, 5000, 'gp2', 6000 );
     insert into builds values
       ('9ec219f0-9227-47cb-b570-f996d50b980a','fa2b535d-de4d-4a14-be36-d44af53b59e3','2016-08-25 12:48:38.896000','2016-08-25 12:51:09.371629',
         '123456','sha256:93f16649a03d37aef081dfec3c2fecfa41bb22dd45de2b79f32dcda83bd69bcf','','',0,'',

@@ -413,7 +413,7 @@ Immediately creates a new application and all specified resources described in t
 | env[key]:description | optional string | Optional string describing its purpose | "Some description" |                                                                                     
 | formation | optional object | A key value pair of dyno types and their definitions | `{"web":..., "worker":...}` | 
 | formation[key]:quantity | optional number | How many of this dyno type is requested | `{"web":{"quantity":1}}` |
-| formation[key]:size | optional string | The size requested for this dyno type (see sizes below) | `{"web":{"size":"scout"}}` |
+| formation[key]:size | optional string | The size requested for this dyno type (see sizes below) | `{"web":{"size":"gp1"}}` |
 | formation[key]:health-check | optional string | The relative URI for checking if the health of the dyno is ok. (web dyno type only) | {"web":{"health-check":"/octhc"}} |
 | formation[key]:port | optional number | The port in which the paplication will listne for web traffic (web dyno type only) | `{"web":{"port":5000}}` |
 | formation[key]:command | optional string | The command to use to start this dyno from the image, defaults to command specified in docker build. | {"web":{"command":"./start.sh"}} |
@@ -627,7 +627,7 @@ Create a new process or formation type. Note that formations can be automaticall
 
 |   Name   |       Type      | Description                                                                                                                                                                                                | Example                                                                                                                            |
 |:--------:|:---------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-|   size   | required string | The size of server requested. defaults to constellation on autodeploy | constellation |
+|   size   | required string | The size of server requested. defaults to gp2 on autodeploy | gp2 |
 | quantity | requred string  | The quantity of servers or instances for this app. | 1 |
 |   type   | required string | The type of server requested, note that "web" has a special meaning as its the only process with an exposed port to take incoming web traffic (specified by the PORT env). | web |
 |   port   | optional integer| The port number to run on. | 9000 |
@@ -641,7 +641,7 @@ curl \
   -H 'Authorization: ...' \
   -X POST \
   https://apps.akkeris.io/apps/app-space/formation
-  -d '{"size":"constellation", "quantity":1, "type":"web", "command":null, "healthcheck":null}'
+  -d '{"size":"gp2", "quantity":1, "type":"web", "command":null, "healthcheck":null}'
 ```
 
 **200 "OK" Response**
@@ -656,7 +656,7 @@ curl \
   "created_at": "2016-07-26T15:47:33.411Z",
   "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c",
   "quantity": 1,
-  "size": "constellation",
+  "size": "gp2",
   "type": "web",
   "updated_at": "2016-07-26T15:47:36.676Z"
 }
@@ -690,7 +690,7 @@ curl \
   "created_at": "2016-07-26T15:47:33.411Z",
   "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c",
   "quantity": 1,
-  "size": "constellation",
+  "size": "gp2",
   "type": "web",
   "port": 9000,
   "updated_at": "2016-07-26T15:47:36.676Z"
@@ -717,7 +717,7 @@ curl \
 ```json
 [
   {
-    "name": "scout-prod",
+    "name": "gp1-prod",
     "resources": {
       "requests": {
         "memory": "256Mi"
@@ -728,7 +728,7 @@ curl \
     }
   },
   {
-    "name": "scout",
+    "name": "gp1",
     "resources": {
       "requests": {
         "memory": "256Mi"
@@ -769,7 +769,7 @@ curl \
     "created_at": "2016-07-26T15:47:33.411Z",
     "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c",
     "quantity": 1,
-    "size": "constellation",
+    "size": "gp2",
     "type": "web",
     "port": 9000,
     "updated_at": "2016-07-26T15:47:36.676Z"
@@ -785,7 +785,7 @@ Update an server, change its formation or size and quantity.  Note that valid si
 
 |   Name   |       Type      | Description                                                                                                                                                                                                | Example                                                                                                                            |
 |:--------:|:---------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-|   size   | required string | The size of server requested.                                                                                                                                     | constellation                                                                                                                       |
+|   size   | required string | The size of server requested.                                                                                                                                     | gp2                                                                                                                       |
 | quantity | requred string  | The quantity of servers or instances for this app.                                                                                                                                                         | 1                                                                                                                                  |
 |   type   | required string | The type of server requested, for now the only available option is "web"                                                                                                                                   | web                                                                                                                                |
 |   port   | optional string | The optional port to use during a batch update| 9000 |
@@ -801,7 +801,7 @@ curl \
   -H 'Authorization: ...' \
   -X PATCH \
   https://apps.akkeris.io/apps/app-space/formation \
-  -d '[{"size":"constellation", "quantity":1, "type":"web"}]'
+  -d '[{"size":"gp2", "quantity":1, "type":"web"}]'
 ```
 
 **200 "OK" Response**
@@ -817,7 +817,7 @@ curl \
     "created_at": "2016-07-26T15:47:33.411Z",
     "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c",
     "quantity": 1,
-    "size": "constellation",
+    "size": "gp2",
     "type": "web",
     "command": null,
     "port":9000,
@@ -834,7 +834,7 @@ Update an server, change its formation or size and quantity.  Note that valid si
 
 |   Name   |       Type      | Description                                                                                                                                                                                                | Example                                                                                                                            |
 |:--------:|:---------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-|   size   | required string | The size of server requested.                                                                                                                                     | constellation                                                                                                                        |
+|   size   | required string | The size of server requested.                                                                                                                                     | gp2                                                                                                                        |
 | quantity | requred string  | The quantity of servers or instances for this app. | 1 |
 |   port   | optional string | The optional port to use during a batch update| web |
 | command  | optional string | The optional command to use during a batch update, or specify null to use the default command | npm start |
@@ -850,7 +850,7 @@ curl \
   -H 'Authorization: ...' \
   -X PATCH \
   https://apps.akkeris.io/apps/app-space/formation/web \
-  -d '{"size":"constellation", "quantity":1}]'
+  -d '{"size":"gp2", "quantity":1}]'
 ```
 
 **200 "OK" Response**
@@ -865,7 +865,7 @@ curl \
   "created_at": "2016-07-26T15:47:33.411Z",
   "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c",
   "quantity": 1,
-  "size": "constellation",
+  "size": "gp2",
   "type": "web",
   "port": 9000,
   "updated_at": "2016-07-26T15:47:36.676Z"
@@ -929,7 +929,7 @@ curl \
       "name": "app-space",
       "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c"
     },
-    "size": "constellation",
+    "size": "gp2",
     "state": "running",
     "ready": true,
     "type": "web",
@@ -971,7 +971,7 @@ curl \
     "name": "app-space",
     "id": "62dc0fd3-2cba-4925-8fca-d1129d296d2c"
   },
-  "size": "constellation",
+  "size": "gp2",
   "state": "Running",
   "ready": true,
   "type": "web",
@@ -4080,7 +4080,7 @@ Upon successful deletion the API responds with 200.
             {
               "type": "web",
               "quantity": 2,
-              "size": "constellation"
+              "size": "gp2"
             }
           ]
         }
@@ -4335,7 +4335,7 @@ The occurs when there is a scale event or a new formation type is created.
       "type":"web",
       "port":8000,
       "command":"cmd",
-      "size":"constellation",
+      "size":"gp2",
       "quantity":1
     }
   ]
@@ -4776,7 +4776,7 @@ curl \
       "app": {
         "name": "app-space"
       },
-      "description": "constellation web dyno",
+      "description": "gp2 web dyno",
       "type": "dyno",
       "quantity": 1,
       "price_per_unit": 60,

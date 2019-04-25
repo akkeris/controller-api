@@ -86,7 +86,7 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
 
 
   it("covers creating worker without release", function(done) {
-    let payload = {command:"fubar", type:"worker", "quantity":1, "size":"scout"}
+    let payload = {command:"fubar", type:"worker", "quantity":1, "size":"gp1"}
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers, JSON.stringify(payload), (err, info) => {
       if(err) {
         console.log('err on worker without release:', err);

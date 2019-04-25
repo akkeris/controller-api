@@ -45,7 +45,7 @@ describe("github: ensure we can attach auto builds, submit auto builds, and remo
 
 
   it("ensure we can create an app", async () => {
-    let req_data = JSON.stringify({org:"test", space:"default", name:app_name, size:"constellation", quantity:1, "type":"web", port:9000})
+    let req_data = JSON.stringify({org:"test", space:"default", name:app_name, size:"gp2", quantity:1, "type":"web", port:9000})
     let data = await httph.request('post', 'http://localhost:5000/apps', {"Authorization":process.env.AUTH_KEY}, req_data)
   });
 

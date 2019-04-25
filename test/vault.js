@@ -67,7 +67,7 @@ describe("vault: provisioning, etc", function() {
   let vault_prod_plan = null;
   it("covers creating a formation for the app to attach services", (done) => {
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers,
-      JSON.stringify({size:"constellation", quantity:1, "type":"web", port:5000}),
+      JSON.stringify({size:"gp2", quantity:1, "type":"web", port:5000}),
       (err, data) => {
         expect(err).to.be.null;
         done();

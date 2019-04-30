@@ -1,65 +1,11 @@
 "use strict"
 
-const init = require('./support/init.js');
 describe("app-setups:", function() {
   this.timeout(10 * 60 * 1000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
   process.env.DEFAULT_PORT = "5000";
-
-
-    
-  function wait_for_app_content(httph, app, content, callback, iteration) {
-    iteration = iteration || 1;
-    if(iteration === 1) {
-      process.stdout.write("    ~ Waiting for app to turn up");
-    }
-    if(iteration === 60) {
-      process.stdout.write("\n");
-      callback({code:0, message:"Timeout waiting for app to turn up."});
-    }
-    setTimeout(function() {
-      httph.request('get', 'https://' + app + process.env.ALAMO_BASE_DOMAIN, {'X-Timeout':1500}, null, (err, data) => {
-        if(err || data.indexOf(content) === -1) {
-          if(data) {
-            console.log("got data:", data)
-          }
-          process.stdout.write(".");
-          setTimeout(wait_for_app_content.bind(null, httph, app, content, callback, (iteration + 1)), 250);
-          //callback(err, null);
-        } else {
-          process.stdout.write("\n");
-          callback(null, data);
-        }
-      });
-    },1000);
-  }
-
-  function wait_for_build(httph, app, build_id, callback, iteration) {
-    iteration = iteration || 1;
-    if(iteration === 1) {
-      process.stdout.write("    ~ Waiting for build");
-    }
-    httph.request('get', 'http://localhost:5000/apps/' + app + '/builds/' + build_id, alamo_headers, null, (err, data) => {
-      if(err && err.code === 423) {
-        process.stdout.write(".");
-        setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-      } else if(err) {
-        callback(err, null);
-      } else {
-        let build_info = JSON.parse(data);
-        if(build_info.status === 'pending' || build_info.status === 'queued') {
-          process.stdout.write(".");
-          setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-        } else {
-          process.stdout.write("\n");
-          callback(null, data);
-        }
-      }
-    });
-  }
-
-
+  const init = require('./support/init.js');
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "x-username":"test", "x-elevated-access":"true"};
@@ -67,16 +13,14 @@ describe("app-setups:", function() {
   let appname = "alamotest" + Math.floor(Math.random() * 10000)
   let app_uuid = null;
   let app_setup_uuid = null;
-  it("ensure we can create an app from a definition", (done) => {
+  it("ensure we can create an app from a definition", async () => {
     let payload = {
       "app": {
         "locked": false,
         "name": appname,
-        "organization": "alamo",
-        "region": "us-seattle",
+        "organization": "test",
         "personal": false,
         "space": "default",
-        "stack": "ds1"
       },
       "env": {
         "FEEBAR": {
@@ -98,7 +42,7 @@ describe("app-setups:", function() {
       "formation": {
         "web": {
           "quantity": 1,
-          "size": "scout",
+          "size": "gp1",
           "command": null,
           "port":5000
         }
@@ -121,136 +65,152 @@ describe("app-setups:", function() {
       "pipeline-couplings": [],
       "sites": {}
     }
-    httph.request('post', 'http://localhost:5000/app-setups', alamo_headers, JSON.stringify(payload), (err, data) => {
-      if(err) {
-        console.error(err);
-      }
-      expect(err).to.be.null;
-      data = JSON.parse(data);
+    let data = JSON.parse(await httph.request('post', 'http://localhost:5000/app-setups', alamo_headers, JSON.stringify(payload)));
+    expect(data).to.be.an('object');
+    expect(data.id).to.be.a('string');
+    app_setup_uuid = data.id;
+    expect(data.created_at).to.be.a('string');
+    expect(data.updated_at).to.be.a('string');
+    expect(data.app).to.be.an('object');
+    expect(data.app.id).to.be.a('string');
+    expect(data.build).to.be.an('object');
+    expect(data.status).to.equal('pending');
+    expect(data.progress).to.equal(0);
+    app_uuid = data.app.id;
+  });
+
+  it("ensure we can check the status of app creation", (done) => {
+    let intv = setInterval(async () => {
+      let data = JSON.parse(await httph.request('get', `http://localhost:5000/app-setups/${app_setup_uuid}`, alamo_headers, null));
       expect(data).to.be.an('object');
       expect(data.id).to.be.a('string');
-      app_setup_uuid = data.id;
       expect(data.created_at).to.be.a('string');
       expect(data.updated_at).to.be.a('string');
       expect(data.app).to.be.an('object');
       expect(data.app.id).to.be.a('string');
-      expect(data.build).to.be.an('object');
-      expect(data.status).to.equal('pending');
-      expect(data.progress).to.equal(0);
-      app_uuid = data.app.id;
-      done();
-    });
-  });
-
-  it("ensure we can check the status of app creation", (done) => {
-    let intv = setInterval(() => {
-      httph.request('get', 'http://localhost:5000/app-setups/' + app_setup_uuid, alamo_headers, null, (err, data) => {
-        expect(err).to.be.null;
-        data = JSON.parse(data);
-        expect(data).to.be.an('object');
-        expect(data.id).to.be.a('string');
-        expect(data.created_at).to.be.a('string');
-        expect(data.updated_at).to.be.a('string');
-        expect(data.app).to.be.an('object');
-        expect(data.app.id).to.be.a('string');
-        if(data.progress === 1) {
-          clearInterval(intv)
-          expect(data.status).to.equal("succeeded")
-          done();
-        }
-      });
+      if(data.progress === 1) {
+        clearInterval(intv)
+        expect(data.status).to.equal("succeeded")
+        done();
+      }
     }, 1500);
   });
 
-  it("ensure the app setup starts the build", (done) => {
-    setTimeout(() => {
-      httph.request('get', 'http://localhost:5000/apps/' + appname + '-default/builds', alamo_headers, null, (err, data) => {
-        expect(err).to.be.null;
-        let builds = JSON.parse(data)
-        expect(builds.length).to.equal(1)
-        wait_for_build(httph, `${appname}-default`, builds[0].id, (wait_err, building_info) => {
-          if(wait_err) {
-            console.error("Error waiting for build:", wait_err);
-            return expect(true).to.equal(false);
-          }
-          done();
-        })
-      })
-    }, 1000)
+  it("ensure the app setup starts the build", async () => {
+    let builds = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname}-default/builds`, alamo_headers, null));
+    expect(builds.length).to.equal(1)
+    await init.wait_for_build(`${appname}-default`, builds[0].id)
   })
 
-  it("ensure the app auto-deploys", (done) => {
-    wait_for_app_content(httph, `${appname}`, '[setting return value failed.] with port [5000] and restart value [undefined]', (wait_app_err, resp) => {
-      if(wait_app_err) {
-        console.error("Error waiting for build:", wait_app_err);
-        return expect(true).to.equal(false);
-      }
-      done();
-    })
+  it("ensure the app auto-deploys", async () => {
+    await init.wait_for_app_content(`${appname}`, '[setting return value failed.] with port [5000] and restart value [undefined]');
   })
 
-  it("ensure app setups created the config vars", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/' + appname + '-default/config-vars', alamo_headers, null, (err, data) => {
-      expect(err).to.be.null;
-      let config_vars = JSON.parse(data);
-      expect(config_vars).to.be.an('object');
-      expect(config_vars.FEEBAR).to.equal("FOOBAR");
-      expect(config_vars.FUGAZI).to.equal("FUGAZI!!!");
-      done();
-    });
-  });
-  it("ensure app setups created the formation", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/' + appname + '-default/formation', alamo_headers, null, (err, data) => {
-      expect(err).to.be.null;
-      let formation = JSON.parse(data);
-      expect(formation).to.be.an('array');
-      expect(formation[0]).to.be.an('object');
-      expect(formation[0].command).to.be.null;
-      expect(formation[0].quantity).to.equal(1);
-      expect(formation[0].size).to.equal('scout');
-      expect(formation[0].type).to.equal('web');
-      done();
-    });
-  });
 
-
-  it("ensure we can get an app definition", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/' + appname + '-default/app-setups', alamo_headers, null, (err, data) => {
-      if(err) {
-        console.error(err)
-      }
-      expect(err).to.be.null;
-      data = JSON.parse(data);
-      expect(data).to.be.an('object');
-      expect(data.app).to.be.an('object');
-      expect(data.app.name).to.equal(appname);
-      expect(data.app.organization).to.be.a('string');
-      expect(data.app.space).to.equal('default');
-      expect(data.env).to.be.an('object');
-      expect(data.env.AUTH_KEY).to.be.an('object');
-      expect(data.env.AUTH_KEY.required).to.be.true;
-      expect(data.env.AUTH_KEY.value).to.be.undefined;
-      expect(data.env.PORT).to.be.an('object');
-      expect(data.env.PORT.required).to.be.false;
-      expect(data.env.PORT.value).to.equal("5000");
-      expect(data.formation).to.be.an('object');
-      expect(data.formation.web).to.be.an('object');
-      expect(data.formation.web.quantity).to.equal(1);
-      expect(data.formation.web.size).to.equal('scout');
-      expect(data.formation.web.command).to.be.null;
-      expect(data.source_blob).to.be.an('object');
-      expect(data.source_blob.checksum).to.be.a('string');
-      expect(data.source_blob.url).to.be.a.a('string');
-      expect(data.source_blob.version).to.be.a.a('string');
-      done();
-    });
+  it("Ensures we can place the application into maintenance mode.", async () => {
+    let data = await httph.request('patch', `http://localhost:5000/apps/${appname}-default`, alamo_headers, JSON.stringify({"maintenance":true}));
+    let appobj = JSON.parse(data);
+    expect(appobj).to.be.an('object');
+    expect(appobj.archived_at).to.be.a('string');
+    expect(appobj.buildpack_provided_description).to.be.a('string');
+    expect(appobj.build_stack).to.be.an('object');
+    expect(appobj.build_stack.id).to.be.a('string');
+    expect(appobj.build_stack.name).to.be.a('string');
+    expect(appobj.created_at).to.be.a('string');
+    expect(appobj.id).to.be.a('string');
+    expect(appobj.maintenance).to.equal(true);
+    expect(appobj.name).to.equal(appname + "-default");
+    expect(appobj.simple_name).to.equal(appname);
+    expect(appobj.key).to.equal(appname + "-default");
+    expect(appobj.owner).to.be.an('object');
+    expect(appobj.organization).to.be.an('object');
+    expect(appobj.region).to.be.an('object');
+    expect(appobj.region.name).to.be.a('string');
+    expect(appobj.repo_size).to.equal(0);
+    expect(appobj.slug_size).to.equal(0);
+    expect(appobj.space).to.be.an('object');
+    expect(appobj.space.name).to.equal("default");
+    expect(appobj.stack).to.be.an('object');
+    expect(appobj.updated_at).to.be.a('string');
+    expect(appobj.web_url).to.contain("https://" + appname + process.env.ALAMO_BASE_DOMAIN);
   });
 
+  it("Ensures we can take the application out of maintenance mode.", async () => {
+    let data = await httph.request('patch', `http://localhost:5000/apps/${appname}-default`, alamo_headers, JSON.stringify({"maintenance":false}));
+    let appobj = JSON.parse(data);
+    expect(appobj).to.be.an('object');
+    expect(appobj.archived_at).to.be.a('string');
+    expect(appobj.buildpack_provided_description).to.be.a('string');
+    expect(appobj.build_stack).to.be.an('object');
+    expect(appobj.build_stack.id).to.be.a('string');
+    expect(appobj.build_stack.name).to.be.a('string');
+    expect(appobj.created_at).to.be.a('string');
+    expect(appobj.id).to.be.a('string');
+    expect(appobj.maintenance).to.equal(false);
+    expect(appobj.name).to.equal(appname + "-default");
+    expect(appobj.simple_name).to.equal(appname);
+    expect(appobj.key).to.equal(appname + "-default");
+    expect(appobj.owner).to.be.an('object');
+    expect(appobj.organization).to.be.an('object');
+    expect(appobj.region).to.be.an('object');
+    expect(appobj.region.name).to.be.a('string');
+    expect(appobj.repo_size).to.equal(0);
+    expect(appobj.slug_size).to.equal(0);
+    expect(appobj.space).to.be.an('object');
+    expect(appobj.space.name).to.equal("default");
+    expect(appobj.stack).to.be.an('object');
+    expect(appobj.updated_at).to.be.a('string');
+    expect(appobj.web_url).to.contain("https://" + appname + process.env.ALAMO_BASE_DOMAIN);
+  });
 
-  it("ensure we clean up after ourselves", (done) => {
-    httph.request('delete', 'http://localhost:5000/apps/' + appname + '-default', alamo_headers, null, (err, data) => {
-      expect(err).to.be.null;
-      done();
-    });
+  it("ensure the app comes out of maintenance mode", async () => {
+    await init.wait_for_app_content(`${appname}`, '[setting return value failed.] with port [5000] and restart value [undefined]');
+  })
+
+
+  it("ensure app setups created the config vars", async () => {
+    let config_vars = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname}-default/config-vars`, alamo_headers, null));
+    expect(config_vars).to.be.an('object');
+    expect(config_vars.FEEBAR).to.equal("FOOBAR");
+    expect(config_vars.FUGAZI).to.equal("FUGAZI!!!");
+  });
+
+  it("ensure app setups created the formation", async () => {
+    let formation = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname}-default/formation`, alamo_headers, null));
+    expect(formation).to.be.an('array');
+    expect(formation[0]).to.be.an('object');
+    expect(formation[0].command).to.be.null;
+    expect(formation[0].quantity).to.equal(1);
+    expect(formation[0].size).to.equal('gp1');
+    expect(formation[0].type).to.equal('web');
+  });
+
+  it("ensure we can get an app definition", async () => {
+    let data = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname}-default/app-setups`, alamo_headers, null));
+    expect(data).to.be.an('object');
+    expect(data.app).to.be.an('object');
+    expect(data.app.name).to.equal(appname);
+    expect(data.app.organization).to.be.a('string');
+    expect(data.app.space).to.equal('default');
+    expect(data.env).to.be.an('object');
+    expect(data.env.AUTH_KEY).to.be.an('object');
+    expect(data.env.AUTH_KEY.required).to.be.true;
+    expect(data.env.AUTH_KEY.value).to.be.undefined;
+    expect(data.env.PORT).to.be.an('object');
+    expect(data.env.PORT.required).to.be.false;
+    expect(data.env.PORT.value).to.equal("5000");
+    expect(data.formation).to.be.an('object');
+    expect(data.formation.web).to.be.an('object');
+    expect(data.formation.web.quantity).to.equal(1);
+    expect(data.formation.web.size).to.equal('gp1');
+    expect(data.formation.web.command).to.be.null;
+    expect(data.source_blob).to.be.an('object');
+    expect(data.source_blob.checksum).to.be.a('string');
+    expect(data.source_blob.url).to.be.a.a('string');
+    expect(data.source_blob.version).to.be.a.a('string');
+  });
+
+  it("ensure we clean up after ourselves", async () => {
+    await httph.request('delete', `http://localhost:5000/apps/${appname}-default`, alamo_headers, null)
   });
 });

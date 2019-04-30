@@ -80,14 +80,14 @@ describe("formations: creating, updating and deleting dynos and process types", 
   });
   it("Ensures processes cannot create invalid ports.", function(done) {
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-      JSON.stringify({size:"constellation", quantity:1, "type":"web", port:-2}),
+      JSON.stringify({size:"gp2", quantity:1, "type":"web", port:-2}),
       function(err, data) {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
         expect(err.code).to.equal(422);
         expect(err.message).to.equal('The specified port is invalid, it must be a number between 1024 and 65535.');
         httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-          JSON.stringify({size:"constellation", quantity:1, "type":"web", port:0.5}),
+          JSON.stringify({size:"gp2", quantity:1, "type":"web", port:0.5}),
           function(err, data) {
             expect(err).to.be.an('object');
             expect(data).to.be.null;
@@ -107,7 +107,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
       let appsobj = JSON.parse(data);
       expect(appsobj).to.be.an('array');
       appsobj.forEach(function(appobj) {
-        if(appobj.name === 'constellation') {
+        if(appobj.name === 'gp2') {
           expect(appobj).to.be.an('object');
           expect(appobj.resources).to.be.an('object');
           expect(appobj.resources.requests).to.be.an('object');
@@ -122,14 +122,14 @@ describe("formations: creating, updating and deleting dynos and process types", 
 
   it("Ensures processes cannot create invalid quantities.", function(done) {
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-      JSON.stringify({size:"constellation", quantity:-1, "type":"web", port:9000}),
+      JSON.stringify({size:"gp2", quantity:-1, "type":"web", port:9000}),
       function(err, data) {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
         expect(err.code).to.equal(422);
         expect(err.message).to.equal('The number of instances must be between 0 and 32.');
         httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-          JSON.stringify({size:"constellation", quantity:1000, "type":"web", port:9000}),
+          JSON.stringify({size:"gp2", quantity:1000, "type":"web", port:9000}),
           function(err, data) {
             expect(err).to.be.an('object');
             expect(data).to.be.null;
@@ -152,7 +152,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
   });
   it("Ensures processes cannot create invalid types.", function(done) {
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-      JSON.stringify({size:"constellation", quantity:1, "type":"what da heck.", port:9000}),
+      JSON.stringify({size:"gp2", quantity:1, "type":"what da heck.", port:9000}),
       function(err, data) {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -163,7 +163,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
   });
   it("Ensures creation of web type.", function(done) {
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-      JSON.stringify({size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({size:"gp2", quantity:1, "type":"web", port:9000}),
       function(err, data) {
         expect(err).to.be.null;
         expect(data).to.be.a('string');
@@ -176,7 +176,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
         expect(formation_info.id).to.be.a('string');
         expect(formation_info.quantity).to.equal(1);
         expect(formation_info.port).to.equal(9000);
-        expect(formation_info.size).to.equal('constellation');
+        expect(formation_info.size).to.equal('gp2');
         expect(formation_info.type).to.equal('web');
         expect(formation_info.app.name).to.equal(appname_brand_new + '-default');
         done();
@@ -184,7 +184,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
   });
   it("Ensures one cannot create duplicate types.", function(done) {
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-      JSON.stringify({size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({size:"gp2", quantity:1, "type":"web", port:9000}),
       function(err, data) {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -195,7 +195,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
   });
   it("Ensures a port on a worker type throws an error.", function(done) {
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-      JSON.stringify({size:"constellation", quantity:1, "type":"worker", port:9000, "command":"node worker.js"}),
+      JSON.stringify({size:"gp2", quantity:1, "type":"worker", port:9000, "command":"node worker.js"}),
       function(err, data) {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -206,7 +206,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
   });
   it("Ensures a healthcheck on a worker type throws an error.", function(done) {
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-      JSON.stringify({size:"constellation", quantity:1, "type":"worker", "command":"node worker.js", "healthcheck":"/"}),
+      JSON.stringify({size:"gp2", quantity:1, "type":"worker", "command":"node worker.js", "healthcheck":"/"}),
       function(err, data) {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -217,7 +217,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
   });
   it("Ensures trying to remove healthcheck on a worker type throws an error.", function(done) {
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-      JSON.stringify({size:"constellation", quantity:1, "type":"worker", "command":"node worker.js", removeHealthcheck:true}),
+      JSON.stringify({size:"gp2", quantity:1, "type":"worker", "command":"node worker.js", removeHealthcheck:true}),
       function(err, data) {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -228,7 +228,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
   });
   it("Ensures creation of a worker type.", function(done) {
     httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', {"Authorization":process.env.AUTH_KEY},
-      JSON.stringify({size:"constellation", "quantity":1, "type":"worker", "command":"node worker.js"}),
+      JSON.stringify({size:"gp2", "quantity":1, "type":"worker", "command":"node worker.js"}),
       function(err, data) {
         if(err) {
           console.error('Err:', err);
@@ -244,7 +244,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
         expect(formation_info.id).to.be.a('string');
         expect(formation_info.quantity).to.equal(1);
         expect(formation_info.port).to.be.null;
-        expect(formation_info.size).to.equal('constellation');
+        expect(formation_info.size).to.equal('gp2');
         expect(formation_info.type).to.equal('worker');
         expect(formation_info.app.name).to.equal(appname_brand_new + '-default');
         done();
@@ -297,7 +297,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
     },1000);
   });
   it("Covers ensuring batch update works", function(done) {
-    let bu_payload = [{"port":8282, "quantity":2, "type":"web", "size":"scout", "healthcheck":"/"}];
+    let bu_payload = [{"port":8282, "quantity":2, "type":"web", "size":"gp1", "healthcheck":"/"}];
     httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers, JSON.stringify(bu_payload), function(err, data) {
       if(err) {
         console.log('error with batch update:', err);

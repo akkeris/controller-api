@@ -22,7 +22,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   it("Ensures organization is required.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({name:"testing123", space:"testing123", size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({name:"testing123", space:"testing123", size:"gp2", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -33,7 +33,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   it("Ensures app name is required.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"testing123", space:"testing123", size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({org:"testing123", space:"testing123", size:"gp2", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -44,7 +44,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   it("Ensures space name is required.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"testing123", name:"testing123", size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({org:"testing123", name:"testing123", size:"gp2", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -66,7 +66,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   it("Ensures apps cannot be created with duplicate names.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"test", space:"default", name:"api", size:"constellation"}),
+      JSON.stringify({org:"test", space:"default", name:"api", size:"gp2"}),
       (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -77,7 +77,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   });
   it("Ensures apps cannot be created with brackets in names.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"test", space:"default", name:"[fugazi]", size:"constellation"}),
+      JSON.stringify({org:"test", space:"default", name:"[fugazi]", size:"gp2"}),
       (err, data) => {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
@@ -89,7 +89,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   //todo: correct app names (no dashes, alpha numeric only)
   it("Ensures we can create an app.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"test", space:"default", name:"alamotestapp", size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({org:"test", space:"default", name:"alamotestapp", size:"gp2", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         if(err) {
           console.error(err);
@@ -161,82 +161,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
       done();
     });
   });
-  it("Ensures we can place the application into maintenance mode.", (done) => {
-    httph.request('patch', 'http://localhost:5000/apps/alamotestapp-default', alamo_headers, 
-      JSON.stringify({"build_stack":"ds1", "maintenance":true, "name":"alamotestapp"}), 
-    (err, data) => {
-      if(err) {
-        console.error(err);
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let appobj = JSON.parse(data);
-      expect(appobj).to.be.an('object');
-      expect(appobj.archived_at).to.be.a('string');
-      expect(appobj.buildpack_provided_description).to.be.a('string');
-      expect(appobj.build_stack).to.be.an('object');
-      expect(appobj.build_stack.id).to.be.a('string');
-      expect(appobj.build_stack.name).to.be.a('string');
-      expect(appobj.created_at).to.be.a('string');
-      expect(appobj.id).to.be.a('string');
-      expect(appobj.maintenance).to.equal(true);
-      expect(appobj.name).to.equal("alamotestapp-default");
-      expect(appobj.simple_name).to.equal("alamotestapp");
-      expect(appobj.key).to.equal("alamotestapp-default");
-      expect(appobj.owner).to.be.an('object');
-      expect(appobj.organization).to.be.an('object');
-      expect(appobj.organization.name).to.equal('test');
-      expect(appobj.region).to.be.an('object');
-      expect(appobj.region.name).to.be.a('string');
-      expect(appobj.released_at).to.be.null;
-      expect(appobj.repo_size).to.equal(0);
-      expect(appobj.slug_size).to.equal(0);
-      expect(appobj.space).to.be.an('object');
-      expect(appobj.space.name).to.equal("default");
-      expect(appobj.stack).to.be.an('object');
-      expect(appobj.updated_at).to.be.a('string');
-      expect(appobj.web_url).to.contain("https://alamotestapp"+process.env.ALAMO_BASE_DOMAIN);
-      done();
-    });
-  });
 
-  it("Ensures we can take the application out of maintenance mode.", (done) => {
-    httph.request('patch', 'http://localhost:5000/apps/alamotestapp-default', alamo_headers, 
-      JSON.stringify({"build_stack":"ds1", "maintenance":false, "name":"alamotestapp"}), 
-    (err, data) => {
-      if(err) {
-        console.error(err);
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let appobj = JSON.parse(data);
-      expect(appobj).to.be.an('object');
-      expect(appobj.archived_at).to.be.a('string');
-      expect(appobj.buildpack_provided_description).to.be.a('string');
-      expect(appobj.build_stack).to.be.an('object');
-      expect(appobj.build_stack.id).to.be.a('string');
-      expect(appobj.build_stack.name).to.be.a('string');
-      expect(appobj.created_at).to.be.a('string');
-      expect(appobj.id).to.be.a('string');
-      expect(appobj.maintenance).to.equal(false);
-      expect(appobj.name).to.equal("alamotestapp-default");
-      expect(appobj.key).to.equal("alamotestapp-default");
-      expect(appobj.owner).to.be.an('object');
-      expect(appobj.organization).to.be.an('object');
-      expect(appobj.organization.name).to.equal('test');
-      expect(appobj.region).to.be.an('object');
-      expect(appobj.region.name).to.be.a('string');
-      expect(appobj.released_at).to.be.null;
-      expect(appobj.repo_size).to.equal(0);
-      expect(appobj.slug_size).to.equal(0);
-      expect(appobj.space).to.be.an('object');
-      expect(appobj.space.name).to.equal("default");
-      expect(appobj.stack).to.be.an('object');
-      expect(appobj.updated_at).to.be.a('string');
-      expect(appobj.web_url).to.contain("https://alamotestapp"+process.env.ALAMO_BASE_DOMAIN);
-      done();
-    });
-  });
   it("Ensures we can pull application info with relevant autobuild info.", (done) => {
     httph.request('get', 'http://localhost:5000/apps/api-default', alamo_headers, null, (err, data) => {
       if(err) {

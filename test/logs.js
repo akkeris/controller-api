@@ -28,7 +28,7 @@ describe("logs: ensure we can pull app logs", function() {
   let id = null;
   it("covers creating log drain", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"test", space:"default", name:app_name, size:"constellation", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({org:"test", space:"default", name:app_name, size:"gp2", quantity:1, "type":"web", port:9000}),
       (err, data) => {
         if(err) {
           console.error(err);
@@ -49,6 +49,19 @@ describe("logs: ensure we can pull app logs", function() {
             id = data.id;
             done();
           });
+      });
+  });
+
+  it("covers not allowing duplicate log drains", (done) => {
+    httph.request('post', 'http://localhost:5000/apps/' + app_name + '-default/log-drains', alamo_headers,
+      JSON.stringify({"url":"syslog+tls://logs.abcd.com:40481"}),
+      (err, data) => {
+        if(err) {
+          expect(err.code).to.equal(400);
+          expect(err.message).to.equal('The requested log drain already exists on this application.');
+          return done();
+        }
+        expect(true).to.equal(false);
       });
   });
 

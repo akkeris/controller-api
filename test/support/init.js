@@ -35,7 +35,7 @@ function wait(time) {
   return new Promise((resolve) => setTimeout(() => resolve(), time));
 }
 
-async function wait_for_app_content(url, content, path) {
+async function wait_for_app_content(url, content, path, headers) {
   if(!url.startsWith('http')) {
     url = 'https://' + url + process.env.ALAMO_BASE_DOMAIN;
   }
@@ -49,7 +49,12 @@ async function wait_for_app_content(url, content, path) {
   process.stdout.write(`    ~ Waiting for ${url} to turn up`);
   for(let i = 0; i < 210; i++) {
     try {
-      let data = await httph.request('get', url, {'X-Timeout':1500, 'x-silent-error':'true'}, null);
+      if(headers) {
+        headers = Object.assign(headers, {'X-Timeout':1500, 'x-silent-error':'true'})
+      } else {
+        headers = {'X-Timeout':1500, 'x-silent-error':'true'}
+      }
+      let data = await httph.request('get', url, headers, null);
       if(content && data && data.indexOf(content) === -1) {
         throw new Error('Content could not be found.')
       }
@@ -97,18 +102,18 @@ async function delete_app(app) {
 }
 
 async function create_formation(app, type, command) {
-  return await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"scout", "quantity":1, "type":type, "command":command}))
+  return await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"gp1", "quantity":1, "type":type, "command":command}))
 }
 
 async function create_build(app, image, port) {
   if(port) {
-    await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"scout", "quantity":1, "type":"web", "command":null, "port":port}))
+    await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"gp1", "quantity":1, "type":"web", "command":null, "port":port}))
   }
   return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/builds`, alamo_headers, JSON.stringify({"org":"test", "checksum":"", "url":image}))); 
 }
 
 async function create_fake_formation(app) {
-  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"type":"web","command":"what", "quantity":1, "size":"scout", "healthcheck":"/what"})))
+  return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"type":"web","command":"what", "quantity":1, "size":"gp1", "healthcheck":"/what"})))
 }
 
 async function fake_github_notice(app, pr_file) {

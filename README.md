@@ -27,8 +27,8 @@
 * `PAPERTRAIL_DRAIN` - The syslog standard drain end point for papertrail.  This has no default.
 * `AUTH_KEY` - If secure key addon isn't usued, this can be set as a shared secret simple authentication, this should be used in all API calls in the Authorization header.
 * `BLACKLIST_ENV` - A comma delimited list of socs keywords causing config vars to be redacted, defaults to 'PASS,KEY,SECRET,PRIVATE,TOKEN'
-* `DYNO_DEFAULT_SIZE` - The default dyno size to use. The set default is `scout` if no other is specified.
-
+* `DYNO_DEFAULT_SIZE` - The default dyno size to use. The set default is `gp1` if no other is specified.
+* `RESERVED_SPACES` - A list of reserved spaces to add to the reserved list.  The default reserved spaces are `kube-system, brokers, k2-poc, kube-public, akkeris-system, istio-system, cert-manager`. Note, setting this will only add to the list, not override it.
 ## Installing ##
 
 ```

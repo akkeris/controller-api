@@ -224,7 +224,7 @@ describe("pipelines", function() {
   it("creating multiple apps for pipelining (1).", function(done) {
     this.timeout(0);
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"test", space:'pipline-test-space1', name:app1, size:"constellation", quantity:1, "type":"web", port:5000}),
+      JSON.stringify({org:"test", space:'pipline-test-space1', name:app1, size:"gp2", quantity:1, "type":"web", port:5000}),
       function(err, data) {
         if(err) {
           console.error(err);

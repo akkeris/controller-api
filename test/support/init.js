@@ -35,7 +35,7 @@ function wait(time) {
   return new Promise((resolve) => setTimeout(() => resolve(), time));
 }
 
-async function wait_for_app_content(url, content, path) {
+async function wait_for_app_content(url, content, path, headers) {
   if(!url.startsWith('http')) {
     url = 'https://' + url + process.env.ALAMO_BASE_DOMAIN;
   }
@@ -49,7 +49,12 @@ async function wait_for_app_content(url, content, path) {
   process.stdout.write(`    ~ Waiting for ${url} to turn up`);
   for(let i = 0; i < 210; i++) {
     try {
-      let data = await httph.request('get', url, {'X-Timeout':1500, 'x-silent-error':'true'}, null);
+      if(headers) {
+        headers = Object.assign(headers, {'X-Timeout':1500, 'x-silent-error':'true'})
+      } else {
+        headers = {'X-Timeout':1500, 'x-silent-error':'true'}
+      }
+      let data = await httph.request('get', url, headers, null);
       if(content && data && data.indexOf(content) === -1) {
         throw new Error('Content could not be found.')
       }

@@ -128,9 +128,6 @@ routes.add.post('/apps$')
 routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.apps.http.update.bind(alamo.apps.http.update, pg_pool))
           .and.authorization([simple_key]);
-routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/info$')
-          .run(alamo.apps.http.update_info.bind(alamo.apps.http.update, pg_pool))
-          .and.authorization([simple_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.apps.http.delete.bind(alamo.apps.http.delete, pg_pool))
           .and.authorization([simple_key]);

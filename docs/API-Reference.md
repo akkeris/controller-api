@@ -31,7 +31,9 @@ Immediately creates a new application container in the specified space requested
 |    org   | required string | Organization name, alphanumeric only                                                                                                                                                                       | akkeris                                                                                                                           |
 |   name   | required string | The name of the application (alpha numeric, no dashes or spaces or special characters)                                                                                                                     | events                                                                                                                             |
 |   space  | required string | The name of the existing space to add the app too. For the default space use "default".                                                                                                                    | perf-dev-us                                                                                                                        |
-                                                                                                                             |
+| description | string | App description, used for informational purposes  |  My akkeris app |
+| labels | string | Comma-separated list of labels, used for categorization |  perf,apis | |
+
 
 **CURL Example**
 
@@ -40,7 +42,7 @@ curl \
   -H 'Authorization: ...' \
   -X POST \
   https://apps.akkeris.io/apps \
-  -d '{"org":"akkeris", "name":"events", "space":"perf-dev-us"}'
+  -d '{"org":"akkeris", "name":"events", "space":"perf-dev-us", "description":"desc", "labels":"label1,label2"}'
 ```
 
 **201 "Created" Response**
@@ -56,7 +58,9 @@ curl \
   "created_at":"2016-07-18T14:55:38.190Z",
   "git_url":"",
   "git_branch":"",
+  "description":"desc",
   "id":"4f739e5e-4cf7-11e6-beb8-9e71128cae77",
+  "labels":"label1,label2",
   "maintenance":false,
   "name":"events",
   "key":"events-perf-dev-us",
@@ -96,13 +100,15 @@ curl \
 
 `PATCH /apps`
 
-Updates the maintenance mode of an application, note that build_stack and name are not currently updatable but are there for future use.
+Updates the maintenance mode, description, or labels of an application - note that build_stack and name are not currently updatable but are there for future use.
 
 |   Name   |       Type      | Description                                                                                                                                                                                                | Example                                                                                                                            |
 |:--------:|:---------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
 |    maintenance   | boolean | True or false value indicating whether to place the app into maintenance mode. | true                                                                                                                           |
 |   name   | required string | Updates the app name (note currently does not work, placeholder for future feature) | events                                                                                                                             |
-|   build_stack  | required string | Updates the build stack to use for this app (note this currently does not work place holder for future feature) | ds1 | |
+|   build_stack  | required string | Updates the build stack to use for this app (note this currently does not work place holder for future feature) | ds1 |
+| description | string | Updates the description of the app |  My akkeris app |
+| labels | string | Updates the labels of the app |  perf,apis | |
 
 **CURL Example**
 
@@ -126,7 +132,9 @@ curl \
   },
   "created_at":"2016-07-18T14:55:38.190Z",
   "git_url":"",
+  "description":"desc",
   "id":"4f739e5e-4cf7-11e6-beb8-9e71128cae77",
+  "labels":"label1,label2",
   "maintenance":true,
   "name":"events",
   "key":"events-perf-dev-us",
@@ -5181,6 +5189,8 @@ Creates a new https website.
 | domain | required string | A name for your domain, must only contain alpha-numerics, hypens, and full stops | merpderp.akkeris.io
 | region  | required string | Cluster region | us-seattle
 | internal  | required boolean | If routing to internal apps | true  
+| description | string | Site description, used for informational purposes  |  My akkeris site |
+| labels | string | Comma-separated list of labels, used for categorization |  perf,akkeris |
 
 **CURL Example**
 
@@ -5191,7 +5201,9 @@ curl \
   https://apps.akkeris.io/sites \
   -d '{"domain":"test.example.com",
        "regoin":"us-seattle",
-       "internal": false}'
+       "internal": false,
+       "description":"desc",
+       "labels":"label1,label2"}'
 ```
 
 **200 "Ok" Response**
@@ -5206,6 +5218,8 @@ curl \
   },
   "created_at": "2018-04-18T22:08:47.481Z",
   "updated_at": "2018-04-18T22:08:47.481Z",
+  "description": "desc",
+  "labels": "label1,label2",
   "compliance": [
     "internal"
   ]
@@ -5238,11 +5252,56 @@ curl \
   },
   "created_at": "2018-04-18T22:08:47.481Z",
   "updated_at": "2018-04-18T22:08:47.481Z",
+  "description": "desc",
+  "labels": "label1,label2",
   "compliance": [
     "internal"
   ]
 }
 ```
+
+### Update Site
+
+`PATCH /sites/{site_id_or_host}`
+
+Update the description and labels of a site
+
+|   Name       |       Type      | Description                                                                                   | Example                                                 |
+|:------------:|:---------------:|-----------------------------------------------------------------------------------------------|---------------------------------------------------------|
+| description | string | Site description, used for informational purposes  |  My akkeris site |
+| labels | string | Comma-separated list of labels, used for categorization |  perf,akkeris |
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X POST \
+  https://apps.akkeris.io/sites \
+  -d '{"description":"desc",
+       "labels":"label1,label2"}'
+```
+
+**200 "Ok" Response**
+
+```json
+{
+  "id": "ee1664e0-2e30-4edc-8b2d-f9a436b439cc",
+  "domain": "test.example.com",
+  "region": {
+    "id": "f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3",
+    "name": "us-seattle"
+  },
+  "created_at": "2018-04-18T22:08:47.481Z",
+  "updated_at": "2018-04-18T22:08:47.481Z",
+  "description": "desc",
+  "labels": "label1,label2",
+  "compliance": [
+    "internal"
+  ]
+}
+```
+
 
 ### Delete Site
 

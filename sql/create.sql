@@ -98,9 +98,14 @@ begin
     space uuid references spaces(space),
     org uuid references organizations(org),
     url href not null,
+    description text not null default '',
+    labels text not null default '',
     disabled boolean NOT NULL default false,
     deleted boolean not null default false
   );
+
+  alter table apps add column if not exists description text not null default '';
+  alter table apps add column if not exists labels text not null default '';
 
   create table if not exists app_setups (
     "app_setup" uuid not null primary key,
@@ -390,10 +395,15 @@ begin
     region uuid references regions("region") not null default 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3',
     preview uuid references previews("preview") null,
     tags text NOT NULL default '',
+    description text not null default '',
+    labels text not null default '',
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
     deleted boolean not null default false
   );
+
+  alter table sites add column if not exists description text not null default '';
+  alter table sites add column if not exists labels text not null default '';
 
   create table if not exists routes (
     route uuid not null primary key,

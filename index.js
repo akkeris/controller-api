@@ -600,6 +600,9 @@ routes.add.get('/sites$')
 routes.add.post('/sites$')
           .run(alamo.sites.http.create.bind(alamo.sites.http.create, pg_pool))
           .and.authorization([simple_key]);
+routes.add.patch('/sites/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.sites.http.update.bind(alamo.sites.http.update, pg_pool))
+          .and.authorization([simple_key]);
 routes.add.get('/sites/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.sites.http.get.bind(alamo.sites.http.get, pg_pool))
           .and.authorization([simple_key]);

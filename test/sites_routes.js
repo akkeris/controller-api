@@ -32,15 +32,24 @@ describe("sites/routes", function () {
       this.timeout(500000)
       testapp1 = await support.create_test_app();  
     });
+
     it("covers creating sites", async () => {
       this.timeout(30000)
-      let payload = { domain: domain1, owner: "owner", region: process.env.TEST_REGION, email: "email@email.com", description: "description" };
+      let payload = { 
+        domain: domain1,
+        owner: "owner",
+        region: process.env.TEST_REGION,
+        email: "email@email.com",
+        description: "description",
+        labels: "label1,label2"
+      };
       let data = await httph.request('post', 'http://localhost:5000/sites', alamo_headers, JSON.stringify(payload));
       let obj = JSON.parse(data);
       expect(obj.domain).to.equal(domain1);
       expect(obj.region.name).to.equal(process.env.TEST_REGION);
       site_id = obj.id;
     });
+
     it("covers listing sites", async () => {
       let data = await httph.request('get', 'http://localhost:5000/sites', alamo_headers, null);  
       expect(data).to.be.a('string');
@@ -63,6 +72,20 @@ describe("sites/routes", function () {
       let obj = JSON.parse(data);
       expect(obj.domain).to.equal(domain1);
       expect(obj.region.name).to.equal(process.env.TEST_REGION);
+      expect(obj.description).to.equal("description");
+      expect(obj.labels).to.equal("label1,label2");
+    });
+
+    it(`covers updating site info ${siteurl1}`, async () => {
+      this.timeout(30000)
+      let payload = {
+        description: "new description",
+        labels: "label3,label4"
+      };
+      let data = await httph.request('patch', `http://localhost:5000/sites/${siteurl1}`, alamo_headers, JSON.stringify(payload));
+      let obj = JSON.parse(data);
+      expect(obj.description).to.equal(payload.description);
+      expect(obj.labels).to.equal(payload.labels);
     });
 
     it("covers creating routes", async () => {

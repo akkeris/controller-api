@@ -89,7 +89,17 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
   //todo: correct app names (no dashes, alpha numeric only)
   it("Ensures we can create an app.", (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"test", space:"default", name:"alamotestapp", size:"gp2", quantity:1, "type":"web", port:9000}),
+      JSON.stringify({
+        org:"test",
+        space:"default",
+        name:"alamotestapp",
+        size:"gp2",
+        quantity:1,
+        "type":"web",
+        port:9000,
+        description:"description",
+        labels:"label1,label2",
+      }),
       (err, data) => {
         if(err) {
           console.error(err);
@@ -121,6 +131,8 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
         expect(appobj.stack).to.be.an('object');
         expect(appobj.updated_at).to.be.a('string');
         expect(appobj.web_url).to.contain("https://alamotestapp"+process.env.ALAMO_BASE_DOMAIN);
+        expect(appobj.description).to.equal('description');
+        expect(appobj.labels).to.equal('label1,label2');
         done();
     });
   });
@@ -158,9 +170,27 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
       expect(appobj.stack).to.be.an('object');
       expect(appobj.updated_at).to.be.a('string');
       expect(appobj.web_url).to.contain("https://alamotestapp"+process.env.ALAMO_BASE_DOMAIN);
+      expect(appobj.description).to.equal('description');
+      expect(appobj.labels).to.equal('label1,label2');
       done();
     });
   });
+
+  it("Ensure we can update app labels and description", (done) => {
+    httph.request('patch', 'http://localhost:5000/apps/alamotestapp-default', alamo_headers,
+      JSON.stringify({
+        description:"new description",
+        labels:"label3,label4",
+      }),
+      (err, data) => {
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        let appobj = JSON.parse(data);
+        expect(appobj.description).to.equal('new description');
+        expect(appobj.labels).to.equal('label3,label4');
+        done();
+      });
+    });
 
   it("Ensures we can pull application info with relevant autobuild info.", (done) => {
     httph.request('get', 'http://localhost:5000/apps/api-default', alamo_headers, null, (err, data) => {

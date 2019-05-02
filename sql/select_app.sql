@@ -3,6 +3,8 @@ select
   apps.created, 
   apps.updated, 
   apps.name app_name,
+  apps.description description,
+  apps.labels labels,
   apps.disabled,
   spaces.name space_name, 
   spaces.space space_uuid,

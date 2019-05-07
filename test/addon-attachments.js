@@ -9,7 +9,7 @@ const expect = require("chai").expect;
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 
 describe("addons attachments:", function() {
-  this.timeout(100000);
+  this.timeout(200000);
 
   let appname_brand_new = `alamotest${Math.floor(Math.random() * 10000)}`;
   let memcached_response = null;

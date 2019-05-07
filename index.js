@@ -75,7 +75,7 @@ let db_conf = {
 let pg_pool = new pg.Pool(db_conf);
 pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", err); });
 
-(async () => {
+let ready = (async () => {
   if(process.env.TEST_MODE || process.env.ONE_PROCESS_MODE) {
     // normally in a worker.
     // Run any database migrations necessary.
@@ -84,7 +84,7 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
     alamo.tasks.begin(pg_pool)
     alamo.previews.timers.begin(pg_pool)
   }
-  common.init(pg_pool);
+  await common.init(pg_pool);
   if (!config.alamo_app_controller_url) {
     let records = await query(fs.readFileSync('./sql/select_web_url.sql').toString('utf8'), null, pg_pool, ['api', 'default'])
     assert.ok(records.length > 0, 'Unable to determine ALAMO_APP_CONTROLLER_URL, either set the environment variable ALAMO_APP_CONTROLLER_URL or ensure theres a record for api-default in the apps table.')
@@ -111,7 +111,9 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()
   console.log(`Akkeris Controller API (v${pkg.version}) Ready`)
-})().catch(e => {
+})()
+
+ready.catch(e => {
   console.error("Initialization failed, this is fatal.")
   console.error(e.message, e.stack)
   process.exit(1)
@@ -765,5 +767,5 @@ process.on('uncaughtException', (e) => {
   console.error(e.stack);
 });
 
-module.exports = {routes:routes, pg_pool:pg_pool, server};
+module.exports = {routes:routes, pg_pool:pg_pool, server, ready};
 

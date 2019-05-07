@@ -7,6 +7,7 @@ const alamo_headers = {"Authorization": process.env.AUTH_KEY, "User-Agent": "Hel
 let running_app = null
 
 before(async function() {
+  this.timeout(10000)
   if(process.env.NGROK_TOKEN) {
     try {
       let port = (process.env.PORT || 5000);
@@ -14,11 +15,13 @@ before(async function() {
       process.env.TEST_CALLBACK = url
       process.env.ALAMO_APP_CONTROLLER_URL = url
       running_app = require('../../index.js')
+      await running_app.ready
     } catch (err) {
       console.error("ERROR: Unable to establish NGROK connection:", err);
     }
   } else {
     running_app = require('../../index.js')
+    await running_app.ready
   }
 })
 

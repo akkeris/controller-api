@@ -239,14 +239,6 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     expect(auto_build.branch).to.equal(webhook_pr_opened.pull_request.head.ref)
   })
 
-  it("ensure a new site with same routes are created", async () => {
-    let routes = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${preview_app.app.id}/routes`, alamo_headers, null))
-    expect(routes.length).to.equal(1)
-    expect(routes[0].app.id).to.equal(preview_app.app.id)
-    expect(routes[0].source_path).to.equal('/')
-    expect(routes[0].target_path).to.equal('/')
-  })
-
   if(process.env.SMOKE_TESTS) {
     it("ensure new preview app attaches source addon-attachments, as an attachment", async () => {
       let attachments = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${preview_app.app.id}/addon-attachments`, alamo_headers, null))

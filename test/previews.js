@@ -15,7 +15,6 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "x-username":"test", "x-elevated-access":"true"}
   const app_dummy_name = "altest" + Math.round(Math.random() * 10000)
   const app_name = "altestingapp" + Math.round(Math.random() * 10000)
-  const site_name = "altestingapp" + Math.round(Math.random() * 10000) + process.env.SITE_BASE_DOMAIN
 
 
   const webhook_pr_push_before_pr = JSON.parse(fs.readFileSync('./test/support/github-webhook-pr-push-before-pr.json').toString('utf8'))
@@ -71,11 +70,6 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     expect(data[0].healthcheck).to.equal("/what")
   })
 
-  it("setup site", async () => {
-    await httph.request('post', `http://localhost:5000/sites`, alamo_headers, JSON.stringify({"domain":site_name}))
-    await httph.request('post', `http://localhost:5000/routes`, alamo_headers, JSON.stringify({"site":site_name, "app":app_name + '-preview', "target_path":"/", "source_path":"/"}))
-  })
-
   it("setup a sharable (and attached) addon", async () => {
     let data = await httph.request('post', `http://localhost:5000/apps/${app_name}-preview/addons`, alamo_headers, JSON.stringify({"plan":"akkeris-postgresql:hobby"}))
     if(process.env.SMOKE_TESTS) {
@@ -105,12 +99,12 @@ describe("preview apps: ensure preview apps work appropriately", function() {
   it("ensure we can enable preview apps", async () => {
     let result = await httph.request('patch', `http://localhost:5000/apps/${app_name}-preview/features/preview`, alamo_headers, {"enabled":true}, null)
     result = JSON.parse(result)
-    let result_sites = await httph.request('patch', `http://localhost:5000/apps/${app_name}-preview/features/preview-sites`, alamo_headers, {"enabled":true}, null)
+    let result_sites = await httph.request('patch', `http://localhost:5000/apps/${app_name}-preview/features/preview-sites`, alamo_headers, {"enabled":false}, null)
     result_sites = JSON.parse(result_sites)
     expect(result).be.an('object')
     expect(result.enabled).to.equal(true)
     expect(result_sites).be.an('object')
-    expect(result_sites.enabled).to.equal(true)
+    expect(result_sites.enabled).to.equal(false)
   })
 
   it("ensure a PR request targeted at the wrong destination branch does not cause a preview app", async () => {
@@ -371,10 +365,6 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     previews = JSON.parse(previews.toString())
     expect(previews).to.be.an('array')
     expect(previews.length).to.equal(0)
-  })
-
-  it("clean up site", async () => {
-    await httph.request('delete', `http://localhost:5000/sites/${site_name}`, alamo_headers, null) 
   })
 
   it("ensure we clean up after ourselves", (done) => {

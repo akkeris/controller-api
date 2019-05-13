@@ -132,19 +132,6 @@ describe("releases: list, get, create a release", function() {
     expect(resp).to.equal('hello');
   });
 
-  it("covers putting up and taking down maintenance pages", async function() {
-    var payload = {}
-    payload.maintenance = true
-    let maint_info_on = JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default`, alamo_headers, JSON.stringify(payload)))
-    expect(maint_info_on.maintenance).to.equal(true)
-    let resp = await support.wait_for_app_content(appname_brand_new, 'System Maintenance')
-    payload.maintenance = false
-    let maint_info_off = JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default`, alamo_headers, JSON.stringify(payload)))
-    expect(maint_info_off.maintenance).to.equal(false)
-    resp = await support.wait_for_app_content(appname_brand_new, 'hello')
-    expect(resp).to.equal('hello');
-  })
-
   it("ensure we can restart the app", (done) => {
     expect(release_succeeded).to.equal(true);
     // ensure we can restart the app.

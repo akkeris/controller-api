@@ -66,20 +66,6 @@ describe("addon services: plans, services listing and getting.", function() {
     expect(obj).to.be.an('object');
     validate_service(obj)
   });
-  it("covers getting a specific service (anomaly)", async () => {
-    let data = await httph.request('get', 'http://localhost:5000/addon-services/anomaly', alamo_headers, null)
-    expect(data).to.be.a('string');
-    let obj = JSON.parse(data);
-    expect(obj).to.be.an('object');
-    validate_service(obj)
-  });
-  it("covers getting a specific service (twilio)", async () => {
-    let data = await httph.request('get', 'http://localhost:5000/addon-services/twilio', alamo_headers, null)
-    expect(data).to.be.a('string');
-    let obj = JSON.parse(data);
-    expect(obj).to.be.an('object');
-    validate_service(obj)
-  });
   it("covers getting a specific service's plans (postgresql)", async () => {
     let data = await httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql/plans', alamo_headers, null)
     expect(data).to.be.a('string');
@@ -87,23 +73,6 @@ describe("addon services: plans, services listing and getting.", function() {
     expect(obj).to.be.an('array');
     expect(obj[0]).to.be.an('object');
     obj.forEach(validate_plan)
-  });
-  it("covers getting a specific service's plans (anomaly)", async () => {
-    let data = await httph.request('get', 'http://localhost:5000/addon-services/anomaly/plans', alamo_headers, null)
-    expect(data).to.be.a('string');
-    let obj = JSON.parse(data);
-    expect(obj).to.be.an('array');
-    expect(obj[0]).to.be.an('object');
-    obj.forEach(validate_plan)
-  });
-  it("covers getting a specific service's plans (twilio)", async () => {
-    let data = await httph.request('get', 'http://localhost:5000/addon-services/twilio/plans', alamo_headers, null)
-    expect(data).to.be.a('string');
-    let obj = JSON.parse(data);
-    expect(obj).to.be.an('array');
-    expect(obj[0]).to.be.an('object');
-    obj.forEach(validate_plan)
-  });
   it("covers getting a specific service's plan", async () => {
     let data = await httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql/plans/standard-0', alamo_headers, null);
     expect(data).to.be.a('string');
@@ -137,4 +106,38 @@ describe("addon services: plans, services listing and getting.", function() {
     expect(obj).to.be.an('array')
     obj.forEach(validate_service)
   });
+  
+  });
+  if(process.env.SMOKE_TESTS) {
+    it("covers getting a specific service (anomaly)", async () => {
+      let data = await httph.request('get', 'http://localhost:5000/addon-services/anomaly', alamo_headers, null)
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('object');
+      validate_service(obj)
+    });
+    it("covers getting a specific service (twilio)", async () => {
+      let data = await httph.request('get', 'http://localhost:5000/addon-services/twilio', alamo_headers, null)
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('object');
+      validate_service(obj)
+    });
+    it("covers getting a specific service's plans (anomaly)", async () => {
+      let data = await httph.request('get', 'http://localhost:5000/addon-services/anomaly/plans', alamo_headers, null)
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('array');
+      expect(obj[0]).to.be.an('object');
+      obj.forEach(validate_plan)
+    });
+    it("covers getting a specific service's plans (twilio)", async () => {
+      let data = await httph.request('get', 'http://localhost:5000/addon-services/twilio/plans', alamo_headers, null)
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('array');
+      expect(obj[0]).to.be.an('object');
+      obj.forEach(validate_plan)
+    });
+  }
 });

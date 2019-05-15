@@ -12,7 +12,7 @@ describe("hooks:", function() {
   let server = test.create_callback_server()
   const httph = require('../lib/http_helper.js');
   const expect = require("chai").expect;
-  let appname_brand_new = "alamotest" + Math.floor(Math.random() * 10000);
+  let appname_brand_new = "alamotest" + Math.floor(Math.random() * 100000);
   let build_id = null;
   let placed_hooks = false;
 

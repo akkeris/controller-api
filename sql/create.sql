@@ -192,6 +192,10 @@ begin
     healthcheck varchar(1024) null
   );
 
+  create index if not exists formation_changes_created on formation_changes (created);
+  create index if not exists formation_changes_formation on formation_changes (formation);
+  create index if not exists formation_changes_app on formation_changes (app);
+
   create table if not exists authorizations (
     "authorization" uuid not null primary key,
     created timestamptz not null default now(),

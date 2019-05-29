@@ -1,0 +1,1 @@
+insert into invoice_caches (invoice_id, org, space, cache) values ($1, $2, $3, $4)

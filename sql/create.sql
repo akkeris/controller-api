@@ -192,6 +192,10 @@ begin
     healthcheck varchar(1024) null
   );
 
+  create index if not exists formation_changes_created on formation_changes (created);
+  create index if not exists formation_changes_formation on formation_changes (formation);
+  create index if not exists formation_changes_app on formation_changes (app);
+
   create table if not exists authorizations (
     "authorization" uuid not null primary key,
     created timestamptz not null default now(),
@@ -516,7 +520,6 @@ begin
       create type task_status as enum('pending', 'started', 'finished', 'failed');
   end if;
 
-
   create table if not exists tasks
   (
     task uuid not null primary key,
@@ -533,6 +536,13 @@ begin
     deleted bool not null default false
   );
 
+  create table if not exists invoice_caches
+  (
+    invoice_id varchar(128) not null,
+    org varchar(1024),
+    space varchar(1024),
+    cache text not null
+  );
 
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then

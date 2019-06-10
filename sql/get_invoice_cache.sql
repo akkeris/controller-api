@@ -1,0 +1,1 @@
+select cache from invoice_caches where invoice_id = $1 and (space = $2 or $2 is null) and (org = $3 or $3 is null)

@@ -5,10 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "./node_modules/.bin/_mocha --exit",
-    "tests": "./node_modules/.bin/_mocha --exit test/*.js",
-    "coverage": "export DEFAULT_PORT=5000; ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --exit -u exports -R spec ; cat coverage/lcov.info | ./node_modules/.bin/codacy-coverage",
-    "jenkins-test": "export DEFAULT_PORT=5000; export NODE_ENV=dev; JUNIT_REPORT_PATH=./report.xml mocha --colors --reporter mocha-jenkins-reporter"
+    "test": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors -u exports --reporter spec --reporter mocha-jenkins-reporter --reporter-options=junit_report_path=./coverage/report.xml --exit",
+    "cover": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors -u exports --reporter spec --reporter mocha-jenkins-reporter --reporter-options=junit_report_path=./coverage/report.xml --exit && cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage"
   },
   "author": "",
   "license": "Apache-2.0",
@@ -20,9 +18,9 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "codacy-coverage": "^3.2.0",
-    "istanbul": "^1.0.0-alpha.2",
     "mocha": "^5.2.0",
     "mocha-jenkins-reporter": "0.3.8",
-    "ngrok": "^3.1.0"
+    "ngrok": "^3.1.0",
+    "nyc": "^14.1.1"
   }
 }

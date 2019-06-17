@@ -14,7 +14,7 @@ describe("sites/routes", function () {
 
     let site_id, route_id;
     const app_id = 'fa2b535d-de4d-4a14-be36-d44af53b59e3';
-    const domain1 = 'alamotestsite' + getRandomInt(0, 9999);
+    const domain1 = 'alamotestsite' + getRandomInt(0, 9999) + process.env.BASE_DOMAIN;
     const siteurl1 = `http://localhost:5000/sites/${domain1}`;
 
     let testapp1 = null;

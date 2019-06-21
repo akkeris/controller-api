@@ -268,7 +268,7 @@ async function remove_hook(app, hook_id) {
 }
 
 async function create_test_site() {
-  let site_name = "alamotest" + Math.floor(Math.random() * 10000)
+  let site_name = "alamotest" + Math.floor(Math.random() * 10000) + process.env.BASE_DOMAIN;
   return JSON.parse(await httph.request('post', 'http://localhost:5000/sites', alamo_headers, JSON.stringify({"domain":site_name})))
 }
 

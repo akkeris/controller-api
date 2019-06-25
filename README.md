@@ -1,5 +1,8 @@
 # Akkeris Controller API #
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2ca150dbc553444dab5b8ed8e0ecd296)](https://www.codacy.com/app/Akkeris/controller-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=akkeris/controller-api&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/2ca150dbc553444dab5b8ed8e0ecd296)](https://www.codacy.com/app/Akkeris/controller-api?utm_source=github.com&utm_medium=referral&utm_content=akkeris/controller-api&utm_campaign=Badge_Coverage)
+
 ## Setting Up ##
 
 ### Storage 

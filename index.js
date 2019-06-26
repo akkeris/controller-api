@@ -53,7 +53,8 @@ let alamo = {
   topic_acls:require('./lib/topic_acls.js'),
   topic_configs:require('./lib/topic_configs.js'),
   topic_schemas:require('./lib/topic_schemas.js'),
-  topic_clusters:require('./lib/topic_clusters.js')
+  topic_clusters:require('./lib/topic_clusters.js'),
+  diagnostics:require('./lib/diagnostics.js')
 };
 
 
@@ -747,6 +748,148 @@ routes.add.post('/events$')
           .run(alamo.events.http.create.bind(alamo.events.http.create, pg_pool))
           .and.authorization([simple_key]);
 
+
+// TaaS
+
+/*
+
+GET     /diagnostics                                      GetDiagnosticsList
+POST    /diagnostics                                      CreateDiagnostic
+
+GET     /diagnostics/:provided                            GetDiagnosticByNameOrID
+PATCH   /diagnostics/:provided                            UpdateDiagnostic
+DELETE  /diagnostics/:provided                            DeleteDiagnostic
+
+POST    /diagnostics/:provided/config                     SetConfig
+DELETE  /diagnostics/:provided/config/:varname            UnsetConfig
+
+POST    /diagnostics/:provided/hooks                      CreateHooks
+
+POST    /diagnostics/:provided/bind/**                    BindDiagnosticSecret
+DELETE  /diagnostics/:provided/bind/**                    UnbindDiagnosticSecret
+
+GET     /diagnostics/logs/:runid                          GetLogsES
+POST    /diagnostics/logs/:runid                          WriteLogESPost
+GET     /diagnostics/logs/:runid/array                    GetLogsESObj
+
+GET     /diagnostics/jobspace/:jobspace/job/:job/runs     GetRuns
+GET     /diagnostics/rerun                                Rerun
+POST    /diagnostics/results/:runid                       StoreBits
+
+GET     /diagnostics/runs/:runid                          GetRunInfo
+GET     /diagnostics/runs/:runid/artifacts                Wrapper(artifacts.Awss3)
+GET     /diagnostics/runs/:runid/artifacts/**             Wrapper(artifacts.Awss3)
+
+*/
+
+// Get all tests
+// diagnostics.GetDiagnosticsList
+routes.add.get('/diagnostics')
+          .run(alamo.diagnostics.http.list.bind(alamo.diagnostics.http.list, pg_pool))
+          .and.authorization([simple_key]);
+// Create new test 
+// diagnostics.CreateDiagnostic
+routes.add.post('/diagnostics')
+          .run(alamo.diagnostics.http.create.bind(alamo.diagnostics.http.create, pg_pool))
+          .and.authorization([simple_key]);
+// Get specific test 
+// diagnostics.GetDiagnosticByNameOrID
+routes.add.get('/diagnostics/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.diagnostics.http.get.bind(alamo.diagnostics.http.get, pg_pool))
+          .and.authorization([simple_key]);
+// Update specific test 
+// diagnostics.UpdateDiagnostic
+routes.add.patch('/diagnostics/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.diagnostics.http.update.bind(alamo.diagnostics.http.update, pg_pool))
+          .and.authorization([simple_key]);
+// Delete specific test
+// diagnostics.DeleteDiagnostic
+routes.add.delete('/diagnostics/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.diagnostics.http.delete.bind(alamo.diagnostics.http.delete, pg_pool))
+          .and.authorization([simple_key]);
+
+// Config
+
+// Add config var to test
+// diagnostics.SetConfig
+routes.add.post('/diagnostics/([A-z0-9\\-\\_\\.]+)/config')
+          .run(alamo.diagnostics.config.create.bind(alamo.diagnostics.config.create, pg_pool))
+          .and.authorization([simple_key]);
+// Delete config var from test
+// diagnostics.UnsetConfig
+routes.add.delete('/diagnostics/([A-z0-9\\-\\_\\.]+)/config')
+          .run(alamo.diagnostics.config.delete.bind(alamo.diagnostics.config.delete, pg_pool))
+          .and.authorization([simple_key]);
+
+// Hooks
+
+// Add hooks to test's app
+// diagnostics.CreateHooks
+routes.add.post('/diagnostics/([A-z0-9\\-\\_\\.]+)/hooks')
+          .run(alamo.diagnostics.hooks.create.bind(alamo.diagnostics.hooks.create, pg_pool))
+          .and.authorization([simple_key]);
+
+// Secrets
+
+// Bind secret
+// diagnostics.BindDiagnosticSecret
+routes.add.post('/diagnostics/([A-z0-9\\-\\_\\.]+)/bind/(.*)$')
+          .run(alamo.diagnostics.secret.create.bind(alamo.diagnostics.secret.create, pg_pool))
+          .and.authorization([simple_key]);
+// Unbind secret
+// diagnostics.UnbindDiagnosticSecret
+routes.add.delete('/diagnostics/([A-z0-9\\-\\_\\.]+)/bind/(.*)$')
+          .run(alamo.diagnostics.secret.delete.bind(alamo.diagnostics.secret.delete, pg_pool))
+          .and.authorization([simple_key]);
+
+// Logs
+
+// Get logs for a test run
+// diagnosticlogs.GetLogsES
+routes.add.get('/diagnostics/logs/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.diagnostics.logs.get.bind(alamo.diagnostics.logs.get, pg_pool))
+          .and.authorization([simple_key]);
+// Write logs for a test run
+// diagnosticlogs.WriteLogESPost
+routes.add.post('/diagnostics/logs/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.diagnostics.logs.create.bind(alamo.diagnostics.logs.create, pg_pool))
+          .and.authorization([simple_key]);
+// Get ES object for a test run
+// diagnosticlogs.GetLogsESObj
+routes.add.get('/diagnostics/logs/([A-z0-9\\-\\_\\.]+)/array')
+          .run(alamo.diagnostics.logs.array.bind(alamo.diagnostics.logs.array, pg_pool))
+          .and.authorization([simple_key]);
+
+// Runs
+
+// Get runs for a test
+// diagnosticlogs.GetRuns
+routes.add.get('/diagnostics/jobspace/([A-z0-9\\-\\_\\.]+)/job/([A-z0-9\\-\\_\\.]+)/runs')
+          .run(alamo.diagnostics.runs.list.bind(alamo.diagnostics.runs.list, pg_pool))
+          .and.authorization([simple_key]);
+// Re run a test
+// diagnostics.Rerun
+routes.add.get('/diagnostics/rerun')
+          .run(alamo.diagnostics.runs.rerun.bind(alamo.diagnostics.runs.rerun, pg_pool))
+          .and.authorization([simple_key]);
+// Store run results
+// dbstore.StoreBits
+routes.add.post('/diagnostics/results/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.diagnostics.runs.storeBits.bind(alamo.diagnostics.runs.storeBits, pg_pool))
+          .and.authorization([simple_key]);
+// Get info on a run
+// diagnosticlogs.GetRunInfo
+routes.add.get('/diagnostics/runs/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.diagnostics.runs.get.bind(alamo.diagnostics.runs.get, pg_pool))
+          .and.authorization([simple_key]);
+// Get run artifacts
+// diagnosticlogs.Wrapper(artifacts.Awss3)
+routes.add.get('/diagnostics/runs/([A-z0-9\\-\\_\\.]+)/artifacts/?(.*)$')
+          .run(alamo.diagnostics.runs.artifacts.bind(alamo.diagnostics.runs.artifacts, pg_pool))
+          .and.authorization([simple_key]);
+
+
+          
 routes.add.default((req, res) => {
   res.writeHead(404,{}); 
   res.end();

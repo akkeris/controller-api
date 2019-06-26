@@ -108,7 +108,7 @@ let ready = (async () => {
   alamo.routes.init(pg_pool);
   alamo.topic_acls.init(pg_pool);
   alamo.previews.init(pg_pool);
-
+  alamo.diagnostics.init(pg_pool);
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()
   console.log(`Akkeris Controller API (v${pkg.version}) Ready`)
@@ -821,14 +821,6 @@ routes.add.delete('/diagnostics/([A-z0-9\\-\\_\\.]+)/config')
           .run(alamo.diagnostics.config.delete.bind(alamo.diagnostics.config.delete, pg_pool))
           .and.authorization([simple_key]);
 
-// Hooks
-
-// Add hooks to test's app
-// diagnostics.CreateHooks
-routes.add.post('/diagnostics/([A-z0-9\\-\\_\\.]+)/hooks')
-          .run(alamo.diagnostics.hooks.create.bind(alamo.diagnostics.hooks.create, pg_pool))
-          .and.authorization([simple_key]);
-
 // Secrets
 
 // Bind secret
@@ -889,7 +881,7 @@ routes.add.get('/diagnostics/runs/([A-z0-9\\-\\_\\.]+)/artifacts/?(.*)$')
           .and.authorization([simple_key]);
 
 
-          
+
 routes.add.default((req, res) => {
   res.writeHead(404,{}); 
   res.end();

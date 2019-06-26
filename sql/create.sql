@@ -550,6 +550,17 @@ begin
     deleted bool not null default false
   );
 
+  create table if not exists filter_attachments
+  (
+    filter_attachment uuid not null primary key,
+    filter not null references filters("filter"),
+    attachment_options json not null default '{}'::json,
+    created_by varchar(1024) not null default '',
+    created timestamp with time zone not null default now(),
+    updated timestamp with time zone not null default now(),
+    deleted bool not null default false
+  );
+
   create table if not exists invoice_caches
   (
     invoice_id varchar(128) not null,

@@ -536,6 +536,32 @@ begin
     deleted bool not null default false
   );
 
+  create table if not exists filters
+  (
+    filter uuid not null primary key,
+    name varchar(1024) not null,
+    description text not null default '',
+    type varchar(1024) not null, -- see ./lib/filters.js for type values
+    options json not null default '{}'::json, -- varies by type
+    organization uuid not null references organizations("org"),
+    created_by varchar(1024) not null default '',
+    created timestamp with time zone not null default now(),
+    updated timestamp with time zone not null default now(),
+    deleted bool not null default false
+  );
+
+  create table if not exists filter_attachments
+  (
+    filter_attachment uuid not null primary key,
+    app uuid not null references apps("app"),
+    filter uuid not null references filters("filter"),
+    attachment_options json not null default '{}'::json,
+    created_by varchar(1024) not null default '',
+    created timestamp with time zone not null default now(),
+    updated timestamp with time zone not null default now(),
+    deleted bool not null default false
+  );
+
   create table if not exists invoice_caches
   (
     invoice_id varchar(128) not null,

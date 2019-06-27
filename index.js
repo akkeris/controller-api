@@ -27,6 +27,7 @@ let alamo = {
   dynos:require('./lib/dynos.js'),
   events:require('./lib/events.js'),
   features:require('./lib/features.js'),
+  filters:require('./lib/filters.js'),
   formations:require('./lib/formations.js'), 
   releases:require('./lib/releases.js'), 
   git:require('./lib/git.js'), 
@@ -157,11 +158,28 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/formation/([A-z0-9\\-\\_\\.]+)$')
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/routes$')
           .run(alamo.routes.http.list.bind(alamo.routes.http.list, pg_pool))
           .and.authorization([simple_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/filters$')
+          .run(alamo.filters.http.attach.list.bind(alamo.filters.http.attach.list, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/filters/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.filters.http.attach.get.bind(alamo.filters.http.attach.get, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/filters$')
+          .run(alamo.filters.http.attach.create.bind(alamo.filters.http.attach.create, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/filters/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.filters.http.attach.update.bind(alamo.filters.http.attach.update, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/filters/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.filters.http.attach.delete.bind(alamo.filters.http.attach.delete, pg_pool))
+          .and.authorization([simple_key]);
+
+
+// -- dynos
+// Get dyno sizes
 routes.add.get('/sizes$')
           .run(alamo.formations.sizes.bind(alamo.formations.sizes, pg_pool))
           .and.authorization([simple_key]);
-
-// -- dynos
 // List Dynos
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/dynos$')
           .run(alamo.dynos.list.bind(alamo.dynos.list, pg_pool))
@@ -740,12 +758,29 @@ routes.add.post('/app-setups$')
           .run(alamo.app_setups.http.create.bind(alamo.app_setups.http.create, pg_pool))
           .and.authorization([simple_key]);
 
-
 // Events
 // listen to events
 routes.add.post('/events$')
           .run(alamo.events.http.create.bind(alamo.events.http.create, pg_pool))
           .and.authorization([simple_key]);
+
+// Filters
+routes.add.post('/filters$')
+          .run(alamo.filters.http.create.bind(alamo.filters.http.create, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.put('/filters/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.filters.http.update.bind(alamo.filters.http.update, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/filters$')
+          .run(alamo.filters.http.list.bind(alamo.filters.http.list, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.get('/filters/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.filters.http.get.bind(alamo.filters.http.get, pg_pool))
+          .and.authorization([simple_key]);
+routes.add.delete('/filters/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.filters.http.delete.bind(alamo.filters.http.delete, pg_pool))
+          .and.authorization([simple_key]);
+
 
 routes.add.default((req, res) => {
   res.writeHead(404,{}); 

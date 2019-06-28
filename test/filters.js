@@ -2,6 +2,7 @@
 "use strict"
 
 describe("filters: ensure filters can be created and applied.", function() {
+  this.timeout(30000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
   process.env.DEFAULT_PORT = "5000";

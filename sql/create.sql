@@ -544,6 +544,26 @@ begin
     cache text not null
   );
 
+create table if not exists diagnostics (
+    diagnostic uuid not null PRIMARY KEY,
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    name text not null,
+    jobspace uuid references spaces(space),
+    app uuid references apps(app),
+    action text not null,
+    result text not null,
+    image text not null,
+    pipeline uuid references pipelines(pipeline),
+    transitionfrom text,
+    transitionto text,
+    timeout integer,
+    startdelay integer,
+    slackchannel text,
+    command text,
+    deleted boolean not null default false
+);
+
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then
     insert into regions 

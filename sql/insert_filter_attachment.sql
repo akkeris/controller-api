@@ -1,0 +1,1 @@
+insert into filter_attachments(filter_attachment, app, filter, attachment_options, created_by) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4) returning *

@@ -1,0 +1,1 @@
+update filter_attachments set deleted = true where filter_attachment = $1 and deleted = false returning *

@@ -6016,7 +6016,10 @@ curl \
   "startdelay": 10,
   "slackchannel": "taas_test",
   "command": "./start.sh",
-  "org": null
+  "org": null,
+  "env": {
+    "foo": "bar"
+  }
 }
 ```
 

@@ -5871,9 +5871,9 @@ Diagnostics are tests that can be run against Akkeris apps. There are only two r
 
 ### Create Diagnostic
 
-Creates a diagnostic. The diagnostic will be created in the given space and with the given name, and act upon the given app. Note that the name, space, and org cannot be changed later. Use the prefix `akkeris://` to use the current image of an Akkeris app.
-
 `POST /diagnostics`
+
+Creates a diagnostic. The diagnostic will be created in the given space and with the given name, and act upon the given app. Note that the name, space, and org cannot be changed later. Use the prefix `akkeris://` to use the current image of an Akkeris app.
 
 | Name           | Type             | Description                                                                | Example                                          |
 |----------------|------------------|----------------------------------------------------------------------------|--------------------------------------------------|
@@ -5946,9 +5946,9 @@ curl \
 
 ### List Diagnostics
 
-Retrieves a list of all of the currently configured diagnostics.
-
 `GET /diagnostics`
+
+Retrieves a list of all of the currently configured diagnostics.
 
 **CURL Example**
 
@@ -5985,9 +5985,9 @@ curl \
 
 ### Get Diagnostic Info
 
-Get info about a specific diagnostic
-
 `GET /diagnostics/{diagnostic}`
+
+Get info about a specific diagnostic
 
 **CURL Example**
 
@@ -6022,9 +6022,9 @@ curl \
 
 ### Update Diagnostic Configuration
 
-Update properties of a specific diagnostic. To unset properties that can be unset (pipeline, command, startdelay) set the value to an empty string. Properties not included in the JSON body will remain unchanged. Use the prefix `akkeris://` to use the current image of an Akkeris app.
-
 `PATCH /diagnostics/{diagnostic}`
+
+Update properties of a specific diagnostic. To unset properties that can be unset (pipeline, command, startdelay) set the value to an empty string. Properties not included in the JSON body will remain unchanged. Use the prefix `akkeris://` to use the current image of an Akkeris app.
 
 | Name           | Type             | Description                                                                | Example                                          |
 |----------------|------------------|----------------------------------------------------------------------------|--------------------------------------------------|
@@ -6076,9 +6076,9 @@ curl \
 
 ### Delete Diagnostic
 
-Delete a specific diagnostic
-
 `DELETE /diagnostics/{diagnostic}`
+
+Delete a specific diagnostic
 
 **CURL Example**
 
@@ -6101,9 +6101,9 @@ curl \
 
 ### Set/Update Environment Variable
 
-Set or overwrite an environment variable on a diagnostic
-
 `POST /diagnostics/{diagnostic}/config`
+
+Set or overwrite an environment variable on a diagnostic
 
 | Name           | Type             | Description                                   | Example       |
 |----------------|------------------|-----------------------------------------------|---------------|
@@ -6131,9 +6131,9 @@ curl \
 
 ### Unset Environment Variable
 
-Remove an environment variable from a diagnostic
-
 `DELETE /diagnostics/{diagnostic}/config/{varname}`
+
+Remove an environment variable from a diagnostic
 
 **CURL Example**
 

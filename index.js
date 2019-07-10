@@ -846,12 +846,12 @@ routes.add.delete('/diagnostics/([A-z0-9\\-\\_\\.]+)$')
 // Add config var to test
 // diagnostics.SetConfig
 routes.add.post('/diagnostics/([A-z0-9\\-\\_\\.]+)/config$')
-          .run(alamo.diagnostics.config.create.bind(alamo.diagnostics.config.create, pg_pool))
+          .run(alamo.diagnostics.config.set.bind(alamo.diagnostics.config.set, pg_pool))
           .and.authorization([simple_key]);
 // Delete config var from test
 // diagnostics.UnsetConfig
-routes.add.delete('/diagnostics/([A-z0-9\\-\\_\\.]+)/config$')
-          .run(alamo.diagnostics.config.delete.bind(alamo.diagnostics.config.delete, pg_pool))
+routes.add.delete('/diagnostics/([A-z0-9\\-\\_\\.]+)/config/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.diagnostics.config.unset.bind(alamo.diagnostics.config.unset, pg_pool))
           .and.authorization([simple_key]);
 
 // Secrets

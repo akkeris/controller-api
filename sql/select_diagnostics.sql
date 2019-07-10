@@ -1,9 +1,8 @@
 select 
   diagnostic,
   diagnostics.name as name,
-  s2.name as jobspace,
-  apps.name as app,
-  spaces.name as space,
+  s2.name as space,
+  (apps.name || '-' || spaces.name) as app,
   action,
   result,
   image,
@@ -13,13 +12,15 @@ select
   timeout,
   startdelay,
   slackchannel,
-  command
+  command,
+  organizations.name as org
 from
   diagnostics
     join apps on diagnostics.app = apps.app
     join spaces on apps.space = spaces.space
     left join pipelines on pipelines.pipeline = diagnostics.pipeline
-    join spaces s2 on diagnostics.jobspace = s2.space
+    join spaces s2 on diagnostics.space = s2.space
+    left join organizations on diagnostics.org = organizations.org
 where
   diagnostics.deleted = false
 order by

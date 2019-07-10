@@ -5864,3 +5864,310 @@ curl -H 'Authorization: ...'\
   }
 ]
 ```
+
+## Diagnostics
+
+Diagnostics are tests that can be run against Akkeris apps. There are only two requirements for a test framework to run as an Akkeris diagnostic - the framework must run in Docker, and it must exit with a zero (pass) or nonzero (fail). 
+
+### Create Diagnostic
+
+Creates a diagnostic. The diagnostic will be created in the given space and with the given name, and act upon the given app. Note that the name, space, and org cannot be changed later. Use the prefix `akkeris://` to use the current image of an Akkeris app.
+
+`POST /diagnostics`
+
+| Name           | Type             | Description                                                                | Example                                          |
+|----------------|------------------|----------------------------------------------------------------------------|--------------------------------------------------|
+| name           | required string  | The name of the diagnostic                                                 | ui-tests                                         |
+| space          | required string  | The name of the space where the diagnostic should live                     | taas                                             |
+| org          	 | optional string  | The name of the org for attribution (currently unused)                     | taas                                             |
+| app            | required string  | The name of the app that the diagnostic will target                        | appkitui-default                                 |
+| action         | required string  | The app lifecycle action that the diagnostic will listen for               | released                                         |
+| result         | required string  | The result of the action that will trigger the diagnostic                  | succeeded                                        |
+| image          | required string  | The Docker image to run                                                    | akkeris://appkitui-default, crccheck/hello-world |
+| pipeline       | optional string  | The pipeline to promote the app in                                         | ui-pipeline                                      |
+| transitionfrom | optional string  | The pipeline stage to transition from                                      | dev                                              |
+| transitionto   | optional string  | The pipeline stage to transition to                                        | qa                                               |
+| timeout        | required integer | The amount of time in seconds before the diagnostic is marked as failed    | 180                                              |
+| startdelay     | optional integer | The amount of time in seconds that the diagnostic will wait before running | 60                                               |
+| slackchannel   | required string  | The Slack channel to notify with test results                              | taas_tests                                       |
+| command   	 | optional string  | Override the Docker image command                                          | ./start.sh   		                            |
+| env            | optional array   | An array of name/value objects to add as environment variables             | [ { "name": "RUN_TESTS", "value": "true" } ]     |
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X PATCH \ 
+  "http://localhost:5000/diagnostics/ui-tests-taas" \
+  -d '{
+    "name": "ui-tests",
+    "space": "taas",
+    "org": "akkeris",
+    "app": "appkitui-default",
+    "action": "released",
+    "result": "succeeded",
+    "image": "akkeris://appkitui-default",
+    "pipeline": "uipipeline",
+    "transitionfrom": "dev",
+    "transitionto": "qa",
+    "timeout": 100,
+    "startdelay": 10,
+    "slackchannel": "taas_runs",
+    "command": "./start.sh",
+    "env": [ { "name": "FOO", "value": "BAR" } ]
+  }'
+```
+
+**201 "Created" Response**
+
+```json
+{
+  "diagnostic_uuid": "a552a7cc-c7a9-4dac-aead-5f2cd5719a10",
+  "created": "2019-07-10T17:25:44.260Z",
+  "updated": "2019-07-10T17:25:44.260Z",
+  "name": "ui-tests",
+  "space": "taas",
+  "app": "appkitui-default",
+  "action": "released",
+  "result": "succeeded",
+  "image": "crccheck/hello-world",
+  "pipeline": null,
+  "transitionfrom": null,
+  "transitionto": null,
+  "timeout": 100,
+  "startdelay": 10,
+  "slackchannel": "taas_test",
+  "command": "./start.sh",
+  "deleted": false,
+  "org": null
+}
+```
+
+### List Diagnostics
+
+Retrieves a list of all of the currently configured diagnostics.
+
+`GET /diagnostics`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  "http://localhost:5000/diagnostics"
+```
+
+**200 "OK" Response**
+
+```json
+[
+  {
+    "diagnostic_uuid": "a552a7cc-c7a9-4dac-aead-5f2cd5719a10",
+    "name": "ui-tests",
+    "space": "taas",
+    "app": "appkitui-default",
+    "action": "released",
+    "result": "succeeded",
+    "image": "crccheck/hello-world",
+    "pipeline": null,
+    "transitionfrom": null,
+    "transitionto": null,
+    "timeout": 100,
+    "startdelay": 10,
+    "slackchannel": "taas_test",
+    "command": "./start.sh",
+    "org": null
+  }
+]
+```
+
+### Get Diagnostic Info
+
+Get info about a specific diagnostic
+
+`GET /diagnostics/{diagnostic}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  "http://localhost:5000/diagnostics/ui-tests-taas"
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "diagnostic_uuid": "a552a7cc-c7a9-4dac-aead-5f2cd5719a10",
+  "name": "ui-tests",
+  "space": "taas",
+  "app": "appkitui-default",
+  "action": "released",
+  "result": "succeeded",
+  "image": "crccheck/hello-world",
+  "pipeline": null,
+  "transitionfrom": null,
+  "transitionto": null,
+  "timeout": 100,
+  "startdelay": 10,
+  "slackchannel": "taas_test",
+  "command": "./start.sh",
+  "org": null
+}
+```
+
+### Update Diagnostic Configuration
+
+Update properties of a specific diagnostic. To unset properties that can be unset (pipeline, command, startdelay) set the value to an empty string. Properties not included in the JSON body will remain unchanged. Use the prefix `akkeris://` to use the current image of an Akkeris app.
+
+`PATCH /diagnostics/{diagnostic}`
+
+| Name           | Type             | Description                                                                | Example                                          |
+|----------------|------------------|----------------------------------------------------------------------------|--------------------------------------------------|
+| org          	 | optional string  | The name of the org for attribution (currently unused)                     | taas                                             |
+| app            | optional string  | The name of the app that the diagnostic will target                        | appkitui-default                                 |
+| action         | optional string  | The app lifecycle action that the diagnostic will listen for               | released                                         |
+| result         | optional string  | The result of the action that will trigger the diagnostic                  | succeeded                                        |
+| image          | optional string  | The Docker image to run                                                    | akkeris://appkitui-default, crccheck/hello-world |
+| pipeline       | optional string  | The pipeline to promote the app in                                         | ui-pipeline                                      |
+| transitionfrom | optional string  | The pipeline stage to transition from                                      | dev                                              |
+| transitionto   | optional string  | The pipeline stage to transition to                                        | qa                                               |
+| timeout        | optional integer | The amount of time in seconds before the diagnostic is marked as failed    | 180                                              |
+| startdelay     | optional integer | The amount of time in seconds that the diagnostic will wait before running | 60                                               |
+| slackchannel   | optional string  | The Slack channel to notify with test results                              | taas_tests                                       |
+| command   	 | optional string  | The command to run inside the Docker image                                 | ./start.sh   		                            |
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X PATCH \ 
+  "http://localhost:5000/diagnostics/ui-tests-taas" \
+  -d '{ "image": "crccheck/hello-world", "command": "" }'
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "diagnostic_uuid": "a552a7cc-c7a9-4dac-aead-5f2cd5719a10",
+  "name": "ui-tests",
+  "space": "taas",
+  "app": "appkitui-default",
+  "action": "released",
+  "result": "succeeded",
+  "image": "crccheck/hello-world",
+  "pipeline": null,
+  "transitionfrom": null,
+  "transitionto": null,
+  "timeout": 100,
+  "startdelay": 10,
+  "slackchannel": "taas_test",
+  "command": null,
+  "deleted": false,
+  "org": null
+}
+```
+
+### Delete Diagnostic
+
+Delete a specific diagnostic
+
+`DELETE /diagnostics/{diagnostic}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X DELETE \
+  "http://localhost:5000/diagnostics/ui-tests-taas"
+```
+
+**200 "OK" Response**
+
+```json
+{
+    "id": "a552a7cc-c7a9-4dac-aead-5f2cd5719a10",
+    "name": "ui-tests-taas",
+    "result": "successful"
+}
+```
+
+### Set/Update Environment Variable
+
+Set or overwrite an environment variable on a diagnostic
+
+`POST /diagnostics/{diagnostic}/config`
+
+| Name           | Type             | Description                                   | Example       |
+|----------------|------------------|-----------------------------------------------|---------------|
+| varname        | required string  | The name of the environment variable          | FOO           |
+| varvalue       | required string  | The value of the environment variable         | BAR           |
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X PATCH \ 
+  "http://localhost:5000/diagnostics/ui-tests-taas/config" \
+  -d '{ "varname": "FOO", "varvalue": "BAR" }'
+```
+
+**201 "Created" Response**
+
+```json
+{
+  "status": 201,
+  "message": "added FOO"
+}
+```
+
+### Unset Environment Variable
+
+Remove an environment variable from a diagnostic
+
+`DELETE /diagnostics/{diagnostic}/config/{varname}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X DELETE \
+  "http://localhost:5000/diagnostics/ui-tests-taas/config/FOO"
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "status": 200,
+  "message": "FOO deleted"
+}
+```
+
+### Diagnostics TODO
+
+POST    /diagnostics/:provided/hooks
+
+POST    /diagnostics/:provided/bind/**
+DELETE  /diagnostics/:provided/bind/**
+
+GET     /diagnostics/logs/:runid
+POST    /diagnostics/logs/:runid
+GET     /diagnostics/logs/:runid/array
+
+GET     /diagnostics/jobspace/:jobspace/job/:job/runs
+GET     /diagnostics/rerun
+POST    /diagnostics/results/:runid
+
+GET     /diagnostics/runs/:runid
+GET     /diagnostics/runs/:runid/artifacts
+GET     /diagnostics/runs/:runid/artifacts/**

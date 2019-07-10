@@ -1,5 +1,5 @@
 select 
-  diagnostic,
+  diagnostic as diagnostic_uuid,
   diagnostics.name as name,
   s2.name as space,
   (apps.name || '-' || spaces.name) as app,

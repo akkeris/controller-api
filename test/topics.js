@@ -419,6 +419,25 @@ describe("CRUD actions for topics", function() {
           consumerGroupName: consumerGroupName
         })) 
 
+      // create acl 2
+      let acl_response2 = await httph.request('post', 
+      `http://localhost:5000/clusters/${cluster}/topics/${testTopicName}/acls`, 
+      alamo_headers, 
+      JSON.stringify({
+        app: `${newAppName}-default`, 
+        role: 'consumer',
+        consumerGroupName: consumerGroupName2
+      })) 
+
+      // create acl 3
+      let acl_response3 = await httph.request('post', 
+      `http://localhost:5000/clusters/${cluster}/topics/${testTopicName}/acls`, 
+      alamo_headers, 
+      JSON.stringify({
+        app: `${newAppName}-default`, 
+        role: 'producer'
+      })) 
+
       // recreate topic
       let recreate_response = await httph.request('post', 
         `http://localhost:5000/clusters/${cluster}/topics/recreate`, 
@@ -432,11 +451,7 @@ describe("CRUD actions for topics", function() {
           config: 'state'
         })
       let recreate = JSON.parse(recreate_response)
-      expect(recreate.subscriptions.length).to.equal(1);
-      expect(recreate.subscriptions[0].app_name).to.equal(newAppName);
-      expect(recreate.subscriptions[0].topic_name).to.equal(testTopicName);
-      expect(recreate.subscriptions[0].role).to.equal("consumer");
-      expect(recreate.subscriptions[0].consumer_group_name).to.equal(consumerGroupName);
+      expect(recreate.subscriptions.length).to.equal(3);
       expect(recreate.key_mapping).to.equal("string");
       expect(recreate.schemas).to.equal("Test");
 

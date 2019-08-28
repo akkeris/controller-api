@@ -47,8 +47,6 @@ describe("secure keys: creating, attaching and deleting", function() {
     let build_info2 = JSON.parse(await request('post', `http://localhost:5000/apps/${second_app}-preview/builds`, alamo_headers, JSON.stringify(build_payload)))
     await init.wait_for_build(`${first_app}-preview`, build_info.id)
     await init.wait_for_build(`${second_app}-preview`, build_info2.id)
-    let release_info = JSON.parse(await request('post', `http://localhost:5000/apps/${first_app}-preview/releases`, alamo_headers, JSON.stringify({"slug":build_info.id, "description":"secure key test"})))
-    let release_info2 = JSON.parse(await request('post', `http://localhost:5000/apps/${second_app}-preview/releases`, alamo_headers, JSON.stringify({"slug":build_info2.id, "description":"secure key test"})))
     let content = JSON.parse(await init.wait_for_app_content(`${first_app}-preview`, null, '/environment'))
     expect(content.SECURE_KEY).to.equal(addon.config_vars.SECURE_KEY)
     expect(content.KEEP_ME).to.equal(unique_var1)

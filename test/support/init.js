@@ -295,7 +295,7 @@ function create_callback_server(port = 8001) {
   }).on('clientError', (err, socket) => console.error('client socket error:', err) );
   hook_listener.wait_for_callback = async function (type, desc) {
     process.stdout.write(`    ~ Waiting for ${type} hook ${desc}`);
-    for(let i=0; i < 600; i++) {
+    for(let i=0; i < 1200; i++) {
       if(i % 10 === 0) {
         process.stdout.write(".");
       }

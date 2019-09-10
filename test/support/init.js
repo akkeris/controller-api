@@ -94,10 +94,9 @@ async function wait_for_build(app, build_id) {
   throw new Error("Timeout waiting for build to finish.");
 }
 
-async function create_test_app(space) {
-  space = space || 'default';
-  let app_name = "alamotest" + Math.floor(Math.random() * 10000)
-  return JSON.parse(await httph.request('post', 'http://localhost:5000/apps', alamo_headers, JSON.stringify({org:"test", space, name:app_name})));
+async function create_test_app(space = 'default') {
+  let name = "alamotest" + Math.floor(Math.random() * 100000)
+  return JSON.parse(await httph.request('post', 'http://localhost:5000/apps', alamo_headers, JSON.stringify({org:"test", space, name})));
 }
 
 async function delete_app(app) {

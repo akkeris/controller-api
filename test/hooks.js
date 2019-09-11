@@ -6,6 +6,11 @@ process.env.AUTH_KEY = 'hello';
 process.env.ENCRYPT_KEY = 'hello';
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 const test = require('./support/init.js');
+const circleCiHook = require('../lib/hook-types/circleci.js');
+const msTeamsHook = require('../lib/hook-types/microsoft-teams.js');
+const opsGenieHook = require('../lib/hook-types/opsgenie.js');
+const rollBarHook = require('../lib/hook-types/rollbar.js');
+const slackHook = require('../lib/hook-types/slack.js');
 
 describe("hooks:", function() {
   this.timeout(100000);
@@ -17,6 +22,20 @@ describe("hooks:", function() {
   let placed_hooks = false;
 
   let testapp = null
+
+  it("covers testing hook type formatters", async() => {
+    expect(circleCiHook.test('https://circleci.com/api/v1.1/project/github/akkeris/tests/tree/master?circle-token=abc123')).to.equal(true);
+    expect(circleCiHook.test('https://token:@circleci.com/api/v1.1/project/github/akkeris/tests')).to.equal(true);
+    expect(msTeamsHook.test('https://outlook.office365.com/webhook/01234567-abcd-4444-abcd-1234567890ab@98765432-dddd-5555-8888-777777777777/IncomingWebhook/1234567890abcdefedcba09876544321/ffffffff-3333-4444-5555-bbbbbbbbbbbb')).to.equal(true);
+    expect(opsGenieHook.test('https://token@api.opsgenie.com/v2/alerts')).to.equal(true);
+    expect(opsGenieHook.test('https://token@api.eu.opsgenie.com/v2/alerts')).to.equal(true);
+    expect(opsGenieHook.test('https://www.opsgenie.com/v2/alerts/some/other/uri')).to.equal(false);
+    expect(rollBarHook.test('https://api.rollbar.com/api/1/deploy')).to.equal(true);
+    expect(rollBarHook.test('https://api.rollbar.com/api/1/deploy/')).to.equal(true);
+    expect(rollBarHook.test('https://api.rollly.com/api/1/deploy/')).to.equal(false);
+    expect(slackHook.test('https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX')).to.equal(true);
+    expect(slackHook.test('https://hooks.slackss.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX')).to.equal(false);
+  });
 
   it("covers creating a an app and a hook", async () => {
     testapp = await test.create_test_app("default")

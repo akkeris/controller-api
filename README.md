@@ -22,16 +22,24 @@
 * `DOCKER_REGISTRY_HOST` - The host for storing image sources. E.g., docker.hostname.com, This has no default.
 * `DOCKER_REGISTRY_ORG` - The organization in `DOCKER_REGISTRY_HOST` to store gold master build images. This has no default.
 * `DOCKER_REGISTRY_AUTH` - The JSON object that is either `{"username":"..", "password":"..", "email":"...", "serveraddress":"..."}` note that email/serveraddress are optional, or if a token auth it could be `{"identitytoken":"..."}`. See [docker authorization](https://docs.docker.com/engine/api/v1.39/#section/Authentication) for more information.
-* `NEW_BUILD_SHUTTLE` - Whether to use the format of the new buildshuttle.
 
 ### Optional Environment Variables
-* `TWILIO_AUTH_KEY` - The master sid:token for the twilio account.
 * `ANOMALY_METRICS_DRAIN` - The syslog drain end point for the opentsdb custom metrics collector. This has no default.
 * `PAPERTRAIL_DRAIN` - The syslog standard drain end point for papertrail.  This has no default.
 * `AUTH_KEY` - If secure key addon isn't usued, this can be set as a shared secret simple authentication, this should be used in all API calls in the Authorization header.
-* `BLACKLIST_ENV` - A comma delimited list of socs keywords causing config vars to be redacted, defaults to 'PASS,KEY,SECRET,PRIVATE,TOKEN'
+* `BLACKLIST_ENV` - A comma delimited list of socs keywords causing config vars to be redacted, defaults to `PASS,KEY,SECRET,PRIVATE,TOKEN,SALT,AUTH,HASH`
 * `DYNO_DEFAULT_SIZE` - The default dyno size to use. The set default is `gp1` if no other is specified.
 * `RESERVED_SPACES` - A list of reserved spaces to add to the reserved list.  The default reserved spaces are `kube-system, brokers, k2-poc, kube-public, akkeris-system, istio-system, cert-manager`. Note, setting this will only add to the list, not override it.
+
+### Integration Variables
+To disable custom formatting for outgoing webhooks set these to true.
+
+* `WEBHOOK_DISABLE_MICROSOFT_TEAMS` - If set to `true` disable auto-formatting outgoing webhooks for Microsoft Team Channel Notifications.
+* `WEBHOOK_DISABLE_CIRCLECI` - If set to `true` disable auto-formatting outgoing webhooks for CircleCI Jobs.
+* `WEBHOOK_DISABLE_SLACK` - If set to `true` disable auto-formatting outgoing webhooks for Slack Channel Notifications.
+* `WEBHOOK_DISABLE_OPSGENIE` - If set to `true` disable auto-formatting outgoing webhooks for OpsGenie Alerts.
+* `WEBHOOK_DISABLE_ROLLBAR` - If set to `true` disable auto-formatting outgoing release webhooks for notifying Rollbar of deployments.
+
 ## Installing ##
 
 ```

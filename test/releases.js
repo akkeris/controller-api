@@ -97,7 +97,7 @@ describe("releases: list, get, create a release", function() {
       expect(release_info).to.be.a('string');
       let release_res = JSON.parse(release_info);
       expect(release_res.id).to.be.a('string');
-      expect(release_res.status).to.equal("succeeded");
+      expect(release_res.status).to.equal("queued");
       validate_release_object(release_res);
       release_id = release_res.id;
       release_succeeded = true;
@@ -160,8 +160,8 @@ describe("releases: list, get, create a release", function() {
       expect(release_succeeded).to.equal(true);
       httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/releases', alamo_headers, JSON.stringify({"release":"12345"}), (rollback_err, rollback_info) => {
         expect(rollback_err).to.be.an('object');
-        expect(rollback_err.code).to.equal(409);
-        expect(rollback_err.message).to.equal('The release 12345 does not exist');
+        expect(rollback_err.code).to.equal(404);
+        expect(rollback_err.message).to.equal('The specified release 12345 was not found.');
         expect(rollback_info).to.be.null;
         done();
       });

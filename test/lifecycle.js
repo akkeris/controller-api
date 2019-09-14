@@ -13,7 +13,7 @@ function wait_for_app_content(httph, app, content, callback, iteration) {
   if(iteration === 1) {
     process.stdout.write("    ~ Waiting for app to turn up");
   }
-  if(iteration === 60) {
+  if(iteration === 120) {
     process.stdout.write("\n");
     callback({code:0, message:"Timeout waiting for app to turn up."});
   }
@@ -186,8 +186,8 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
           console.log(wait_app_err);
         }
         // ensure we get the response "hello", so we know its our app that turned up.
-        expect(resp).to.contain('[FOOBAR]')
         expect(wait_app_err).to.be.null;
+        expect(resp).to.contain('[FOOBAR]')
         done();
       });
     });

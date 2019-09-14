@@ -207,6 +207,11 @@ async function addon_info(app, addon) {
   return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/addons/${addon.id}`, alamo_headers, null))
 }
 
+async function latest_release(app) {
+  let releases = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/releases`, alamo_headers, null))
+  return releases.reduce((acc, cur, index, src) => { if(acc.version < cur.version) return cur; return acc; }, {"version":0});
+}
+
 async function create_test_app_with_content(content, space) {
   let app = await create_test_app(space);
   return await create_app_content(content, space, app);
@@ -349,6 +354,7 @@ module.exports = {
   wait_for_build,
   create_test_app,
   create_app_content,
+  latest_release,
   delete_app,
   create_build,
   create_addon,

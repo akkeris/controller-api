@@ -138,22 +138,22 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.apps.http.get.bind(alamo.apps.http.get, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/formation/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.formations.get.bind(alamo.formations.get, pg_pool))
+          .run(alamo.formations.http.get.bind(alamo.formations.http.get, pg_pool))
           .and.authorization([simple_key]);
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/formation$')
           .run(alamo.formations.http.create.bind(alamo.formations.http.create, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/formation$')
-          .run(alamo.formations.list.bind(alamo.formations.list, pg_pool))
+          .run(alamo.formations.http.list.bind(alamo.formations.http.list, pg_pool))
           .and.authorization([simple_key]);
 routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/formation$')
-          .run(alamo.formations.batch_update.bind(alamo.formations.batch_update, pg_pool))
+          .run(alamo.formations.http.batch_update.bind(alamo.formations.http.batch_update, pg_pool))
           .and.authorization([simple_key]);
 routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/formation/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.formations.update.bind(alamo.formations.update, pg_pool))
+          .run(alamo.formations.http.update.bind(alamo.formations.http.update, pg_pool))
           .and.authorization([simple_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/formation/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.formations.delete.bind(alamo.formations.delete, pg_pool))
+          .run(alamo.formations.http.delete.bind(alamo.formations.http.delete, pg_pool))
           .and.authorization([simple_key]);
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/routes$')
           .run(alamo.routes.http.list.bind(alamo.routes.http.list, pg_pool))
@@ -178,7 +178,7 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/filters/([A-z0-9\\-\\_\\.]+)$')
 // -- dynos
 // Get dyno sizes
 routes.add.get('/sizes$')
-          .run(alamo.formations.sizes.bind(alamo.formations.sizes, pg_pool))
+          .run(alamo.formations.http.sizes.bind(alamo.formations.http.sizes, pg_pool))
           .and.authorization([simple_key]);
 // List Dynos
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/dynos$')

@@ -1,0 +1,1 @@
+update releases set status = $3 where app = $1 and release = $2

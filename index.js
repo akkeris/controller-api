@@ -182,23 +182,23 @@ routes.add.get('/sizes$')
           .and.authorization([simple_key]);
 // List Dynos
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/dynos$')
-          .run(alamo.dynos.list.bind(alamo.dynos.list, pg_pool))
+          .run(alamo.dynos.http.list.bind(alamo.dynos.http.list, pg_pool))
           .and.authorization([simple_key]);
 // Dyno Info
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/dynos/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.dynos.info.bind(alamo.dynos.info, pg_pool))
+          .run(alamo.dynos.http.get.bind(alamo.dynos.http.get, pg_pool))
           .and.authorization([simple_key]);
 // Restart All Dynos
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/dynos$')
-          .run(alamo.dynos.restart_app.bind(alamo.dynos.restart_app, pg_pool))
+          .run(alamo.dynos.http.restart_all_dyno_types.bind(alamo.dynos.http.restart_all_dyno_types, pg_pool))
           .and.authorization([simple_key]);
 // Restart Specific Dyno
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/dynos/([A-z0-9\\-\\_\\.]+)$')
-          .run(alamo.dynos.restart_dyno.bind(alamo.dynos.restart_dyno, pg_pool))
+          .run(alamo.dynos.http.restart_dyno_type.bind(alamo.dynos.http.restart_dyno_type, pg_pool))
           .and.authorization([simple_key]);
 // Stop Specific Dyno
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/dynos/([A-z0-9\\-\\_\\.]+)/actions/stop$')
-          .run(alamo.dynos.stop.bind(alamo.dynos.stop, pg_pool))
+          .run(alamo.dynos.http.restart_dyno.bind(alamo.dynos.http.restart_dyno, pg_pool))
           .and.authorization([simple_key]);
 
 // metrics 

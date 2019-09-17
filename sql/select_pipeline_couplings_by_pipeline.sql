@@ -9,6 +9,7 @@
   apps.app app_uuid, 
   apps.name app_name, 
   spaces.name space_name,
+  spaces.tags space_tags,
   releases.release,
   releases.updated release_updated,
   releases.version release_version,

@@ -68,7 +68,7 @@ describe("hooks:", function() {
     let release_payload = JSON.stringify({"slug":build_id,"description":"Deploy " + build_id})
     let release_info = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${testapp.id}/releases`, alamo_headers, release_payload))
     expect(release_info.id).to.be.a('string');
-    expect(release_info.status).to.equal("succeeded");
+    expect(release_info.status).to.equal("queued");
     release_id = release_info.id;
     let payload = await release_payload_promise;
     expect(payload.release).to.be.an('object');

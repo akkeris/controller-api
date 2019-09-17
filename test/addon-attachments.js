@@ -159,7 +159,6 @@ describe("addons attachments:", function() {
     expect(data.app).to.be.an('object');
   });
 
-
   it("covers creating the third test app for services", async () => {
     let data = await httph.request('post', 'http://localhost:5000/apps', alamo_headers, JSON.stringify({org:"test", space:"preview", name:appname_third_new}));  
     expect(data).to.be.a('string');
@@ -181,14 +180,13 @@ describe("addons attachments:", function() {
 
   it("covers creating dependent build for third app", async () => {
     let build_payload = {"sha":"123456","org":"test","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756","url":"docker://docker.io/akkeris/test-attach:v4"};
-    let info = await httph.request('post', 'http://localhost:5000/apps/' + appname_third_new + '-preview/builds', alamo_headers, JSON.stringify(build_payload));
+    let info = await httph.request('post', `http://localhost:5000/apps/${appname_third_new}-preview/builds`, alamo_headers, JSON.stringify(build_payload));
     expect(info).to.be.a('string');
     let build_info = JSON.parse(info);
     let building_info = await support.wait_for_build(`${appname_third_new}-preview`, build_info.id);
     let release_info = await httph.request('post', `http://localhost:5000/apps/${appname_third_new}-preview/releases`, alamo_headers, JSON.stringify({"slug":build_info.id,"description":"Deploy " + build_info.id}));
     expect(release_info).to.be.a('string');
   })
-
 
   it("covers ensuring attached addon DATABASE_URL is returned from second app", async () => {
     await support.wait(1000);
@@ -219,7 +217,7 @@ describe("addons attachments:", function() {
 
   it("covers ensuring addon attachment config vars are returned", async () => {
     expect(appname_second_id).to.be.a("string");
-    let data = await httph.request('get', 'http://localhost:5000/apps/' + appname_second_new + '-default/config-vars', alamo_headers, null);
+    let data = await httph.request('get', `http://localhost:5000/apps/${appname_second_new}-default/config-vars`, alamo_headers, null);
     expect(data).to.be.a('string');
     data = JSON.parse(data);
     expect(data.DATABASE_URL).to.equal(postgresql_response.config_vars.DATABASE_URL);

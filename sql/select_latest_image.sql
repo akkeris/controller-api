@@ -22,7 +22,7 @@ from
   join organizations building_org on building_app.org = building_org.org
 where 
   apps.app = $1 and
-  releases.status = 'succeeded' and
+  (releases.status = 'queued' or releases.status = 'pending' or releases.status = 'succeeded') and
   apps.deleted = false and
   releases.deleted = false and
   builds.deleted = false

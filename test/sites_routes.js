@@ -332,8 +332,9 @@ describe("sites/routes", function () {
       this.timeout(500000)
       await support.wait_for_app_content(`https://${new_site}/fugazi`, 'testapp2');
       await support.create_app_content('testapp4', 'default', testapp4);
+      let release = await support.latest_release(testapp4)
       // fake out a released event call. 
-      httph.request('post', 'http://localhost:5000/events', alamo_headers, JSON.stringify({"app":{"name":testapp4.simple_name}, "space":{"name":testapp4.space.name}, "key":testapp4.name, "action":"released", "slug":{"image":""}, "released_at":(new Date(Date.now())).toISOString()}))
+      httph.request('post', 'http://localhost:5000/events', alamo_headers, JSON.stringify({"app":{"name":testapp4.simple_name}, "space":{"name":testapp4.space.name}, "key":testapp4.name, "release":{"id":release.id}, "action":"released", "slug":{"image":""}, "released_at":(new Date(Date.now())).toISOString()}))
       // wait for the route to appear
       await support.wait_for_app_content(`https://${new_site}/fugazi`, 'testapp4');
       // double check we didn't break old routes.

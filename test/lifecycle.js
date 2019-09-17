@@ -13,7 +13,7 @@ function wait_for_app_content(httph, app, content, callback, iteration) {
   if(iteration === 1) {
     process.stdout.write("    ~ Waiting for app to turn up");
   }
-  if(iteration === 60) {
+  if(iteration === 120) {
     process.stdout.write("\n");
     callback({code:0, message:"Timeout waiting for app to turn up."});
   }
@@ -175,6 +175,27 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
     });
   });
 
+
+
+  it("covers getting metrics", (done) => {
+    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/metrics', alamo_headers, null, (err, data) => {
+      if(err) {
+        console.log(err);
+      } 
+      expect(err).to.be.null;
+      expect(data).to.be.a('string');
+      let obj = JSON.parse(data);
+      expect(obj).to.be.an('object');
+      expect(obj.web).to.be.an('object');
+      expect(obj.web.memory_usage_bytes).to.be.an('object');
+      expect(obj.web.memory_rss).to.be.an('object');
+      expect(obj.web.memory_cache).to.be.an('object');
+      expect(obj.web.cpu_user_seconds_total).to.be.an('object');
+      expect(obj.web.cpu_usage_seconds_total).to.be.an('object');
+      done();
+    });
+  });
+
   // test changing config env's make sure it restarts the server
   it("ensure app restarts and reloads config when changing config vars", function(done) {
     this.timeout(0);
@@ -186,8 +207,8 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
           console.log(wait_app_err);
         }
         // ensure we get the response "hello", so we know its our app that turned up.
-        expect(resp).to.contain('[FOOBAR]')
         expect(wait_app_err).to.be.null;
+        expect(resp).to.contain('[FOOBAR]')
         done();
       });
     });
@@ -329,6 +350,5 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
       done();
     });
   });
-
 });
 

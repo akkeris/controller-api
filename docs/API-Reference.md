@@ -1,5 +1,7 @@
 # Overview
 
+<!-- toc -->
+
 The Platform Apps API empowers developers to build, extend and combine Akkeris functionality with other services, tooling and systems. You can use this API to programmatically create apps, provision add-ons, promote pipelines and any other tasks you can complete with the CLI or UI. In-fact the CLI and UI use this API for all of their interactions, commands and operations.
 
 ## Authentication

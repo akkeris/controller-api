@@ -1074,15 +1074,18 @@ curl \
 ```json
 {  
   "app":{  
-    "key":"app-name"
+    "id":"app-name"
   },
   "created_at":"2016-07-12T23:36:16.976Z",
   "updated_at":"2016-07-12T23:36:16.976Z",
   "id":16,
+  "output_stream_url":"/apps/app-space/builds/999b5ce9-b60c-42c4-bca5-e442cd86df78/result",
   "source_blob":{  
-    "checksum":"sha256:0827f94194a9d99554f4fafbfa6661a676450814e5293b64cc5fc396963c53f3"
+    "checksum":"sha256:b0cef53230ead3fb08b2b82d8f933a5a611fbabf416b2117d6896c7f5bde57b8",
+    "url":"",
+    "version":"v1.0",
+    "commit":"123456"
   },
-  "output_stream_url":"/apps/api/builds/169/result",
   "release":null,
   "slug":{  
     "id":"999b5ce9-b60c-42c4-bca5-e442cd86df78"

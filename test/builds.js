@@ -5,6 +5,8 @@ process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 
+const expect = require("chai").expect
+
 function wait_for_build_start(httph, app, build_id, callback, iteration) {
   iteration = iteration || 1;
   if(iteration === 1) {
@@ -47,6 +49,24 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
   });
 }
 
+function validate_build_obj(build_obj) {
+  expect(build_obj.id).to.be.a('string');
+  expect(build_obj.app).to.be.an('object');
+  expect(build_obj.created_at).to.be.a('string');
+  expect(build_obj.updated_at).to.be.a('string');
+  expect(build_obj.source_blob).to.be.an('object');
+  expect(build_obj.source_blob.checksum).to.be.a('string')
+  expect(build_obj.source_blob.url).to.be.a('string')
+  expect(build_obj.source_blob.version).to.be.a('string')
+  expect(build_obj.source_blob.commit).to.be.a('string')
+  expect(build_obj.slug).to.be.an('object')
+  expect(build_obj.slug.id).to.be.a('string')
+  expect(build_obj.status).to.be.a('string')
+  expect(build_obj.user).to.be.an('object')
+  expect(build_obj.user.id).to.be.a('string')
+  expect(build_obj.user.email).to.be.a('string')
+}
+
 const support = require('./support/init.js')
 
 describe("builds: conversion between payload, response and database", function() {  
@@ -54,32 +74,6 @@ describe("builds: conversion between payload, response and database", function()
 
   //let builds = require('../lib/builds.js')
   const httph = require('../lib/http_helper.js')
-  const expect = require("chai").expect
-  it("covers listing builds", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/api-default/builds', alamo_headers, null, 
-      (err, data) => {
-        let obj = JSON.parse(data);
-        expect(err).to.be.null;
-        expect(obj).to.be.an('array');
-        done();
-    });
-  });
-  it("covers getting build info", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/api-default/builds', alamo_headers, null, 
-      (err, data) => {
-        let objs = JSON.parse(data);
-        expect(err).to.be.null;
-        expect(objs).to.be.an('array');
-        httph.request('get', 'http://localhost:5000/apps/api-default/builds/' + objs[0].id, alamo_headers, null, 
-          (err, build_info) => {
-            let obj = JSON.parse(build_info);
-
-            expect(err).to.be.null;
-            expect(obj).to.be.an('object');
-            done();
-        });
-    });
-  });
 
   it("covers ensuring soft error on non-uuid", function(done) {
     this.timeout(0);
@@ -108,12 +102,14 @@ describe("builds: conversion between payload, response and database", function()
           expect(err).to.be.null;
           expect(build_info).to.be.a('string');
           let build_obj = JSON.parse(build_info);
-          expect(build_obj.id).to.be.a('string');
+          validate_build_obj(build_obj)
+
           wait_for_build(httph, appname_brand_new + '-default', build_obj.id, (wait_err, building_info) => {
             if(wait_err) {
               console.error("Error waiting for build:", wait_err);
               return expect(true).to.equal(false);
             }
+            validate_build_obj(JSON.parse(building_info));
             httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/builds/' + build_obj.id + '/result', alamo_headers, null, (err, build_result) => {
               expect(err).to.be.null;
               expect(build_result).to.be.a('string');
@@ -130,6 +126,7 @@ describe("builds: conversion between payload, response and database", function()
                 build_info_new = JSON.parse(build_info_new);
                 expect(build_info_new.id).to.be.a('string');
                 expect(build_obj.id).to.not.equal(build_info_new.id);
+                validate_build_obj(build_info_new);
 
                 wait_for_build(httph, appname_brand_new + '-default', build_info_new.id, (wait_err, building_info_new) => {
                   if(wait_err) {
@@ -192,6 +189,9 @@ describe("builds: conversion between payload, response and database", function()
     expect(build_id).to.be.a('string')
     let slug_info = JSON.parse(await httph.request('get', `http://localhost:5000/slugs/${build_id}`, alamo_headers, null))
     expect(slug_info).to.be.an('object')
+    expect(slug_info.slug).to.be.an('object')
+    expect(slug_info.slug.id).to.be.a('string')
+    validate_build_obj(slug_info)
   })
 
   it("covers removing build app", (done) => {
@@ -240,6 +240,24 @@ describe("builds: conversion between payload, response and database", function()
           });
         }, 2000)
       });
+    });
+  });
+
+  it("covers getting build info", (done) => {
+    httph.request('get', 'http://localhost:5000/apps/' + random_name + '-default/builds', alamo_headers, null, 
+      (err, data) => {
+        let objs = JSON.parse(data);
+        expect(err).to.be.null;
+        expect(objs).to.be.an('array');
+        objs.map(validate_build_obj);
+        httph.request('get', 'http://localhost:5000/apps/' + random_name + '-default/builds/' + objs[0].id, alamo_headers, null, 
+          (err, build_info) => {
+            let obj = JSON.parse(build_info);
+            expect(err).to.be.null;
+            expect(obj).to.be.an('object');
+            validate_build_obj(obj);
+            done();
+        });
     });
   });
 

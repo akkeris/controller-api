@@ -188,7 +188,7 @@ describe("formations: creating, updating and deleting dynos and process types", 
       function(err, data) {
         expect(err).to.be.an('object');
         expect(data).to.be.null;
-        expect(err.code).to.equal(422);
+        expect(err.code).to.equal(409);
         expect(err.message).to.equal('The process of type web already exists.');
         done();
       });

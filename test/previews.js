@@ -105,6 +105,9 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     expect(result.enabled).to.equal(true)
     expect(result_sites).be.an('object')
     expect(result_sites.enabled).to.equal(false)
+    result = await httph.request('get', `http://localhost:5000/apps/${app_name}-preview/features`, alamo_headers, null, null)
+    result = JSON.parse(result).filter((x) => x.name === "preview")
+    expect(result[0].enabled).to.equal(true)
   })
 
   it("ensure a PR request targeted at the wrong destination branch does not cause a preview app", async () => {

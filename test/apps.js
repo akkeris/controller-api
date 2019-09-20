@@ -202,7 +202,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
       let appobj = JSON.parse(data);
       expect(appobj).to.be.an('object');
       expect(appobj.name).to.equal("api-default");
-      expect(appobj.git_url).to.equal('repo');
+      expect(appobj.git_url).to.be.a('string');
       done();
     });
   });

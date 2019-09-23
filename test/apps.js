@@ -82,7 +82,7 @@ describe("apps: ensure we can create an app, list apps, view app info and delete
         expect(err).to.be.an('object');
         expect(data).to.be.null;
         expect(err.code).to.equal(422);
-        expect(err.message).to.equal('The application name cannot contain brackets.');
+        expect(err.message).to.equal('The application name was invalid or missing, it cannot contain dashes or other special characters.');
         done();
     });
   });

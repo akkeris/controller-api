@@ -42,7 +42,7 @@ pg_pool.on('error', (err, client) => { console.error("Postgres Pool Error: ", er
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()
   console.log(`Akkeris Controller API - Worker - (v${pkg.version}) Ready`)
-})().catch(e => {
+})().catch((e) => {
   console.error("Initialization failed, this is fatal.")
   console.error(e.message, e.stack)
   process.exit(1)

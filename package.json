@@ -1,6 +1,6 @@
 {
   "name": "akkeris-controller-api",
-  "version": "3.0.7",
+  "version": "4.0.0",
   "description": "Central API for controlling apps in akkeris",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "test": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors -u exports --reporter spec --reporter mocha-jenkins-reporter --reporter-options=junit_report_path=./coverage/report.xml --exit",
     "cover": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors -u exports --reporter spec --reporter mocha-jenkins-reporter --reporter-options=junit_report_path=./coverage/report.xml --exit && cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage"
   },
-  "author": "",
+  "author": "O.C. Tanner",
   "license": "Apache-2.0",
   "dependencies": {
     "elasticsearch": "^15.1.1",

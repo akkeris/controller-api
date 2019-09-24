@@ -114,7 +114,7 @@ let ready = (async () => {
   console.log(`Akkeris Controller API (v${pkg.version}) Ready`)
 })()
 
-ready.catch(e => {
+ready.catch((e) => {
   console.error("Initialization failed, this is fatal.")
   console.error(e.message, e.stack)
   process.exit(1)
@@ -802,5 +802,10 @@ process.on('uncaughtException', (e) => {
   console.error(e.stack);
 });
 
-module.exports = {routes:routes, pg_pool:pg_pool, server, ready};
+module.exports = {
+  routes, 
+  pg_pool, 
+  server, 
+  ready
+};
 

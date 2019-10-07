@@ -59,14 +59,14 @@ let alamo = {
 
 
 let simple_key = simple_key_auth(config.simple_key);
-let curl = url.parse(process.env.DATABASE_URL);
+let curl = new url.URL(process.env.DATABASE_URL);
 
 let db_conf = {
-  user: curl.auth ? curl.auth.split(':')[0] : '',
-  password: curl.auth ? curl.auth.split(':')[1] : '',
-  host:curl.hostname,
-  database:((curl.path.indexOf('?') > -1) ? curl.path.substring(1,curl.path.indexOf("?")) : curl.path).replace(/^\//, ''),
-  port:curl.port,
+  user: curl.username ? curl.username : '',
+  password: curl.password ? curl.password : '',
+  host: curl.hostname,
+  database: curl.pathname.replace(/^\//, ''),
+  port: curl.port,
   max:40,
   idleTimeoutMillis:30000,
   ssl:false
@@ -789,7 +789,7 @@ routes.add.default((req, res) => {
 
 let server = http.createServer((req, res) => {
   let method = req.method.toLowerCase();
-  let path = url.parse(req.url.toLowerCase()).path;
+  let path = (new url.URL(req.url.toLowerCase())).pathname;
   routes.process(method, path, req, res).catch((e) => { console.error("Uncaught error:", e) })
 }).listen(process.env.PORT || 5000, () => {
   if(!process.env.TEST_MODE) {

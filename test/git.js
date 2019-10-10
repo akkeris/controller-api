@@ -17,7 +17,7 @@ describe("github: enc/dec tokens, checks against incoming payloads", function() 
 
   it("covers calculating hashes and encryption", (done) => {
     expect(github.calculate_hash("SECRET", "ABCDEFGHIJLKMNOPQRSTUVWXYZ")).to.equal("sha1=5867f5d4b01da52c034fedfa1f96bc5605652019");
-    expect(common.decrypt_token("SECRET",common.encrypt_token("SECRET","FUGAZI!"))).to.equal("FUGAZI!");
+    expect(common.decrypt_token("SECRETSECRETSECRETSECRET",common.encrypt_token("SECRETSECRETSECRETSECRET","FUGAZI!"))).to.equal("FUGAZI!");
     done();
   });
   it("covers cleaning up github urls that are slightly malformed", (done) => {

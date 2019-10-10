@@ -109,6 +109,13 @@ let ready = (async () => {
   alamo.topic_acls.init(pg_pool);
   alamo.previews.init(pg_pool);
 
+  // Run token migration (if neccesary)
+  if (process.env.RUN_TOKEN_MIGRATION) {
+    console.log('Running token migration...');
+    const migration = require('./lib/salt_tokens.js');
+    await migration.update_tokens();
+  }
+
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()
   console.log(`Akkeris Controller API (v${pkg.version}) Ready`)
@@ -789,7 +796,12 @@ routes.add.default((req, res) => {
 
 let server = http.createServer((req, res) => {
   let method = req.method.toLowerCase();
-  let path = (new url.URL(req.url.toLowerCase())).pathname;
+
+  // https://stackoverflow.com/questions/48196706/new-url-whatwg-url-api
+  // https://github.com/nodejs/node/issues/12682
+  const parsedURL = (new url.URL(req.url.toLowerCase(), `http://${req.headers.host}/`));
+  const path = parsedURL.pathname + parsedURL.search;
+
   routes.process(method, path, req, res).catch((e) => { console.error("Uncaught error:", e) })
 }).listen(process.env.PORT || 5000, () => {
   if(!process.env.TEST_MODE) {

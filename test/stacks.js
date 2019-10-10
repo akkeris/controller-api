@@ -2,7 +2,7 @@
 process.env.PORT = 5000;
 process.env.DEFAULT_PORT = "5000";
 process.env.AUTH_KEY = 'hello';
-process.env.ENCRYPT_KEY = 'hello';
+process.env.ENCRYPT_KEY = 'merpmerpmerpmerpmerpmerp';
 process.env.TEST_MODE = 'true'
 process.env.FUBAR_REGION_API = process.env.US_SEATTLE_REGION_API
 process.env.FUGAZI_STACK_API = process.env.MARU_STACK_API || process.env.DS1_STACK_API

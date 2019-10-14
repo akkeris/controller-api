@@ -164,12 +164,12 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
   // Now that we changed the port, the app should turn up by itself (and automatically be restarted/redeployed.)
   it("ensure app comes back up after changing its port to the correct value (5000).", function(done) {
     this.timeout(0);
-    wait_for_app_content(httph, appname_brand_new, '[setting return value failed.] with port [5000] and restart value [undefined]', (wait_app_err, resp) => {
+    wait_for_app_content(httph, appname_brand_new, '[setting return value failed.] with port [5000]', (wait_app_err, resp) => {
       if(wait_app_err) {
         console.log('waiting for app err:', wait_app_err);
       }
       // ensure we get the response "hello", so we know its our app that turned up.
-      expect(resp).to.equal('[setting return value failed.] with port [5000] and restart value [undefined]')
+      expect(resp).to.equal('[setting return value failed.] with port [5000]')
       expect(wait_app_err).to.be.null;
       done();
     });

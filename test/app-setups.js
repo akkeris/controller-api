@@ -103,7 +103,7 @@ describe("app-setups:", function() {
   })
 
   it("ensure the app auto-deploys", async () => {
-    await init.wait_for_app_content(`${appname}`, '[setting return value failed.] with port [5000] and restart value [undefined]');
+    await init.wait_for_app_content(`${appname}`, '[setting return value failed.] with port [5000]');
   })
 
 
@@ -164,7 +164,7 @@ describe("app-setups:", function() {
   });
 
   it("ensure the app comes out of maintenance mode", async () => {
-    await init.wait_for_app_content(`${appname}`, '[setting return value failed.] with port [5000] and restart value [undefined]');
+    await init.wait_for_app_content(`${appname}`, '[setting return value failed.] with port [5000]');
   })
 
 

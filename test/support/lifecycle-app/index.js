@@ -5,7 +5,7 @@ const http = require('http');
 process.env.RETURN_VALUE = process.env.RETURN_VALUE || "setting return value failed."
 const server = http.createServer((req, res) => {
   res.writeHead(200, {});
-  res.write("[" + process.env.RETURN_VALUE + "] with port [" + process.env.PORT + "] and restart value [" + process.env.RESTART + "]");
+  res.write("[" + process.env.RETURN_VALUE + "] with port [" + process.env.PORT + "]");
   res.end();
 });
 server.on('clientError', (err, socket) => {

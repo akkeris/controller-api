@@ -59,14 +59,14 @@ let alamo = {
 
 
 let simple_key = simple_key_auth(config.simple_key);
-let curl = url.parse(process.env.DATABASE_URL);
+let curl = new url.URL(process.env.DATABASE_URL);
 
 let db_conf = {
-  user: curl.auth ? curl.auth.split(':')[0] : '',
-  password: curl.auth ? curl.auth.split(':')[1] : '',
-  host:curl.hostname,
-  database:((curl.path.indexOf('?') > -1) ? curl.path.substring(1,curl.path.indexOf("?")) : curl.path).replace(/^\//, ''),
-  port:curl.port,
+  user: curl.username ? curl.username : '',
+  password: curl.password ? curl.password : '',
+  host: curl.hostname,
+  database: curl.pathname.replace(/^\//, ''),
+  port: curl.port,
   max:40,
   idleTimeoutMillis:30000,
   ssl:false
@@ -108,6 +108,13 @@ let ready = (async () => {
   alamo.routes.init(pg_pool);
   alamo.topic_acls.init(pg_pool);
   alamo.previews.init(pg_pool);
+
+  // Run token migration (if neccesary)
+  if (process.env.RUN_TOKEN_MIGRATION) {
+    console.log('Running token migration...');
+    const migration = require('./lib/salt_tokens.js');
+    await migration.update_tokens();
+  }
 
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));
   console.log()
@@ -789,7 +796,12 @@ routes.add.default((req, res) => {
 
 let server = http.createServer((req, res) => {
   let method = req.method.toLowerCase();
-  let path = url.parse(req.url.toLowerCase()).path;
+
+  // https://stackoverflow.com/questions/48196706/new-url-whatwg-url-api
+  // https://github.com/nodejs/node/issues/12682
+  const parsedURL = (new url.URL(req.url.toLowerCase(), `http://${req.headers.host}/`));
+  const path = parsedURL.pathname + parsedURL.search;
+
   routes.process(method, path, req, res).catch((e) => { console.error("Uncaught error:", e) })
 }).listen(process.env.PORT || 5000, () => {
   if(!process.env.TEST_MODE) {

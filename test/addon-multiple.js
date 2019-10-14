@@ -109,13 +109,13 @@ describe("addons multiple: test the ability to promote and primary/secondary add
       await test.wait(15000)
 
       // connect to db
-      let curl = url.parse(postgres1_testapp1.config_vars.DATABASE_URL);
+      let curl = new url.URL(postgres1_testapp1.config_vars.DATABASE_URL);
       let db_conf = {
-        user: curl.auth ? curl.auth.split(':')[0] : '',
-        password: curl.auth ? curl.auth.split(':')[1] : '',
-        host:curl.hostname,
-        database:((curl.path.indexOf('?') > -1) ? curl.path.substring(1,curl.path.indexOf("?")) : curl.path).replace(/^\//, ''),
-        port:curl.port,
+        user: curl.username ? curl.username : '',
+        password: curl.password ? curl.password : '',
+        host: curl.hostname,
+        database: curl.pathname.replace(/^\//, ''),
+        port: curl.port,
         max:10,
         idleTimeoutMillis:30000,
         ssl:false

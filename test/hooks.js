@@ -3,7 +3,7 @@
 process.env.PORT = 5000;
 process.env.DEFAULT_PORT = "5000";
 process.env.AUTH_KEY = 'hello';
-process.env.ENCRYPT_KEY = 'hello';
+process.env.ENCRYPT_KEY = 'merpmerpmerpmerpmerpmerp';
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
 const test = require('./support/init.js');
 const circleCiHook = require('../lib/hook-types/circleci.js');

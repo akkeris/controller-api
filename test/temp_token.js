@@ -147,4 +147,19 @@ describe("jwt tokens: ensure temporary tokens work appropriately", function() {
   });
 
 
+  it("Ensure jkws uri works.", async() => {
+    const httph = require('../lib/http_helper.js');
+    let response = JSON.parse(await httph.get('get', 'http://localhost:5000/.well-known/jkws.json', {}));
+    expect(response).to.be.an('object')
+    expect(response.keys).to.be.an('array')
+    expect(response.keys[0]).to.be.an('object')
+    expect(response.keys[0].use).to.equal('sig')
+    expect(response.keys[0].x5c).to.be.an('array')
+    expect(response.keys[0].x5c[0]).to.be.a('string')
+    expect(response.keys[0].alg).to.equal('RS256');
+    expect(response.keys[0].kty).to.equal('RSA');
+    expect(response.keys[0].kid).to.be.a('string');
+    expect(response.keys[0].n).to.be.a('string');
+    expect(response.keys[0].e).to.be.a('string');
+  });
 });

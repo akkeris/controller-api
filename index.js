@@ -126,7 +126,7 @@ routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.apps.http.delete.bind(alamo.apps.http.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not delete apps.
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.apps.http.get.bind(alamo.apps.http.get, pg_pool))
           .and.authorization([simple_key,jwt_key]);
@@ -147,7 +147,7 @@ routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/formation/([A-z0-9\\-\\_\\.]+)$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/formation/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.formations.http.delete.bind(alamo.formations.http.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not delete formations.
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/routes$')
           .run(alamo.routes.http.list.bind(alamo.routes.http.list, pg_pool))
           .and.authorization([simple_key,jwt_key]);
@@ -165,7 +165,7 @@ routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/filters/([A-z0-9\\-\\_\\.]+)$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/filters/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.filters.http.attach.delete.bind(alamo.filters.http.attach.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not delete filter attachments.
 
 
 // -- dynos
@@ -330,7 +330,7 @@ routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.addons.http.delete.bind(alamo.addons.http.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not delete addons.
 // -- addon actions
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
@@ -372,16 +372,16 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/hooks$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/hooks$')
           .run(alamo.hooks.create.bind(alamo.hooks.create, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not create webhooks.
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/hooks/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.hooks.get.bind(alamo.hooks.get, pg_pool))
           .and.authorization([simple_key,jwt_key]);
 routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/hooks/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.hooks.update.bind(alamo.hooks.update, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not update webhooks.
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/hooks/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.hooks.delete.bind(alamo.hooks.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not remove webhooks.
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/hooks/([A-z0-9\\-\\_\\.]+)/results$')
           .run(alamo.hooks.results.bind(alamo.hooks.results, pg_pool))
           .and.authorization([simple_key,jwt_key]);
@@ -412,7 +412,7 @@ routes.add.get('/organizations/([A-z0-9\\-\\_\\.]+)$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/organizations/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.organizations.delete.bind(alamo.organizations.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not delete organizations.
 
 // -- invoices
 routes.add.get('/account/invoices$')
@@ -495,7 +495,7 @@ routes.add.get('/addon-attachments/([A-z0-9\\-\\_\\.]+)$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/addon-attachments/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.addon_attachments.http.delete.bind(alamo.addon_attachments.http.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not destroy addon attachments.
 routes.add.get('/addon-attachments$')
           .run(alamo.addon_attachments.http.list_all.bind(alamo.addon_attachments.http.list_all, pg_pool))
           .and.authorization([simple_key,jwt_key]);
@@ -615,13 +615,13 @@ routes.add.post('/sites$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.patch('/sites/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.sites.http.update.bind(alamo.sites.http.update, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not update sites
 routes.add.get('/sites/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.sites.http.get.bind(alamo.sites.http.get, pg_pool))
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/sites/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.sites.http.delete.bind(alamo.sites.http.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt tokens may not delete sites
 
 // Routes by site
 routes.add.get('/sites/([A-z0-9\\-\\_\\.]+)/routes$')
@@ -640,7 +640,7 @@ routes.add.get('/routes/([A-z0-9\\-\\_\\.]+)$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/routes/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.routes.http.delete.bind(alamo.routes.http.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]);  // jwt tokens may not delete routes in sites
 
 // Favorites
 routes.add.get('/favorites$')
@@ -684,7 +684,7 @@ routes.add.post('/clusters/([A-z0-9_.-]+)/topics/recreate$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)$')
           .run(alamo.topics.delete.bind(null, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]);  // jwt tokens may not delete topics
 
 // Topic ACLs
 routes.add.get('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls$')
@@ -694,8 +694,8 @@ routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls/([A-z0-9_
           .run(alamo.topic_acls.delete_consumer.bind(null, pg_pool))
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls/([A-z0-9_.-]+)/role/(producer|consumer)$')
-          .run(alamo.topic_acls.delete.bind(null, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .run(alamo.topic_acls.delete.bind(null, pg_pool))  // jwt tokens may not delete acl roles
+          .and.authorization([simple_key]);
 routes.add.post('/clusters/([A-z0-9_.-]+)/topics/([A-z0-9_.-]+)/acls$')
           .run(alamo.topic_acls.create.bind(null, pg_pool))
           .and.authorization([simple_key,jwt_key]);
@@ -772,7 +772,7 @@ routes.add.get('/filters/([A-z0-9\\-\\_\\.]+)$')
           .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/filters/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.filters.http.delete.bind(alamo.filters.http.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]);  // jwt tokens may not delete filters
 
 // openid jwt tokens for service accounts and webhooks
 routes.add.get('/\\.well-known/jwks.json$')

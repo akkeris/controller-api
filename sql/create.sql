@@ -433,7 +433,7 @@ begin
     events text,
     app uuid references apps("app"),
     url href not null,
-    secret varchar(128) not null,
+    secret varchar(1024) not null,
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
     active boolean not null default false,
@@ -626,7 +626,14 @@ begin
     alter table releases add column scm_metadata text;
   end if;
 
-
+  if not exists (SELECT NULL 
+    FROM INFORMATION_SCHEMA.COLUMNS
+   WHERE table_name = 'hooks'
+    AND column_name = 'secret'
+    and table_schema = 'public'
+    and character_maximum_length = 128) then
+      alter table hooks alter column "secret" TYPE varchar(1024);
+  end if;
 
 end
 $$;

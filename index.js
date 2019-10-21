@@ -645,13 +645,13 @@ routes.add.delete('/routes/([A-z0-9\\-\\_\\.]+)$')
 // Favorites
 routes.add.get('/favorites$')
           .run(alamo.favorites.list.bind(alamo.favorites.list, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt cannot interact with favorites.
 routes.add.post('/favorites$')
           .run(alamo.favorites.create.bind(alamo.favorites.create, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]); // jwt cannot interact with favorites.
 routes.add.delete('/favorites/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.favorites.delete.bind(alamo.favorites.delete, pg_pool))
-          .and.authorization([simple_key,jwt_key]);
+          .and.authorization([simple_key]);  // jwt cannot interact with favorites.
 
 // Topic clusters
 routes.add.get('/clusters/([A-z0-9_.-]+)$')

@@ -4226,7 +4226,7 @@ Finally you can rely on the following headers being available on each of the web
 * `x-akkeris-event` will equal the event name
 * `x-akkeris-delivery` will equal the unique id for the webhook result event.
 * `x-akkeris-signature` will equal the SHA1 of the payload using the secret specified when the hook was created (prefixed with sha1=, e.g., 'sha1=' + hmac(payload, secret) )
-* `x-akkeris-token` will contain a JWT token allowing you make calls to Apps API to take further actions. 
+* `x-akkeris-token` will contain a JWT token that allows calls to Apps API to take further actions. 
 * `user-agent` will equal `akkeris-hookshot`
 
 ### Using Temporary Tokens from Webhooks

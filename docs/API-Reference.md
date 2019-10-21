@@ -4218,15 +4218,27 @@ The following events exist for hooks to listen to:
 * released
 * crashed
 
-When a hook is called the URL provided is called with a POST method, the body is different depending on the event but will always have the property "action" that equals the event name. 
+When a hook is called the URL provided is called with a `POST` method, the body is different depending on the event but will always have the property "action" that equals the event name. 
 
 Finally you can rely on the following headers being available on each of the webhook calls:
 
-* x-appkit-event will equal the event name
-* x-appkit-delivery will equal the unique id for the webhook result event.
-* x-appkit-signature will equal the SHA1 of the payload using the secret specified when the hook was created (prefixed with sha1=, e.g., 'sha1=' + hmac(payload, secret) )
+* `x-akkeris-event` will equal the event name
+* `x-akkeris-delivery` will equal the unique id for the webhook result event.
+* `x-akkeris-signature` will equal the SHA1 of the payload using the secret specified when the hook was created (prefixed with sha1=, e.g., 'sha1=' + hmac(payload, secret) )
+* `x-akkeris-token` will contain a JWT token allowing you make calls to Apps API to take further actions. 
+* `user-agent` will equal `akkeris-hookshot`
 
-Also the user agent will equal "appkit-hookshot"
+### Using Temporary Tokens from Webhooks
+
+All webhooks contain a header `x-akkeris-token` that can be used to make calls against the Akkeris Apps API. This is a useful way to add functionality to Akkeris and implement Pipeline Status Checks or add additional innovations. This token does have certain limitaitons:
+
+* The token will contain the same (or less) permissions as the user who attached the webhook.  
+* The token will only live for 1 hour after the webhook was called. 
+* `feature_change`, `logdrain_change`, `formation_change`, `config_change` and `addon_change` events will limit the actions you can take to only the application that caused the event to fire.
+* `crashed`, `destroy` events and `preview-released` events do not issue tokens.
+* Temporary tokens cannot destroy addons, sites or apps.
+* Temporary tokens cannot modify `socs` or `prod` related resources with the exception of pipeline promotions on `release` or `released` events (e.g., formation changes, feature changes, logdrain changes, etc).
+* Temporary tokens cannot add additional hooks or remove hooks.
 
 ### Release Event Payload
 

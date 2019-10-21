@@ -3330,6 +3330,7 @@ Promote an app coupled to a pipeline up the pipeline. If a safe promote is indic
 |:----------------:|:---------------:|-----------------------------------------------------------------------------------------------|-------------------------------------------|
 | pipeline/id      | required string | The pipeline to promote an app in                                                             | abc34567-99ab-cdef-0123-456789abcdef      |
 | source/app/id    | required string | The source application to promote                                                             | 11334567-99ab-cdef-0123-456789abcdef      |
+| source/app/release/id | optional string | The release uuid on the source application to promote | 11334567-99ab-cdef-0123-456789abcdef |
 | targets[]/app/id | required string | The target application to receive the promotion                                               | 22334567-99ab-cdef-0123-456789abc123      |
 | safe             | optional boolean | Indicates a safe promotion | true |
 

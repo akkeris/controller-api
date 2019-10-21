@@ -10,7 +10,7 @@
 * `DATABASE_URL` - The database url to store build, release information.  This has no default.  Must be a postgres 9.5+ instance. See create.sql in sql folder for creating the tables and schema.
 
 ### Security
-* `ENCRYPT_KEY` - A private key used to encrypt secretive information in postgres.  This has no default.
+* `ENCRYPT_KEY` - A private key used to encrypt secretive information in postgres.  This has no default.  Must be 24 bytes long.
 * `AKKERIS_UI_URL` - Public URI (https://somehost/) for the appkit ui used by developers.
 * `JWT_RS256_PRIVATE_KEY` - The private key used to issue temporary JWT tokens for webhooks. Must be RS256 PEM encoded. See `test/support/generate-jwt-public-private.sh` to create one.
 * `JWT_RS256_PUBLIC_CERT` - The public key used to validate temporary JWT tokens for webhooks. Must be RS256 PEM encoded. See `test/support/generate-jwt-public-private.sh` to create one.
@@ -56,6 +56,10 @@ Prior to running, ensure all of the prior environment variables are properly set
 ```
 npm start
 ```
+
+## Migrating to 192 bit keys ##
+
+If you're using an old deprecated encrypt key values in `ENCRYPT_KEY` you can migrate by first setting `ENCRYPT_KEY_192_BITS` to the new 24 byte long string, then set `RUN_TOKEN_MIGRATION` to true, finally once migrated you can remove `RUN_TOKEN_MIGRATION` and set `ENCRYPT_KEY` to the 24 byte long string from your environment (and remove `ENCRYPT_KEY_192_BITS`).
 
 ## Testing and Developing Locally ##
 

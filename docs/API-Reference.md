@@ -4231,7 +4231,7 @@ Finally you can rely on the following headers being available on each of the web
 
 ### Using Temporary Tokens from Webhooks
 
-All webhooks contain a header `x-akkeris-token` that can be used to make calls against the Akkeris Apps API. This is a useful way to add functionality to Akkeris and implement Pipeline Status Checks or add additional innovations. This token does have certain limitaitons:
+Almost all webhooks contain a header `x-akkeris-token` that can be used to make calls against the Akkeris Apps API. This is a useful way to add functionality to Akkeris and implement Pipeline Status Checks or add additional innovations. This token does have certain limitaitons:
 
 * The token will contain the same (or less) permissions as the user who attached the webhook.  
 * The token will only live for 1 hour after the webhook was called. 

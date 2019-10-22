@@ -12,6 +12,7 @@ describe("jwt tokens: ensure temporary tokens work appropriately", function() {
   const init = require('./support/init.js');
   const common = require('../lib/common.js');
   const fs = require('fs');
+  const httph = require('../lib/http_helper.js');
   let private_key = fs.readFileSync('./test/support/sample-jwt-private-key.pem');
   let public_cert = fs.readFileSync('./test/support/sample-jwt-public-certificate.pem');
   let TTL_TEMP_TOKEN = 60 * 60;
@@ -148,8 +149,7 @@ describe("jwt tokens: ensure temporary tokens work appropriately", function() {
 
 
   it("Ensure jkws uri works.", async() => {
-    const httph = require('../lib/http_helper.js');
-    let response = JSON.parse(await httph.get('get', 'http://localhost:5000/.well-known/jkws.json', {}));
+    let response = JSON.parse(await httph.request('get', 'http://localhost:5000/.well-known/jwks.json', {}));
     expect(response).to.be.an('object')
     expect(response.keys).to.be.an('array')
     expect(response.keys[0]).to.be.an('object')

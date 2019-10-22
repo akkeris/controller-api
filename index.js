@@ -113,7 +113,10 @@ let ready = (async () => {
   if (process.env.RUN_TOKEN_MIGRATION) {
     console.log('Running token migration...');
     const migration = require('./lib/salt_tokens.js');
-    await migration.update_tokens();
+    const result = await migration.update_tokens();
+    if (!result) {
+      console.log('WARNING: Token migration was not successful. Please resolve the above issues or unexpected behavior may occur.');
+    }
   }
 
   let pkg = JSON.parse(fs.readFileSync('./package.json').toString('utf8'));

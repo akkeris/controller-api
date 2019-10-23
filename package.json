@@ -11,7 +11,7 @@
   "author": "O.C. Tanner",
   "license": "Apache-2.0",
   "dependencies": {
-    "elasticsearch": "^15.1.1",
+    "elasticsearch": "^16.4.0",
     "node-jose": "^1.1.3",
     "pg": "^7.5.0",
     "uuid": "^2.0.2"

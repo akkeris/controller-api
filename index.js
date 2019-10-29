@@ -275,6 +275,20 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.releases.http.get.bind(alamo.releases.http.get, pg_pool))
           .and.authorization([simple_key,jwt_key]);
 
+// release statuses
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)$/statuses')
+          .run(alamo.releases.http.status.list.bind(alamo.releases.http.status.list, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)$/statuses/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.releases.http.status.get.bind(alamo.releases.http.status.get, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)$/statuses$')
+          .run(alamo.releases.http.status.create.bind(alamo.releases.http.status.create, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)$/statuses/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.releases.http.status.update.bind(alamo.releases.http.status.update, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
+
 // -- log drains & log sessions
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/log-sessions$')
           .run(alamo.logs.http.create.bind(alamo.logs.http.create, pg_pool))
@@ -519,9 +533,11 @@ routes.add.get('/pipelines/([A-z0-9\\-\\_\\.]+)$')
 routes.add.delete('/pipelines/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.pipelines.http.delete.bind(alamo.pipelines.http.delete, pg_pool))
           .and.authorization([simple_key,jwt_key]);
+// -- pipeline stages
 routes.add.get('/pipeline-stages$')
           .run(alamo.pipelines.stages.http.get.bind(alamo.pipelines.stages.http.get, pg_pool))
           .and.authorization([simple_key,jwt_key]);
+// -- pipeline coupling management
 routes.add.post('/pipeline-couplings$')
           .run(alamo.pipelines.couplings.http.create.bind(alamo.pipelines.couplings.http.create, pg_pool))
           .and.authorization([simple_key,jwt_key]);
@@ -537,9 +553,13 @@ routes.add.get('/pipeline-couplings$')
 routes.add.get('/pipeline-couplings/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.pipelines.couplings.http.get.bind(alamo.pipelines.couplings.http.get, pg_pool))
           .and.authorization([simple_key,jwt_key]);
+routes.add.patch('/pipeline-couplings/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.pipelines.couplings.http.update.bind(alamo.pipelines.couplings.http.update, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
 routes.add.delete('/pipeline-couplings/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.pipelines.couplings.http.delete.bind(alamo.pipelines.couplings.http.delete, pg_pool))
           .and.authorization([simple_key,jwt_key]);
+// -- pipeline promotion
 routes.add.post('/pipeline-promotions$')
           .run(alamo.pipelines.promotions.http.create.bind(alamo.pipelines.promotions.http.create, pg_pool))
           .and.authorization([simple_key,jwt_key]);

@@ -39,6 +39,9 @@ function wait(time) {
 }
 
 async function wait_for_app_content(url, content, path, headers) {
+  if(!url) {
+    throw new Error(`The passed in url for wait_for_app_content was bunk! ${url}`)
+  }
   if(!url.startsWith('http')) {
     url = 'https://' + url + process.env.ALAMO_BASE_DOMAIN;
   }

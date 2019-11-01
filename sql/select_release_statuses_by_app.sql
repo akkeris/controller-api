@@ -10,12 +10,11 @@ select
   releases_statuses.created,
   releases_statuses.updated
 from 
-  releases_statuses
-  join releases on release_statuses.release = releases.release
-  join apps on releases.app = apps.app
+  apps
+  join releases on releases.app = apps.app
+  join releases_statuses on release_statuses.release = releases.release
 where
     releases_statuses.deleted = false and
     releases.deleted = false and
     apps.deleted = false and
-    (release_statuses.release_status::varchar(1024) = $1::varchar(1024) OR release_statuses.context::varchar(1024) = $1::varchar(1024)) and
-    release_statuses.release = $2
+    apps.app_uuid = $1

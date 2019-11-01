@@ -276,16 +276,16 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)$')
           .and.authorization([simple_key,jwt_key]);
 
 // release statuses
-routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)$/statuses')
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)/statuses$')
           .run(alamo.releases.http.status.list.bind(alamo.releases.http.status.list, pg_pool))
           .and.authorization([simple_key,jwt_key]);
-routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)$/statuses/([A-z0-9\\-\\_\\.]+)$')
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)/statuses/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.releases.http.status.get.bind(alamo.releases.http.status.get, pg_pool))
           .and.authorization([simple_key,jwt_key]);
-routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)$/statuses$')
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)/statuses$')
           .run(alamo.releases.http.status.create.bind(alamo.releases.http.status.create, pg_pool))
           .and.authorization([simple_key,jwt_key]);
-routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)$/statuses/([A-z0-9\\-\\_\\.]+)$')
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/releases/([A-z0-9\\-\\_\\.]+)/statuses/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.releases.http.status.update.bind(alamo.releases.http.status.update, pg_pool))
           .and.authorization([simple_key,jwt_key]);
 

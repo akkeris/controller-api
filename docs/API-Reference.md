@@ -3423,7 +3423,7 @@ curl \
 }
 ```
 
-### List Apps added to a Pipeline (by Pipeline)##
+### List Apps added to a Pipeline (by Pipeline)
 
 Lists all available apps added to the pipeline (e.g., a pipeline coupling)
 

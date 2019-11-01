@@ -73,6 +73,15 @@ async function wait_for_app_content(url, content, path, headers) {
 }
 
 async function wait_for_build(app, build_id) {
+  if(app.name && app.name.includes("-")) {
+    app = app.name;
+  }
+  if(app.id) {
+    app = app.id;
+  }
+  if(build_id.id) {
+    build_id = build_id.id;
+  }
   process.stdout.write(`    ~ Waiting for build ${app} ${build_id}`);
   for(let i=0; i < 210; i++) {
     try {
@@ -100,14 +109,20 @@ async function create_test_app(space = 'default') {
 }
 
 async function delete_app(app) {
-  return await httph.request('delete', `http://localhost:5000/apps/${app.id}`, alamo_headers, null);
+  try {
+    return await httph.request('delete', `http://localhost:5000/apps/${app.id}`, alamo_headers, null);
+  } catch (e) {
+    console.error("UNABLE TO REMOVE APP, WE MAY HAVE LEAKED RESOURCES:");
+    console.error(app);
+    console.error(e);
+  }
 }
 
 async function create_formation(app, type, command) {
   return await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"gp1", "quantity":1, "type":type, "command":command}))
 }
 
-async function create_build(app, image, port) {
+async function create_build(app, image, port, checksum, sha, org, repo, branch, version) {
   if(port) {
     await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"gp1", "quantity":1, "type":"web", "command":null, "port":port}))
   }
@@ -138,6 +153,13 @@ async function create_addon(app, service, plan, name) {
     payload.attachment = {"name":name}
   }
   return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/addons`, alamo_headers, JSON.stringify(payload)));
+}
+
+async function get_app(app) {
+  if(app.id) {
+    app = app.id;
+  }
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app}`, alamo_headers, null));
 }
 
 async function is_running(app, type) {
@@ -321,6 +343,8 @@ function create_callback_server(port = 8001) {
 }
 
 module.exports = {
+  alamo_headers,
+  get_app,
   create_callback_server,
   get_hook_results,
   create_test_build,

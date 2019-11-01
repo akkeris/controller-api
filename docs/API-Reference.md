@@ -1597,6 +1597,8 @@ curl \
 
 `GET /apps/{appname}/releases/{release_id}/statuses`
 
+The list response is slightly different than most responses in that it contains the overall status of the release in addition to the individual statuses.
+
 **CURL Example**
 
 ```bash
@@ -1609,37 +1611,58 @@ curl \
 **200 "OK" Response**
 
 ```json
-[
-  {  
-    "id":"193b58e9-b60c-4224-bca5-14423d861f79",
-    "state":"pending",
-    "name":"My Integration Test XYZ",
-    "context":"tests/integration-test-xyz",
-    "description":"The integration tests are still running.",
-    "target_url":"https://example.com/xyz-job/release-status-info/",
-    "image_url":"https://example.com/xyz-job/release-status-info/status.png",
-    "created_at":"2019-07-19T01:56:02.441Z",
-    "release":{  
-      "app":{  
-        "name":"app-space"
+{
+  "state":"pending",
+  "statuses": [
+    {  
+      "id":"193b58e9-b60c-4224-bca5-14423d861f79",
+      "state":"pending",
+      "name":"My Integration Test XYZ",
+      "context":"tests/integration-test-xyz",
+      "description":"The integration tests are still running.",
+      "target_url":"https://example.com/xyz-job/release-status-info/",
+      "image_url":"https://example.com/xyz-job/release-status-info/status.png",
+      "created_at":"2019-07-19T01:56:02.441Z",
+      "release":{  
+        "app":{  
+          "name":"app-space"
+        },
+        "created_at":"2016-07-19T01:56:02.441Z",
+        "description":"new release of c4b86b55-edd6-4ee7-a898-409cca744180",
+        "slug":{  
+          "id":"c4b86b55-edd6-4ee7-a898-409cca744180"
+        },
+        "id":"09a1a1b8-8318-4445-8752-fb3339173100",
+        "status":"succeeded",
+        "user":{  
+          "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
+          "email":""
+        },
+        "version":"",
+        "current":true
       },
-      "created_at":"2016-07-19T01:56:02.441Z",
-      "description":"new release of c4b86b55-edd6-4ee7-a898-409cca744180",
-      "slug":{  
-        "id":"c4b86b55-edd6-4ee7-a898-409cca744180"
-      },
-      "id":"09a1a1b8-8318-4445-8752-fb3339173100",
-      "status":"succeeded",
-      "user":{  
-        "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
-        "email":""
-      },
-      "version":"",
-      "current":true
+      "updated_at":"2019-07-19T01:56:02.441Z",
+    }
+  ],
+  "release":{  
+    "app":{  
+      "name":"app-space"
     },
-    "updated_at":"2019-07-19T01:56:02.441Z",
+    "created_at":"2016-07-19T01:56:02.441Z",
+    "description":"new release of c4b86b55-edd6-4ee7-a898-409cca744180",
+    "slug":{  
+      "id":"c4b86b55-edd6-4ee7-a898-409cca744180"
+    },
+    "id":"09a1a1b8-8318-4445-8752-fb3339173100",
+    "status":"succeeded",
+    "user":{  
+      "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
+      "email":""
+    },
+    "version":"",
+    "current":true
   }
-]
+}
 ```
 
 ### Update a Release Status

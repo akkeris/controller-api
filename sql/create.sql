@@ -293,7 +293,7 @@ begin
   create index if not exists releases_created_by_app_idx on releases (created, app) where created is not null;
   create index if not exists releases_build_idx on releases (build);
 
-  create table if not exists releases_statuses (
+  create table if not exists release_statuses (
     release_status uuid not null primary key,
     release uuid references releases("release"),
     context varchar(1024) not null,

@@ -21,6 +21,17 @@ function validate_release_object(obj) {
   expect(obj.user.email).is.a('string')
   expect(obj.version).is.a('number')
 }
+function validate_release_status_object(obj) {
+  expect(obj).is.an('object');
+  expect(obj.id).is.a('string');
+  expect(obj.name).is.a('string');
+  expect(obj.created_at).is.a('string');
+  expect(obj.description).is.a('string');
+  expect(obj.updated_at).is.a('string');
+  expect(obj.context).is.a('string');
+  expect(obj.image_url).is.a('string');
+  expect(obj.target_url).is.a('string');
+}
 
 describe("releases: list, get, create a release", function() {
   this.timeout(0);
@@ -30,6 +41,7 @@ describe("releases: list, get, create a release", function() {
   let test_build = null;
   let release_succeeded = false;
   let release_id = null;
+  let release_status_id = null;
 
   it("covers parsing command args from end point", (done) => {
     let c = require('../lib/common.js');
@@ -118,6 +130,66 @@ describe("releases: list, get, create a release", function() {
     let app = await support.get_app(test_app);
     expect(app.image).to.be.a('string');
     expect(app.image).to.not.be.null;
+  });
+
+
+  it("ensure the release statuses is an empty array.", async () => {
+    let statuses = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses`, support.alamo_headers));
+    expect(statuses.state).to.equal("success")
+    expect(statuses.statuses.length).to.equal(0);
+  });
+
+  it("ensure we can create a release status.", async () => {
+    let status = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses`, support.alamo_headers, {"state":"pending", "name":"status123", "context":"group/status123", "description":"This is my status", "image_url":"https://example.com/image.png", "target_url":"https://example.com/statuses"}));
+    validate_release_status_object(status);
+  });
+
+  it("ensure we can list a release status.", async () => {
+    let obj = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses`, support.alamo_headers, null));
+    expect(obj.statuses.length).to.equal(1);
+    validate_release_status_object(obj.statuses[0]);
+    expect(obj.statuses[0].state).to.equal("pending");
+    expect(obj.statuses[0].name).to.equal("status123");
+    expect(obj.statuses[0].context).to.equal("group/status123");
+    expect(obj.statuses[0].description).to.equal("This is my status");
+    expect(obj.statuses[0].image_url).to.equal("https://example.com/image.png");
+    expect(obj.statuses[0].target_url).to.equal("https://example.com/statuses");
+    expect(obj.state).to.equal("pending");
+    expect(obj.release).to.be.an("object");
+    release_status_id = obj.statuses[0].id;
+  });
+
+  it("ensure we can get a release status.", async () => {
+    expect(release_status_id).to.not.be.null;
+    let status = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses/${release_status_id}`, support.alamo_headers, null));
+    validate_release_status_object(status);
+    expect(status.id).to.equal(release_status_id);
+    expect(status.state).to.equal("pending");
+    expect(status.name).to.equal("status123");
+    expect(status.context).to.equal("group/status123");
+    expect(status.description).to.equal("This is my status");
+    expect(status.image_url).to.equal("https://example.com/image.png");
+    expect(status.target_url).to.equal("https://example.com/statuses");
+
+    let statuses = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses`, support.alamo_headers));
+    expect(statuses.state).to.equal("pending");
+    
+  });
+
+  it("ensure we can update a release status.", async () => {
+    expect(release_status_id).to.not.be.null;
+    let status = JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses/${release_status_id}`, support.alamo_headers, JSON.stringify({"state":"success"})));
+    validate_release_status_object(status);
+    expect(status.id).to.equal(release_status_id);
+    expect(status.state).to.equal("success");
+    expect(status.name).to.equal("status123");
+    expect(status.context).to.equal("group/status123");
+    expect(status.description).to.equal("This is my status");
+    expect(status.image_url).to.equal("https://example.com/image.png");
+    expect(status.target_url).to.equal("https://example.com/statuses");
+
+    let statuses = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses`, support.alamo_headers));
+    expect(statuses.state).to.equal("success");
   });
 
   it("ensures we clean up after ourselves.", async () => {

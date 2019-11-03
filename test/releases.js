@@ -144,6 +144,40 @@ describe("releases: list, get, create a release", function() {
     validate_release_status_object(status);
   });
 
+  it("ensure we cannot create invalid statuses", async () => {
+    try {
+      await httph.request('post', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses`, {"x-silent-error":true, ...support.alamo_headers}, 
+        {
+          "state":"foobar", 
+          "name":"status123", 
+          "context":"group/status123", 
+          "description":"This is my status", 
+          "image_url":"https://example.com/image.png", 
+          "target_url":"https://example.com/statuses"
+        });
+      expect(false).to.equal(true);
+    } catch (e) {
+      expect(e.message).to.equal("Invalid state: The state must be \"error\", \"failure\", \"pending\" or \"success\".");
+    }
+  });
+
+  it("ensure we cannot create invalid contexts", async () => {
+    try {
+      await httph.request('post', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses`, {"x-silent-error":true, ...support.alamo_headers}, 
+        {
+          "state":"pending", 
+          "name":"status123", 
+          "context":"invalid context", 
+          "description":"This is my status", 
+          "image_url":"https://example.com/image.png", 
+          "target_url":"https://example.com/statuses"
+        });
+      expect(false).to.equal(true);
+    } catch (e) {
+      expect(e.message).to.equal("Invalid context name: The context name must be alpha numeric and can contain the characters /\\+-.");
+    }
+  });
+
   it("ensure we can list a release status.", async () => {
     let obj = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses`, support.alamo_headers, null));
     expect(obj.statuses.length).to.equal(1);
@@ -190,6 +224,28 @@ describe("releases: list, get, create a release", function() {
 
     let statuses = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses`, support.alamo_headers));
     expect(statuses.state).to.equal("success");
+  });
+
+  it("ensure we cannot update a context.", async () => {
+    expect(release_status_id).to.not.be.null;
+    try {
+      await httph.request('patch', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses/${release_status_id}`, {"x-silent-error":true, ...support.alamo_headers}, 
+        JSON.stringify({"context":"foobar/fee", "state":"success"}));
+      expect(false).to.equal(true);
+    } catch (e) {
+      expect(e.message).to.equal("Invalid parameter: the context of the status may not be renamed or changed.");
+    }
+  });
+
+  it("ensure we cannot update a state to an invalid one.", async () => {
+    expect(release_status_id).to.not.be.null;
+    try {
+      await httph.request('patch', `http://localhost:5000/apps/${test_app.id}/releases/${release_id}/statuses/${release_status_id}`, {"x-silent-error":true, ...support.alamo_headers}, 
+        JSON.stringify({"state":"foobar"}));
+      expect(false).to.equal(true);
+    } catch (e) {
+      expect(e.message).to.equal("Invalid state: The state must be \"error\", \"failure\", \"pending\" or \"success\".");
+    }
   });
 
   it("ensures we clean up after ourselves.", async () => {

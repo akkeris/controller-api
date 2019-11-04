@@ -143,8 +143,11 @@ describe("pipelines", function() {
   it("creating pipeline coupling between app1 and app2 in same space.", async () => {
     await httph.request('post', 'http://localhost:5000/pipeline-couplings', init.alamo_headers,
       JSON.stringify({"app":`${app1}-pipline-test-space1`, "pipeline":"test-pipeline", "stage":"review"}));
-    await httph.request('post', 'http://localhost:5000/pipeline-couplings', init.alamo_headers,
-          JSON.stringify({"app":`${app2}-pipline-test-space1`, "pipeline":"test-pipeline", "stage":"development"}));
+    // create coupling with a check.
+    let pipeline_coupling = JSON.parse(await httph.request('post', 'http://localhost:5000/pipeline-couplings', init.alamo_headers,
+          JSON.stringify({"app":`${app2}-pipline-test-space1`, "pipeline":"test-pipeline", "stage":"development", "required_status_checks":{"contexts":["test/me"]}})));
+    // now remove the check.
+    await httph.request('patch', `http://localhost:5000/pipeline-couplings/${pipeline_coupling.id}`, init.alamo_headers, JSON.stringify({"required_status_checks":{"contexts":[]}}));
   });
 
   it("creating pipeline coupling between app2 -> app3 and app4 in separate spaces.", async () => {
@@ -273,6 +276,83 @@ describe("pipelines", function() {
     expect(build_obj.id).to.be.a('string');
     expect(await init.wait_for_app_content(app1 + '-pipline-test-space1', 'pipeline2')).to.equal("pipeline2");
   });
+
+
+  // Begin pipeline status check tests
+  it("ensure required statuses cannot be added to the review stage.", async () => {
+    expect(app2_coupling_id).to.be.a('string');
+    try {
+      await httph.request('patch', `http://localhost:5000/pipeline-couplings/${app1_coupling_id}`, {"x-silent-error":true, ...init.alamo_headers},
+        JSON.stringify({
+          "app":`${app2}-pipline-test-space1`, 
+          "pipeline":"test-pipeline", 
+          "stage":"review",
+          "required_status_checks":{
+            "contexts":["foo/bar"]
+          }
+        }));
+      expect(true).to.equal(false);
+    } catch (e) {
+      expect(e.code).to.equal(422)
+      expect(e.message).to.equal("Required status checks cannot be added to a pipelines review stage.");
+    }
+  });
+
+  it("ensure a pipeline status check can be added (afterwards) to a coupling", async () => {
+    expect(app2_coupling_id).to.be.a('string');
+
+    let coupling = JSON.parse(await httph.request('patch', `http://localhost:5000/pipeline-couplings/${app2_coupling_id}`, init.alamo_headers,
+      JSON.stringify({
+        "app":`${app2}-pipline-test-space1`, 
+        "pipeline":"test-pipeline", 
+        "stage":"development",
+        "required_status_checks":{
+          "contexts":["foo/bar"]
+        }
+      })));
+    expect(coupling.app.name).to.equal(`${app2}-pipline-test-space1`);
+    expect(coupling.pipeline.name).to.equal("test-pipeline");
+    expect(coupling.stage).to.equal("development");
+    expect(coupling.required_status_checks).to.be.an('object');
+    expect(coupling.required_status_checks.contexts).to.be.an('array');
+    expect(coupling.required_status_checks.contexts[0]).to.equal("foo/bar");
+  });
+
+  it("ensure a status check prevents a pipeline from promoting.", async () => {
+    expect(app1_coupling_id).to.be.a('string');
+    expect(app2_coupling_id).to.be.a('string');
+    expect(pipeline_id).to.be.a('string');
+    expect(app1_id).to.be.a('string');
+    expect(app2_id).to.be.a('string');
+    try {
+      let data = JSON.parse(await httph.request('post','http://localhost:5000/pipeline-promotions', {"x-silent-error":true, ...init.alamo_headers},
+        JSON.stringify({pipeline:{id:pipeline_id}, source:{app:{id:app1_id}}, targets:[{app:{id:app2_id}}]})));
+      expect(true).to.equal(false);
+    } catch (e) {
+      expect(e.code).to.equal(409);
+      expect(e.message).to.equal("This promotion was stopped as it was deemed unsafe:\nThe app pl2-pipline-test-space1 at stage development requires the status \"foo/bar\" to pass in order to promote.");
+    }
+  });
+
+  it("ensure a successful status check allows a promotion of a pipeline, and that checks can be removed.", async () => {
+    let release = await init.latest_release(app1_id);
+    await httph.request('post', `http://localhost:5000/apps/${app1_id}/releases/${release.id}/statuses`, init.alamo_headers, 
+      JSON.stringify({"name":"foo bar check", "context":"foo/bar", "state":"success", "description":"foobar"}));
+    await httph.request('post','http://localhost:5000/pipeline-promotions', init.alamo_headers,
+        JSON.stringify({pipeline:{id:pipeline_id}, source:{app:{id:app1_id}}, targets:[{app:{id:app2_id}}]}));
+    let coupling = JSON.parse(await httph.request('patch', `http://localhost:5000/pipeline-couplings/${app2_coupling_id}`, init.alamo_headers,
+      JSON.stringify({
+        "app":`${app2}-pipline-test-space1`, 
+        "pipeline":"test-pipeline", 
+        "stage":"development",
+        "required_status_checks":{
+          "contexts":[]
+        }
+      })));
+  });
+
+  // /end pipeline status check tests
+
 
   // Restart target apps and ensure they still have original first build.
   it("restarting/redeploying target pipelined apps, ensuring they still have original build", async () => {

@@ -3720,6 +3720,10 @@ curl \
 }
 ```
 
+**409 "Conflict" Response**
+
+If a pipeline promotion cannot be created due to an unmet pipeline status check a 422 Conflict error is returned. The response contains a description of why the promotion failed.
+
 ### Get Pipeline Promotion ##
 
 Gets the promotion record from one app to others.

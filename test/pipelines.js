@@ -334,6 +334,17 @@ describe("pipelines", function() {
     }
   });
 
+
+  it("ensure elevated access can promote with unsafe.", async () => {
+    expect(app1_coupling_id).to.be.a('string');
+    expect(app2_coupling_id).to.be.a('string');
+    expect(pipeline_id).to.be.a('string');
+    expect(app1_id).to.be.a('string');
+    expect(app2_id).to.be.a('string');
+    await httph.request('post','http://localhost:5000/pipeline-promotions', init.alamo_headers,
+        JSON.stringify({safe:false, pipeline:{id:pipeline_id}, source:{app:{id:app1_id}}, targets:[{app:{id:app2_id}}]}));
+  });
+
   it("ensure a successful status check allows a promotion of a pipeline, and that checks can be removed.", async () => {
     let release = await init.latest_release(app1_id);
     await httph.request('post', `http://localhost:5000/apps/${app1_id}/releases/${release.id}/statuses`, init.alamo_headers, 

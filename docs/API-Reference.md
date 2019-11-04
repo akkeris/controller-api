@@ -3286,7 +3286,7 @@ To create a pipeline you'll first create the pipeline name, then couple (or add)
 
 Note its customary to use the app name as the pipeline name, pipelines should not be used for promoting multiple different types of apps.
 
-### Create Pipeline ##
+### Create Pipeline
 
 Create a new pipeline for a set of apps.
 
@@ -3318,7 +3318,7 @@ curl \
 }
 ```
 
-### List Pipelines ##
+### List Pipelines
 
 Lists all available existing pipelines.
 
@@ -3347,7 +3347,7 @@ curl \
 ]
 ```
 
-### Get Pipeline Info ##
+### Get Pipeline Info
 
 Gets information on a specific pipeline
 
@@ -3373,7 +3373,7 @@ curl \
 }
 ```
 
-### Delete a Pipeline ##
+### Delete a Pipeline
 
 Removes a pipeline (and all of its couplings)
 
@@ -3396,6 +3396,30 @@ curl \
   "id": "abc34567-99ab-cdef-0123-456789abcdef",
   "name": "my-test-pipeline",
   "updated_at": "2016-01-01T12:00:00Z"
+}
+```
+
+### List Pipeline Stages
+
+Get a directed graph of the pipeline stages and their next stage.
+
+`GET /pipeline-stages`
+
+**CURL Examplee**
+
+```bash
+curl -H 'Authorization: ...' \
+  https://apps.akkeris.io/pipeline-stages
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "review":"development",
+  "development":"staging",
+  "staging":"production",
+  "production":null
 }
 ```
 

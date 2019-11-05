@@ -3423,6 +3423,34 @@ curl -H 'Authorization: ...' \
 }
 ```
 
+### List Available Pipeline Statuses
+
+Get a list of all the available statuses on all releases associated with a pipeline.  This is useful for selecting a status check you'd like to add to a pipeline stage (e.g., pipeline-coupling below).
+
+`GET /pipelines/{pipeline_name_or_id}/statuses`
+
+**CURL Examplee**
+
+```bash
+curl -H 'Authorization: ...' \
+  https://apps.akkeris.io/pipelines/my-test-pipeline/statuses
+```
+
+**200 "OK" Response**
+
+```json
+[
+  {
+    "context":"taas/integration-test-2",
+    "name":"Integration Smoke Test 2"
+  },
+  {
+    "context":"circleci/integration-test-1",
+    "name":"Integration Smoke Test 1"
+  }
+]
+```
+
 ### Create Pipeline Coupling ##
 
 Adds an application to a pipeline at the specified stage.  Note that the only valid stages are "review", "development", "staging", "production".

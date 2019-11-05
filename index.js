@@ -533,6 +533,10 @@ routes.add.get('/pipelines/([A-z0-9\\-\\_\\.]+)$')
 routes.add.delete('/pipelines/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.pipelines.http.delete.bind(alamo.pipelines.http.delete, pg_pool))
           .and.authorization([simple_key,jwt_key]);
+routes.add.get('/pipelines/([A-z0-9\\-\\_\\.]+)/statuses$')
+          .run(alamo.pipelines.http.list_statuses.bind(alamo.pipelines.http.list_statuses, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
+
 // -- pipeline stages
 routes.add.get('/pipeline-stages$')
           .run(alamo.pipelines.stages.http.get.bind(alamo.pipelines.stages.http.get, pg_pool))

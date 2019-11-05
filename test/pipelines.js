@@ -362,6 +362,13 @@ describe("pipelines", function() {
       })));
   });
 
+  it("ensure a set of statuses can be pulled by pipeline", async () => {
+    let statuses = JSON.parse(await httph.request('get', `http://localhost:5000/pipelines/test-pipeline/statuses`, init.alamo_headers, null));
+    expect(statuses.length).to.equal(1);
+    expect(statuses[0].context).to.equal("foo/bar");
+    expect(statuses[0].name).to.equal("foo bar check");
+  });
+
   // /end pipeline status check tests
 
 

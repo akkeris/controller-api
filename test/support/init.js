@@ -39,6 +39,9 @@ function wait(time) {
 }
 
 async function wait_for_app_content(url, content, path, headers) {
+  if(!url) {
+    throw new Error(`The passed in url for wait_for_app_content was bunk! ${url}`)
+  }
   if(!url.startsWith('http')) {
     url = 'https://' + url + process.env.ALAMO_BASE_DOMAIN;
   }
@@ -73,6 +76,15 @@ async function wait_for_app_content(url, content, path, headers) {
 }
 
 async function wait_for_build(app, build_id) {
+  if(app.name && app.name.includes("-")) {
+    app = app.name;
+  }
+  if(app.id) {
+    app = app.id;
+  }
+  if(build_id.id) {
+    build_id = build_id.id;
+  }
   process.stdout.write(`    ~ Waiting for build ${app} ${build_id}`);
   for(let i=0; i < 210; i++) {
     try {
@@ -100,14 +112,20 @@ async function create_test_app(space = 'default') {
 }
 
 async function delete_app(app) {
-  return await httph.request('delete', `http://localhost:5000/apps/${app.id}`, alamo_headers, null);
+  try {
+    return await httph.request('delete', `http://localhost:5000/apps/${app.id}`, alamo_headers, null);
+  } catch (e) {
+    console.error("UNABLE TO REMOVE APP, WE MAY HAVE LEAKED RESOURCES:");
+    console.error(app);
+    console.error(e);
+  }
 }
 
 async function create_formation(app, type, command) {
   return await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"gp1", "quantity":1, "type":type, "command":command}))
 }
 
-async function create_build(app, image, port) {
+async function create_build(app, image, port, checksum, sha, org, repo, branch, version) {
   if(port) {
     await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"gp1", "quantity":1, "type":"web", "command":null, "port":port}))
   }
@@ -138,6 +156,13 @@ async function create_addon(app, service, plan, name) {
     payload.attachment = {"name":name}
   }
   return JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app.id}/addons`, alamo_headers, JSON.stringify(payload)));
+}
+
+async function get_app(app) {
+  if(app.id) {
+    app = app.id;
+  }
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app}`, alamo_headers, null));
 }
 
 async function is_running(app, type) {
@@ -182,6 +207,14 @@ async function get_config_vars(app) {
   return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, null))
 }
 
+async function create_space(name, description) {
+  try {
+    await httph.request('post', 'http://localhost:5000/spaces', {"x-silent-error":true, ...alamo_headers}, JSON.stringify({name, description}));
+  } catch (e) {
+    // do nothing
+  }
+}
+
 async function create_test_build(app) {
   await httph.request('patch', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, {"RETURN_VALUE":"TESTING"});
   return await create_build(app, "docker://docker.io/akkeris/test-sample:latest", 2000);
@@ -208,7 +241,10 @@ async function addon_info(app, addon) {
 }
 
 async function latest_release(app) {
-  let releases = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/releases`, alamo_headers, null))
+  if(app.id) {
+    app = app.id;
+  }
+  let releases = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app}/releases`, alamo_headers, null))
   return releases.reduce((acc, cur, index, src) => { if(acc.version < cur.version) return cur; return acc; }, {"version":0});
 }
 
@@ -225,6 +261,26 @@ async function remove_app(app) {
     console.error(e)
   }
 }
+
+async function remove_app_if_exists(app) {
+  if(app.id) {
+    app = app.id
+  }
+  try {
+    await httph.request('delete', `http://localhost:5000/apps/${app}`, {"x-silent-error":true, ...alamo_headers}, null);
+  } catch (e) {
+    // don't care.
+  }
+}
+
+async function remove_pipeline_if_exists(pipeline) {
+  try {
+    await httph.request('delete', `http://localhost:5000/pipelines/${pipeline}`, {"x-silent-error":true, ...alamo_headers}, null);
+  } catch (e) {
+    // don't care.
+  }
+}
+
 
 async function remove_site(site) {
   try {
@@ -321,6 +377,11 @@ function create_callback_server(port = 8001) {
 }
 
 module.exports = {
+  create_space,
+  remove_pipeline_if_exists,
+  remove_app_if_exists,
+  alamo_headers,
+  get_app,
   create_callback_server,
   get_hook_results,
   create_test_build,

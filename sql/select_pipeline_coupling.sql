@@ -4,6 +4,7 @@ select
   pipeline_couplings.updated,  
   pipeline_couplings.app, 
   pipeline_couplings.stage,
+  pipeline_couplings.required_status_checks,
   pipelines.pipeline,
   pipelines.name,
   apps.app app_uuid, 

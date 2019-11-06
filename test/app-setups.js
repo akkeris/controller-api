@@ -10,7 +10,7 @@ describe("app-setups:", function() {
   const expect = require("chai").expect;
   const alamo_headers = {"Authorization":process.env.AUTH_KEY, "x-username":"test", "x-elevated-access":"true"};
 
-  let appname = "alamotest" + Math.floor(Math.random() * 10000)
+  let appname = "alamotest" + Math.floor(Math.random() * 100000)
   let app_uuid = null;
   let app_setup_uuid = null;
   it("ensure we can create an app from a definition", async () => {

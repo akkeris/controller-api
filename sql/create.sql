@@ -40,6 +40,9 @@ begin
     create type certificate_status as enum('pending', 'rejected', 'processing', 'issued', 'revoked', 'canceled', 'needs_csr', 'needs_approval');
   end if;
 
+  if not exists (select 1 from pg_type where typname = 'release_check_status') then
+    create type release_check_status as enum('error', 'failure', 'pending', 'success');
+  end if;
 
   create table if not exists regions (
     region uuid not null primary key,
@@ -290,6 +293,20 @@ begin
   create index if not exists releases_created_by_app_idx on releases (created, app) where created is not null;
   create index if not exists releases_build_idx on releases (build);
 
+  create table if not exists release_statuses (
+    release_status uuid not null primary key,
+    release uuid references releases("release"),
+    context varchar(1024) not null,
+    name varchar(1024) not null,
+    target_url varchar(1024) not null,
+    image_url varchar(1024) not null,
+    description text not null default '',
+    state release_check_status not null default 'pending',
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    deleted boolean not null default false
+  );
+
   create table if not exists pipelines (
     pipeline uuid not null primary key,
     created timestamptz not null default now(),
@@ -310,6 +327,14 @@ begin
     app uuid references apps(app),
     deleted boolean not null default false
   );
+
+  if not exists (SELECT NULL 
+              FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE table_name = 'pipeline_couplings'
+              AND column_name = 'required_status_checks'
+              and table_schema = 'public') then
+    alter table pipeline_couplings add column required_status_checks varchar(1024)[] default '{}';
+  end if;
 
   create index if not exists pipeline_couplings_app_idx on pipeline_couplings (app);
 

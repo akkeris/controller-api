@@ -292,6 +292,7 @@ begin
   create index if not exists releases_created_idx on releases (created);
   create index if not exists releases_created_by_app_idx on releases (created, app) where created is not null;
   create index if not exists releases_build_idx on releases (build);
+  create index if not exists releases_updated_idx on releases (updated asc) where NOT deleted;
 
   create table if not exists release_statuses (
     release_status uuid not null primary key,

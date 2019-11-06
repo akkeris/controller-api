@@ -1346,7 +1346,7 @@ curl \
 
 ## Releases
 
-Releasing a slug (or build) will immediately place the new image on all targeted app servers and restart the app in a rolling fashion to prevent downtime. The provided slug or build must be already built through the``/apps/{appname}/builds``end point. Note that releases may occur automatically if auto build and deploys are set. In addition, releases to downstream pipelined applications are not allowed and will result in a 422 error code if a release is attempted.
+Releasing a slug (or build) will immediately place the new image on all targeted app servers and restart the app in a rolling fashion to prevent downtime. The provided slug or build must be already built through the``/apps/{appname}/builds``end point. Note that releases may occur automatically if auto build and deploys are set. In addition, releases to downstream pipelined applications are not allowed and will result in a 422 error code if a release is attempted. Note that in a release the `state` represents the release status checks combined state, the `status` field represents whether the release was successfully deployed.
 
 ### Create a New Release
 
@@ -1382,6 +1382,7 @@ curl \
     "id":"c5b5896f-7896-4a11-80f0-dbb0e6c00ac5"
  },
  "status":"succeeded",
+ "state":"success",
  "user":{  
     "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
     "email":""
@@ -1422,6 +1423,7 @@ curl \
     },
     "id":"09a1a1b8-8318-4445-8752-fb3339173100",
     "status":"succeeded",
+    "state":"success",
     "user":{  
       "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
       "email":""
@@ -1461,6 +1463,7 @@ curl \
   },
   "id":"09a1a1b8-8318-4445-8752-fb3339173100",
   "status":"succeeded",
+  "state":"success",
   "user":{  
     "id":"09eac4cd-4824-f569-bdc4-420656e65ce2",
     "email":""

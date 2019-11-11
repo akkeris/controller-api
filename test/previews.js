@@ -84,6 +84,32 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     expect(drains.length).to.equal(1)    
   })
 
+  it("setup an auth filter)", async () => {
+    let filterPayload = {
+      "name":"test-filter-name",
+      "type":"jwt",
+      "description":"merp",
+      "organization":"test",
+      "options" : {
+        "jwks_uri": "https://merpderp.com",
+        "issuer": "https://testing.akkeris.io"
+      },
+    }
+    
+    let testapp_filter = JSON.parse(await httph.request('post', `http://localhost:5000/filters`, alamo_headers, filterPayload))
+    let attachmentPayload = {
+      "filter":{
+        "id": testapp_filter.id
+      },
+      "options":{
+        "excludes":["/foobar"]
+      }
+    }
+    let testapp_filter_attachment = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${app_name}-preview/filters`, alamo_headers, attachmentPayload))
+    expect(testapp_filter_attachment).to.be.an('object')
+    expect(testapp_filter_attachment.options).to.be.an('object')   
+  })
+  
   it("ensure a PR request with feature disabled does not create a preview app", async () => {
     let incoming = JSON.stringify(webhook_pr_opened)
     let hash = git.calculate_hash("testing", incoming)
@@ -379,8 +405,15 @@ describe("preview apps: ensure preview apps work appropriately", function() {
     });
   })
 
+  it("ensure we clean up after ourselves (3)", (done) => {
+    httph.request('delete', `http://localhost:5000/filters/test-filter-name`, alamo_headers, null, (err, data) => {
+      expect(err).to.be.null;
+      done();
+    });
+  })
+
   if(process.env.SMOKE_TESTS) {
-    it("ensure we clean up after ourselves (3)", (done) => {
+    it("ensure we clean up after ourselves (4)", (done) => {
       httph.request('delete', `http://localhost:5000/apps/${app_dummy_name}-preview`, alamo_headers, null, (err, data) => {
         if(err) {
           console.log(err)

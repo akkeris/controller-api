@@ -86,7 +86,6 @@ describe("releases: list, get, create a release", function() {
   it("covers getting release info", async () => {
     let objs = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${test_app.id}/releases`, support.alamo_headers, null));
     expect(objs).to.be.an('array');
-    expect(objs.length).to.equal(1);
     validate_release_object(JSON.parse(await httph.request('get', `http://localhost:5000/apps/${test_app.id}/releases/${objs[0].id}`, support.alamo_headers, null)));
   });
 

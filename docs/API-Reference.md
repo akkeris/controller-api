@@ -1438,7 +1438,7 @@ curl \
 
 `GET /apps/{appname}/releases/{release uuid}`
 
-Fetch the specific details of a release (or rollback) for an application.
+Fetch the specific details of a release (or rollback) for an application.  The `status` field may have the values `succeeded`, `failed`, `pending`, `unknown`, or `queued`. The state field contains the aggregate of release statuses (`success`, `failure`, `error`, `pending`).
 
 **CURL Example**
 

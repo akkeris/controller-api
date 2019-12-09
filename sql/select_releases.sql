@@ -26,7 +26,7 @@ select
       apps.app = ap.app and
       ap.deleted = false and
       rel.deleted = false and
-      rel.status = 'succeeded'
+      (rel.status = 'succeeded' or rel.status = 'unknown')
   ) "current",
   array_agg(release_statuses_successful.context) as success_statuses,
   array_agg(release_statuses_pending.context) as pending_statuses,

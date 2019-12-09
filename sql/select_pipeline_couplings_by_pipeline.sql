@@ -26,7 +26,7 @@ from
     join pipelines on pipeline_couplings.pipeline = pipelines.pipeline
     join apps on pipeline_couplings.app = apps.app
     join spaces on apps.space = spaces.space
-    left join releases on releases.app = apps.app and releases.created = (select max(created) as created from releases r where r.app = apps.app)
+    left join releases on releases.app = apps.app and releases.created = (select max(created) as created from releases r where r.app = apps.app and (r.status = 'succeeded' or r.status = 'unknown'))
     left join builds on releases.build = builds.build
 where
   (pipelines.pipeline::varchar(1024) = $1 or pipelines.name::varchar(1024) = $1) and

@@ -16,7 +16,7 @@ select
   apps.name app_name, 
   spaces.name space_name,
   releases.version,
-  releases.created = (select max(rel.created) from releases rel join apps ap on rel.app = ap.app join spaces s on s.space = ap.space where ap.app = apps.app and ap.deleted = false and rel.deleted = false and rel.status = 'succeeded') "current",
+  releases.created = (select max(rel.created) from releases rel join apps ap on rel.app = ap.app join spaces s on s.space = ap.space where ap.app = apps.app and ap.deleted = false and rel.deleted = false and (rel.status = 'succeeded' or rel.status = 'unknown')) "current",
   array_agg(release_statuses_successful.context) as success_statuses,
   array_agg(release_statuses_pending.context) as pending_statuses,
   array_agg(release_statuses_failure.context) as failure_statuses,

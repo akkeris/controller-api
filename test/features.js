@@ -17,7 +17,6 @@ describe("features: ensure we can set and get app features", function() {
     expect(obj.doc_url).to.be.a('string')
     expect(obj.state).to.be.a('string')
     expect(obj.display_name).to.be.a('string')
-    expect(obj.feedback_email).to.be.a('string')
     expect(obj.enabled).to.be.a('boolean')
   }
 
@@ -243,6 +242,16 @@ describe("features: ensure we can set and get app features", function() {
       expect(arr.enabled).to.equal(true)
       done();
     });
+  });
+
+  it("covers failing to update a deprecated feature.", async () => {
+    try {
+      let arr = JSON.parse(await httph.request('patch', 'http://localhost:5000/apps/api-default/features/http2', {'x-silent-error':true, ...alamo_headers}, {"enabled":true}));
+      expect(true).to.equal(false);
+    } catch (e) {
+      expect(e.code).to.equal(403);
+      expect(e.message).to.equal("The specified feature http2 has been deprecated");
+    }
   });
   
   it("covers ensuring feature that does not exist returns 404 on get", (done) => {

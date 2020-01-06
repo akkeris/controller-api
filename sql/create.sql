@@ -130,6 +130,17 @@ begin
     alter table app_setups add column status_messages text;
   end if;
 
+  create table if not exists config_var_notes (
+    app uuid references apps("app"),
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    key varchar(128) not null,
+    description text not null default '',
+    required boolean not null default true,
+    deleted boolean not null default false,
+    constraint PK primary key (app, key)
+  );
+
   create table if not exists dyno_types (
     "dyno_type" uuid not null primary key,
     created timestamptz not null default now(),

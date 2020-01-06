@@ -34,7 +34,7 @@ describe("app-setups:", function() {
           "value": "FUGAZI!!!"
         },
         "AUTH_KEY": {
-          "description": "",
+          "description": "my description of AUTH_KEY",
           "required": false,
           "value": "AUTH_KEY"
         }
@@ -194,10 +194,11 @@ describe("app-setups:", function() {
     expect(data.app.space).to.equal('default');
     expect(data.env).to.be.an('object');
     expect(data.env.AUTH_KEY).to.be.an('object');
-    expect(data.env.AUTH_KEY.required).to.be.true;
+    expect(data.env.AUTH_KEY.required).to.be.false;
+    expect(data.env.AUTH_KEY.description).to.equal("my description of AUTH_KEY");
     expect(data.env.AUTH_KEY.value).to.be.undefined;
     expect(data.env.PORT).to.be.an('object');
-    expect(data.env.PORT.required).to.be.false;
+    expect(data.env.PORT.required).to.be.true;
     expect(data.env.PORT.value).to.equal("5000");
     expect(data.formation).to.be.an('object');
     expect(data.formation.web).to.be.an('object');

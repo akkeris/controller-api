@@ -1,0 +1,1 @@
+update config_var_notes set deleted=true, updated=now() where app = $1 and key = $2

@@ -150,6 +150,54 @@ describe("config-vars: creating, updating and deleting a config vars", function(
       done();
     });
   });
+  it("covers getting config var notes", async () => {
+    let data = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars/notes`, alamo_headers, null));
+    expect(data).to.be.an('object');
+    expect(data.PORT).to.be.an('object');
+    expect(data.PORT.type).to.equal('system');
+    expect(data.PORT.addon).to.be.null;
+    expect(data.PORT.required).to.equal(true);
+    expect(data.PORT.description).to.be.a('string');
+
+    expect(data.FOO).to.be.an('object');
+    expect(data.FOO.type).to.equal('user');
+    expect(data.FOO.addon).to.be.null;
+    expect(data.FOO.required).to.equal(false);
+    expect(data.FOO.description).to.equal("");
+  });
+  it("covers updating config var notes", async () => {
+    let payload = JSON.stringify({ "FOO":{ "required":true, "description":"This is my description" } });
+    let data = JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars/notes`, alamo_headers, payload));
+    expect(data).to.be.an('object');
+    expect(data.PORT).to.be.an('object');
+    expect(data.PORT.type).to.equal('system');
+    expect(data.PORT.addon).to.be.null;
+    expect(data.PORT.required).to.equal(true);
+    expect(data.PORT.description).to.be.a('string');
+
+    expect(data.FOO).to.be.an('object');
+    expect(data.FOO.type).to.equal('user');
+    expect(data.FOO.addon).to.be.null;
+    expect(data.FOO.required).to.equal(true);
+    expect(data.FOO.description).to.equal("This is my description");
+  });
+
+  it("covers getting config var notes to be updated", async () => {
+    let data = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/config-vars/notes`, alamo_headers, null));
+    expect(data).to.be.an('object');
+    expect(data.PORT).to.be.an('object');
+    expect(data.PORT.type).to.equal('system');
+    expect(data.PORT.addon).to.be.null;
+    expect(data.PORT.required).to.equal(true);
+    expect(data.PORT.description).to.be.a('string');
+
+    expect(data.FOO).to.be.an('object');
+    expect(data.FOO.type).to.equal('user');
+    expect(data.FOO.addon).to.be.null;
+    expect(data.FOO.required).to.equal(true);
+    expect(data.FOO.description).to.equal("This is my description");
+  });
+
   it("covers deleting config vars", (done) => {
     // delete a config var
     httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/config-vars', alamo_headers, JSON.stringify({FOO:null}), (err, data) => {

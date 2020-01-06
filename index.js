@@ -252,6 +252,12 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/config-vars$')
 routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/config-vars$')
           .run(alamo.config_var.http.update.bind(alamo.config_var.http.update, pg_pool))
           .and.authorization([simple_key,jwt_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/config-vars/notes$')
+          .run(alamo.config_var.http.notes.get.bind(alamo.config_var.http.notes.get, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/config-vars/notes$')
+            .run(alamo.config_var.http.notes.update.bind(alamo.config_var.http.notes.update, pg_pool))
+            .and.authorization([simple_key,jwt_key]);
 
 // -- features
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/features$')

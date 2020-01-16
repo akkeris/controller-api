@@ -76,9 +76,8 @@ describe("addons attachments:", function() {
   });
 
   it("covers ensuring owned addon DATABASE_URL is returned from first app", async () => {
-    await support.wait(1000);
-    let dburl = await support.wait_for_app_content(`https://${appname_brand_new}${process.env.ALAMO_BASE_DOMAIN}/DATABASE_URL`);
-    expect(common.socs({"DATABASE_URL":dburl}).DATABASE_URL).to.equal(postgresql_response.config_vars.DATABASE_URL)
+    await support.wait_for_app_content(`https://${appname_brand_new}${process.env.ALAMO_BASE_DOMAIN}/DATABASE_URL`, 
+      postgresql_response.config_vars.DATABASE_URL.substring(postgresql_response.config_vars.DATABASE_URL.indexOf('@')));
   });
 
   it("covers getting info on a running postgresql service by name", async () => {
@@ -189,9 +188,8 @@ describe("addons attachments:", function() {
   })
 
   it("covers ensuring attached addon DATABASE_URL is returned from second app", async () => {
-    await support.wait(1000);
-    let resp = await support.wait_for_app_content(`https://${appname_second_new}${process.env.ALAMO_BASE_DOMAIN}/DATABASE_URL`);
-    expect(common.socs({"DATABASE_URL":resp}).DATABASE_URL).to.equal(postgresql_response.config_vars.DATABASE_URL);
+    await support.wait_for_app_content(`https://${appname_second_new}${process.env.ALAMO_BASE_DOMAIN}/DATABASE_URL`, 
+      postgresql_response.config_vars.DATABASE_URL.substring(postgresql_response.config_vars.DATABASE_URL.indexOf('@')));
   });
 
   it("covers ensuring the original memcacher on the root app cannot be removed since its attached", async () => {

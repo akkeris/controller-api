@@ -7,222 +7,95 @@ const init = require('./support/init.js')
 const httph = require('../lib/http_helper.js');
 const expect = require("chai").expect;
 const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
-
-function wait_for_app_content(httph, app, content, callback, iteration) {
-  iteration = iteration || 1;
-  if(iteration === 1) {
-    process.stdout.write("    ~ Waiting for app to turn up");
-  }
-  if(iteration === 120) {
-    process.stdout.write("\n");
-    callback({code:0, message:"Timeout waiting for app to turn up."});
-  }
-  setTimeout(function() {
-    httph.request('get', 'https://' + app + process.env.ALAMO_BASE_DOMAIN, {'X-Timeout':1500}, null, (err, data) => {
-      if(err || data.indexOf(content) === -1) {
-        process.stdout.write(".");
-        setTimeout(wait_for_app_content.bind(null, httph, app, content, callback, (iteration + 1)), 250);
-        //callback(err, null);
-      } else {
-        process.stdout.write("\n");
-        callback(null, data);
-      }
-    });
-  },1000);
-}
-
-function wait_for_build(httph, app, build_id, callback, iteration) {
-  iteration = iteration || 1;
-  if(iteration === 1) {
-    process.stdout.write("    ~ Waiting for build");
-  }
-  httph.request('get', 'http://localhost:5000/apps/' + app + '/builds/' + build_id, alamo_headers, null, (err, data) => {
-    if(err && err.code === 423) {
-      process.stdout.write(".");
-      setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-    } else if(err) {
-      callback(err, null);
-    } else {
-      let build_info = JSON.parse(data);
-      if(build_info.status === 'pending' || build_info.status === 'queued') {
-        process.stdout.write(".");
-        setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-      } else {
-        process.stdout.write("\n");
-        callback(null, data);
-      }
-    }
-  });
-}
-
 describe("lifecycle: ensure apps restart at appropriate times.", function() {  
   this.timeout(300000);
   process.env.DEFAULT_PORT = "9000";
-  let appname_brand_new = "alamotest" + Math.floor(Math.random() * 10000);
   let build_info
 
+  let app = null;
 
-  it("covers creating dependent app.", function(done) {
+  it("covers creating dependent app.", async () => {
     // create an app.
-    httph.request('post', 'http://localhost:5000/apps', alamo_headers,
-      JSON.stringify({org:"test", space:"default", name:appname_brand_new}), 
-    (err, data) => {
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      done()
-    })
+    app = await init.create_test_app()
   })
 
-  it("covers attempting to restart an app without a release or formation", function(done) {
-    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos', alamo_headers, null, (err, info) => {
-      if(err) {
-        console.log('err on restart without release:', err);
-      }
-      expect(err).to.be.null;
-      expect(info).to.be.a('string');
-      done();
-    });
+  it("covers attempting to restart an app without a release or formation", async () => {
+    expect(app).to.be.an('object');
+    let info = await httph.request('delete', `http://localhost:5000/apps/${app.id}/dynos`, alamo_headers, null);
+    expect(info).to.be.a('string');
   })
 
 
-  it("covers creating worker without release", function(done) {
-    let payload = {command:"fubar", type:"worker", "quantity":1, "size":"gp1"}
-    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers, JSON.stringify(payload), (err, info) => {
-      if(err) {
-        console.log('err on worker without release:', err);
-      }
-      expect(err).to.be.null;
-      expect(info).to.be.a('string');
-      done();
-    });
+  it("covers creating worker without release", async () => {
+    expect(app).to.be.an('object');
+    let info = await init.create_formation(app);
+    expect(info).to.be.a('string');
   })
 
-  it("covers attempting to restart an app with formation, without a release", function(done) {
-    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos', alamo_headers, null, (err, info) => {
-      if(err) {
-        console.log('err on restart without release:', err);
-      }
-      expect(err).to.be.null;
-      expect(info).to.be.a('string');
-      done();
-    });
+  it("covers attempting to restart an app with formation, without a release", async () => {
+    expect(app).to.be.an('object');
+    let info = await httph.request('delete', `http://localhost:5000/apps/${app.id}/dynos`, alamo_headers, null);
+    expect(info).to.be.a('string');
   })
 
 
-  it("covers creating dependent build and release.", function(done) {
-    this.timeout(0);
-    // make a build with the wrong port.
-    let build_payload = {"sha":"123456","org":"test","repo":"https://github.com/abcd/some-repo","branch":"master","version":"v1.0","checksum":"sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756","url":"docker://docker.io/akkeris/test-lifecycle:latest"};
-    httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/builds', alamo_headers, JSON.stringify(build_payload), (err, info) => {
-      expect(err).to.be.null;
-      expect(info).to.be.a('string');
-      build_info = JSON.parse(info);
-      wait_for_build(httph, appname_brand_new + '-default', build_info.id, (wait_err, building_info) => {
-        if(wait_err) {
-          console.error("Error waiting for build:", wait_err);
-          return expect(true).to.equal(false);
-        }
-        httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/releases', alamo_headers, JSON.stringify({"slug":build_info.id,"description":"Deploy " + build_info.id}), (err, release_info) => {
-          if(err) {
-            console.log('release error:', err);
-          }
-          expect(err).to.be.null;
-          expect(release_info).to.be.a('string');
-          done();
-        });
-      });
-    });
+  it("covers creating dependent build and release.", async () => {
+    build_info = await init.create_build(app, "docker://docker.io/akkeris/test-lifecycle:latest", null, "sha256:d3e015c1ef2d5d6d8eafe4451ea148dd3d240a6826d927bcc9c741b66fb46756", "123456", "test", "https://github.com/abcd/some-repo", "master", "v1.0");
+    await init.wait_for_build(app, build_info.id);
   });
 
   // test changing the port, ensure it restarts and comes up (and is down before.)
-  it("ensure app does not respond to default port (9000).", (done) => {
-    // theres no real way to know if the app is down or up or ready or not, well.. sort of. but either way we'll give it a second
-    // to actually come up, at this point we should just get a timeout.
-    setTimeout(function() {
-      let timeout_headers = JSON.parse(JSON.stringify(alamo_headers))
-      timeout_headers['X-Timeout'] = 5000;
-      httph.request('get','https://' + appname_brand_new + process.env.ALAMO_BASE_DOMAIN, timeout_headers, null, (err, data) => {
-        expect(err).to.be.an('object');
-        done();
-      });
-    }, 250);
+  it("ensure app does not respond to default port (9000).", async () => {
+    // wait to see if the app goes unhealthy or not.
+    for(let i = 0; i < 200; i++) {
+      let dynos = await init.get_dynos(app);
+      let web = dynos.filter((x) => x.type === "web" && x.state != "running")
+      if(web.length === 0) {
+        return;
+      }
+      await init.wait(250);
+    }
+    throw new Error("The web dyno never went unhealthy.");
   });
 
-  it("change port and quantity on application via formations batch update", (done) => {
+  it("change port and quantity on application via formations batch update", async () => {
     // submit a change to the port.
-    let changes = [{port:5000, type:"web", quantity:1}]
-    httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation', alamo_headers, JSON.stringify(changes), (err, info) => {
-      if(err) {
-        console.log('err on batch updates:', err);
-      }
-      expect(err).to.be.null;
-      expect(info).to.be.a('string');
-      done();
-    });
+    let info = await init.update_formation(app, "web", null, 5000);
+    expect(info).to.be.a('string');
   });
 
   // Now that we changed the port, the app should turn up by itself (and automatically be restarted/redeployed.)
-  it("ensure app comes back up after changing its port to the correct value (5000).", function(done) {
-    this.timeout(0);
-    wait_for_app_content(httph, appname_brand_new, '[setting return value failed.] with port [5000]', (wait_app_err, resp) => {
-      if(wait_app_err) {
-        console.log('waiting for app err:', wait_app_err);
-      }
-      // ensure we get the response "hello", so we know its our app that turned up.
-      expect(resp).to.equal('[setting return value failed.] with port [5000]')
-      expect(wait_app_err).to.be.null;
-      done();
-    });
+  it("ensure app comes back up after changing its port to the correct value (5000).", async () => {
+    await init.wait_for_app_content(app.name, '[setting return value failed.] with port [5000]');
   });
 
-
-
-  it("covers getting metrics", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/metrics', alamo_headers, null, (err, data) => {
-      if(err) {
-        console.log(err);
-      } 
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      let obj = JSON.parse(data);
-      expect(obj).to.be.an('object');
-      expect(obj.web).to.be.an('object');
-      expect(obj.web.memory_usage_bytes).to.be.an('object');
-      expect(obj.web.memory_rss).to.be.an('object');
-      expect(obj.web.memory_cache).to.be.an('object');
-      expect(obj.web.cpu_user_seconds_total).to.be.an('object');
-      expect(obj.web.cpu_usage_seconds_total).to.be.an('object');
-      done();
-    });
+  it("covers getting metrics", async () => {
+    let obj = await init.get_metrics(app);
+    expect(obj).to.be.an('object');
+    expect(obj.web).to.be.an('object');
+    expect(obj.web.memory_usage_bytes).to.be.an('object');
+    expect(obj.web.memory_rss).to.be.an('object');
+    expect(obj.web.memory_cache).to.be.an('object');
+    expect(obj.web.cpu_user_seconds_total).to.be.an('object');
+    expect(obj.web.cpu_usage_seconds_total).to.be.an('object');
   });
 
   // test changing config env's make sure it restarts the server
-  it("ensure app restarts and reloads config when changing config vars", function(done) {
-    this.timeout(0);
-    // add a config var
-    httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/config-vars', alamo_headers, JSON.stringify({RETURN_VALUE:"FOOBAR"}), (err, data) => {
-      expect(err).to.be.null;
-      wait_for_app_content(httph, appname_brand_new, '[FOOBAR]', (wait_app_err, resp) => {
-        if(wait_app_err) {
-          console.log(wait_app_err);
-        }
-        // ensure we get the response "hello", so we know its our app that turned up.
-        expect(wait_app_err).to.be.null;
-        expect(resp).to.contain('[FOOBAR]')
-        done();
-      });
-    });
+  it("ensure app restarts and reloads config when changing config vars", async () => {
+    await init.update_config_vars(app, {"RETURN_VALUE":"FOOBAR"});
+    await init.wait_for_app_content(app.name, '[FOOBAR]');
   });
 
   var dyno_name = null
-  it("ensure app shows a running dyno.", (done) => {
-    setTimeout(function() {
-      httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos', alamo_headers, null, (err, data) => {
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        data = JSON.parse(data);
-        expect(data).to.be.an('array');
-        let datum = data.filter((x) => x.type === 'web' && x.state === "running")
+  it("ensure app shows a running dyno.", async () => {
+
+    // wait to see if the app goes unhealthy or not.
+    for(let i = 0; i < 200; i++) {
+      let dynos = await init.get_dynos(app);
+      let web = dynos.filter((x) => x.type === "web" && x.state == "running")
+      if(web.length > 0) {
+        expect(dynos).to.be.an('array');
+        let datum = dynos.filter((x) => x.type === 'web' && x.state === "running")
         expect(datum[0]).to.be.a('object');
         expect(datum[0].command).to.be.null;
         expect(datum[0].created_at).to.be.a.string;
@@ -235,120 +108,75 @@ describe("lifecycle: ensure apps restart at appropriate times.", function() {
         expect(datum[0].type).to.equal("web");
         expect(datum[0].updated_at).to.be.a('string');
         dyno_name = datum[0].name;
-        done();
-      });
-    },1000);
+        return;
+      }
+      await init.wait(250);
+    }
+    throw new Error("The web dyno never went healthy.");
   });
 
-  it("get info on a specific dyno type.", (done) => {
+  it("get info on a specific dyno type.", async () => {
     expect(dyno_name).to.be.a.string;
-    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos/' + dyno_name, alamo_headers, null, (err, data) => {
-      if(err) {
-        console.log(err);
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      data = JSON.parse(data);
-      expect(data).to.be.a('object');
-      expect(data.command).to.be.null;
-      expect(data.created_at).to.be.a.string;
-      expect(data.id).to.be.a.string;
-      expect(data.name).to.be.a.string;
-      expect(data.release).to.be.an('object');
-      expect(data.app).to.be.an('object');
-      expect(data.size).to.be.a('string');
-      expect(data.state).to.be.a('string');
-      expect(data.type).to.equal("web");
-      expect(data.updated_at).to.be.a('string');
-      done();
-    });
+    let data = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/dynos/${dyno_name}`, alamo_headers, null));
+    expect(data).to.be.a('object');
+    expect(data.command).to.be.null;
+    expect(data.created_at).to.be.a.string;
+    expect(data.id).to.be.a.string;
+    expect(data.name).to.be.a.string;
+    expect(data.release).to.be.an('object');
+    expect(data.app).to.be.an('object');
+    expect(data.size).to.be.a('string');
+    expect(data.state).to.be.a('string');
+    expect(data.type).to.equal("web");
+    expect(data.updated_at).to.be.a('string');
   });
 
-  it("restart specific dyno", (done) => {
+  it("restart specific dyno", async () => {
     expect(dyno_name).to.be.a('string');
-    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos/web.' + dyno_name, alamo_headers, null, (err, data) => {
-      if(err) {
-        console.log('error restarting dyno type', dyno_name);
-        console.error(err);
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      data = JSON.parse(data);
-      expect(data.type).to.equal('web');
-      expect(data.dyno).to.equal(dyno_name);
-      done();
-    });
+    let data = JSON.parse(await httph.request('delete', `http://localhost:5000/apps/${app.id}/dynos/web.${dyno_name}`, alamo_headers, null));
+    expect(data.type).to.equal('web');
+    expect(data.dyno).to.equal(dyno_name);
   });
 
-  it("update quantity of a dyno type", (done) => {
+  it("update quantity of a dyno type", async () => {
     expect(dyno_name).to.be.a('string');
-    httph.request('patch', 'http://localhost:5000/apps/' + appname_brand_new + '-default/formation/web', alamo_headers, JSON.stringify({'quantity':2}), (err, data) => {
-      if(err) {
-        console.log(err)
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.an('string');
-      data = JSON.parse(data);
-      expect(data.quantity).to.equal(2);
-      done();
-    });
+    let data = JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${app.id}/formation/web`, alamo_headers, JSON.stringify({'quantity':2})));
+    expect(data.quantity).to.equal(2);
   });
 
-  it("restart unknown dyno", (done) => {
+  it("restart unknown dyno", async () => {
     expect(dyno_name).to.be.a('string');
-    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos/foobar', alamo_headers, null, (err, data) => {
-      expect(err).to.be.an('object');
-      expect(data).to.be.null;
-      done();
-    });
+    try {
+      await httph.request('delete', `http://localhost:5000/apps/${app.id}/dynos/foobar`, {...alamo_headers, "x-silent-error":true}, null);
+      expect(true).to.equal(false);
+    } catch (err) {
+      /* do nothing */
+    }
   });
 
-  it("restart dyno type", (done) => {
+  it("restart dyno type", async () => {
     expect(dyno_name).to.be.a('string');
-    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos/web', alamo_headers, null, (err, data) => {
-      if(err) {
-        console.log('error restarting dyno type', dyno_name);
-        console.error(err);
-      }
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      data = JSON.parse(data);
-      expect(data.type).to.equal('web');
-      expect(data.dyno).to.be.undefined;
-      done();
-    });
+    let data = JSON.parse(await httph.request('delete', `http://localhost:5000/apps/${app.id}/dynos/web`, alamo_headers));
+    expect(data.type).to.equal('web');
+    expect(data.dyno).to.be.undefined;
   });
 
-  it("restart all dynos", (done) => {
+  it("restart all dynos", async () => {
     expect(dyno_name).to.be.a('string');
-    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos', alamo_headers, null, (err, data) => {
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      data = JSON.parse(data);
-      expect(data.type).to.be.undefined;
-      expect(data.dyno).to.be.undefined;
-      done();
-    });
+    let data = JSON.parse(await httph.request('delete', `http://localhost:5000/apps/${app.id}/dynos`, alamo_headers));
+    expect(data.type).to.be.undefined;
+    expect(data.dyno).to.be.undefined;
   });
 
-  it("ensure we still have two dynos running.", (done) => {
-    httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/dynos', alamo_headers, null, (err, data) => {
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      data = JSON.parse(data);
-      expect(data).to.be.an('array');
-      expect(data.length).to.be.at.least(2);
-      done();
-    });
+  it("ensure we still have two dynos running.", async () => {
+    let dynos = await init.get_dynos(app);
+    expect(dynos).to.be.an('array');
+    expect(dynos.length).to.be.at.least(2);
   });
 
-  it("covers removing test app.", (done) => {
+  it("covers removing test app.", async () => {
     // destroy the app.
-    httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default', alamo_headers, null, (err, data) => {
-      expect(err).to.be.null;
-      expect(data).to.be.a('string');
-      done();
-    });
+    await init.delete_app(app);
   });
 });
 

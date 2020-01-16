@@ -43,6 +43,10 @@ async function wait_for_app_content(url, content, path, headers) {
     throw new Error(`The passed in url for wait_for_app_content was bunk! ${url}`)
   }
   if(!url.startsWith('http')) {
+    let urltmp = url;
+    if(urltmp.endsWith("-default")) {
+      url = urltmp.substring(0, urltmp.indexOf("-default"));
+    }
     url = 'https://' + url + process.env.ALAMO_BASE_DOMAIN;
   }
   if(path) {
@@ -121,8 +125,12 @@ async function delete_app(app) {
   }
 }
 
-async function create_formation(app, type, command) {
+async function create_formation(app, type = "worker", command = "none") {
   return await httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({"size":"gp1", "quantity":1, "type":type, "command":command}))
+}
+
+async function update_formation(app, type = "worker", command = "none", port = null) {
+  return await httph.request('patch', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify([{"size":"gp1", "quantity":1, "type":type, "command":command, "port":port}]))
 }
 
 async function create_build(app, image, port, checksum, sha, org, repo, branch, version) {
@@ -165,8 +173,12 @@ async function get_app(app) {
   return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app}`, alamo_headers, null));
 }
 
+async function get_dynos(app) {
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/dynos`, alamo_headers, null))
+}
+
 async function is_running(app, type) {
-  let dynos = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/dynos`, alamo_headers, null)).filter((x) => x.type === type)
+  let dynos = (await get_dynos(app)).filter((x) => x.type === type)
   if (dynos.length === 0) {
     return false
   }
@@ -207,12 +219,20 @@ async function get_config_vars(app) {
   return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, null))
 }
 
+async function update_config_vars(app, config) {
+  return JSON.parse(await httph.request('patch', `http://localhost:5000/apps/${app.id}/config-vars`, alamo_headers, JSON.stringify(config)))
+}
+
 async function create_space(name, description) {
   try {
     await httph.request('post', 'http://localhost:5000/spaces', {"x-silent-error":true, ...alamo_headers}, JSON.stringify({name, description}));
   } catch (e) {
     // do nothing
   }
+}
+
+async function get_metrics(app) {
+  return JSON.parse(await httph.request('get', `http://localhost:5000/apps/${app.id}/metrics`, alamo_headers, null));
 }
 
 async function create_test_build(app) {
@@ -377,7 +397,9 @@ function create_callback_server(port = 8001) {
 }
 
 module.exports = {
+  get_dynos,
   create_space,
+  get_metrics,
   remove_pipeline_if_exists,
   remove_app_if_exists,
   alamo_headers,
@@ -385,6 +407,7 @@ module.exports = {
   create_callback_server,
   get_hook_results,
   create_test_build,
+  update_formation,
   add_hook,
   get_hooks,
   get_hook,
@@ -409,6 +432,7 @@ module.exports = {
   addon_info,
   remove_app,
   get_config_vars,
+  update_config_vars,
   alamo_headers,
   wait,
   wait_for_app_content,

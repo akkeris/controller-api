@@ -17,7 +17,7 @@
     "uuid": "^3.4.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
+    "chai": "^4.2.0",
     "codacy-coverage": "^3.2.0",
     "mocha": "^5.2.0",
     "mocha-jenkins-reporter": "0.4.2",

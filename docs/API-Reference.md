@@ -6283,6 +6283,7 @@ one excluded path may be provided.
 | filter.id        | required string | The uuid of the filter to attach.                            | 77cc4e5f-c76e-bb04-b94d-62cc0d06df45 |
 | options          | required object | An object representing the options for the filter.           | `{}`                                 |
 | options.excludes | optional array  | An array of paths to exclude from the filter.                | ["/images","/javascript","/css"]     |
+| options.includes | optional array  | An array of paths to include the filter                      | ["/"]     |
 
 
 **CURL Example**

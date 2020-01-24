@@ -4766,10 +4766,11 @@ The following events exist for hooks to listen to:
 * preview-released
 * released
 * crashed
+* pipeline_promotion
 
-When a hook is called the URL provided is called with a `POST` method, the body is different depending on the event but will always have the property "action" that equals the event name. 
+When a hook is called, the URL provided is called with a `POST` method. While the body of the `POST` may differ slightly depending on the event, it will always have the property "action" that equals the event name. 
 
-Finally you can rely on the following headers being available on each of the webhook calls:
+Finally, you can rely on the following headers being available on each of the webhook calls:
 
 * `x-akkeris-event` will equal the event name
 * `x-akkeris-delivery` will equal the unique id for the webhook result event.
@@ -5228,6 +5229,41 @@ This event occurs when an app has a new version and is now available for request
 }
 ```
 
+### Pipeline Promotion Event Payload
+
+This event occurs upon a successful pipeline promotion. It fires on the target apps in the coupling, and includes information about the source app (`promoted_from`), the new release (`release`), and the build (`build`).
+
+`POST [callback end point]`
+
+```json
+{
+  "action":"pipeline_promotion",
+  "app":{
+    "name":"targetapp",
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+  },
+  "space":{
+    "name":"target-space"
+  },
+  "promoted_from":{
+    "app":{
+      "name":"sourceapp",
+      "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+    },
+    "space":{
+      "name":"source-space"
+    }
+  },
+  "build": {
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+  },
+  "release":{
+    "id":"1edbac4b-6a5e-09e1-ef3a-08084a904623",
+    "status":"queued",
+    "description":"Promotion from sourceapp-source-space"
+  }
+}
+```
 
 ## Invoices
 

@@ -809,7 +809,12 @@ routes.add.delete('/filters/([A-z0-9\\-\\_\\.]+)$')
 
 // openid jwt tokens for service accounts and webhooks
 routes.add.get('/\\.well-known/jwks.json$')
-          .run(common.http_jwks_uri.bind(common.http_jwks_uri, config.jwt_public_cert, pg_pool));
+          .run(common.http_jwks_uri.bind(common.http_jwks_uri, config.jwt_public_cert, pg_pool))
+
+// List available webhooks and their descriptions
+routes.add.get('/docs/hooks$')
+          .run(alamo.hooks.descriptions)
+          .and.authorization([simple_key,jwt_key]);
 
 routes.add.default((req, res) => {
   res.writeHead(404,{}); 

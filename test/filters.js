@@ -267,10 +267,27 @@ describe("filters: ensure filters can be created and applied.", function() {
     }
   })
 
+  it("create filter attachment on an app, test multiple types of filters", async() => {
+    expect(testapp_filter).to.be.an('object')
+    let payload = {
+      "filter":{
+        "id":testapp_filter3.id
+      },
+      "options":{}
+    }
+    testapp_filter_attachment2 = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${testapp.id}/filters`, alamo_headers, payload))
+    expect(testapp_filter_attachment2).to.be.an('object')
+    expect(testapp_filter_attachment2.id).to.be.a('string')
+    expect(testapp_filter_attachment2.options).to.be.an('object')
+    expect(testapp_filter_attachment2.filter.id).to.equal(testapp_filter3.id)
+    expect(testapp_filter_attachment2.created_at).to.be.a('string')
+    expect(testapp_filter_attachment2.updated_at).to.be.a('string')
+  })
+
   it("list filter attachments on an app", async() => {
     expect(testapp_filter).to.be.an('object')
     let fa = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${testapp.id}/filters`, alamo_headers, null))
-    expect(fa.length).to.equal(1)
+    expect(fa.length).to.equal(2)
     expect(fa[0]).to.be.an('object')
     expect(fa[0].options).to.be.an('object')
     expect(fa[0].options.excludes).to.be.an('array')
@@ -318,6 +335,9 @@ describe("filters: ensure filters can be created and applied.", function() {
     expect(testapp_filter_attachment).to.be.an('object')
     await httph.request('delete', `http://localhost:5000/apps/${testapp.id}/filters/${testapp_filter_attachment.id}`, alamo_headers, null)
     let fa = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${testapp.id}/filters`, alamo_headers, null))
+    expect(fa.length).to.equal(1)
+    await httph.request('delete', `http://localhost:5000/apps/${testapp.id}/filters/${testapp_filter_attachment2.id}`, alamo_headers, null)
+    fa = JSON.parse(await httph.request('get', `http://localhost:5000/apps/${testapp.id}/filters`, alamo_headers, null))
     expect(fa.length).to.equal(0)
   })
 

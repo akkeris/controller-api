@@ -187,6 +187,7 @@ describe("filters: ensure filters can be created and applied.", function() {
     }
     testapp_filter_attachment = JSON.parse(await httph.request('post', `http://localhost:5000/apps/${testapp.id}/filters`, alamo_headers, payload))
     expect(testapp_filter_attachment).to.be.an('object')
+    expect(testapp_filter_attachment.id).to.be.a('string')
     expect(testapp_filter_attachment.options).to.be.an('object')
     expect(testapp_filter_attachment.options.excludes).to.be.an('array')
     expect(testapp_filter_attachment.options.excludes[0]).to.equal('/foobar')
@@ -208,9 +209,25 @@ describe("filters: ensure filters can be created and applied.", function() {
     expect(fa[0].updated_at).to.be.a('string')
   })
 
-  //it("update filter attachment on an app", async() => {
-  //  expect(testapp_filter).to.be.an('object')
-  //})
+  it("update filter attachment on an app", async() => {
+    expect(testapp_filter).to.be.an('object')
+    let payload = {
+      "filter":{
+        "id":testapp_filter.id
+      },
+      "options":{
+        "excludes":["/foobar2"]
+      }
+    }
+    testapp_filter_attachment = JSON.parse(await httph.request('put', `http://localhost:5000/apps/${testapp.id}/filters/${testapp_filter_attachment.id}`, alamo_headers, payload))
+    expect(testapp_filter_attachment).to.be.an('object')
+    expect(testapp_filter_attachment.options).to.be.an('object')
+    expect(testapp_filter_attachment.options.excludes).to.be.an('array')
+    expect(testapp_filter_attachment.options.excludes[0]).to.equal('/foobar2')
+    expect(testapp_filter_attachment.filter.id).to.equal(testapp_filter.id)
+    expect(testapp_filter_attachment.created_at).to.be.a('string')
+    expect(testapp_filter_attachment.updated_at).to.be.a('string')
+  })
 
   it("get filter attachments on an app", async() => {
     expect(testapp_filter).to.be.an('object')
@@ -219,7 +236,7 @@ describe("filters: ensure filters can be created and applied.", function() {
     expect(fa).to.be.an('object')
     expect(fa.options).to.be.an('object')
     expect(fa.options.excludes).to.be.an('array')
-    expect(fa.options.excludes[0]).to.equal('/foobar')
+    expect(fa.options.excludes[0]).to.equal('/foobar2')
     expect(fa.filter.id).to.equal(testapp_filter.id)
     expect(fa.created_at).to.be.a('string')
     expect(fa.updated_at).to.be.a('string')

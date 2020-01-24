@@ -157,6 +157,31 @@ describe("regions: list and get available regions", function() {
     });
   });
 
+  it("covers updating a region", (done) => {
+    let payload = {"name":"fubar", "description":"description2","country":"country","locale":"locale","provider":{"name":"provider_name","region":"provider_region","availability_zones":["zone1","zone2"]}, "high_availability":false, "private_capable":true}
+    httph.request('patch', 'http://localhost:5000/regions/fubar', alamo_headers, JSON.stringify(payload), (err, data) => {
+      if(err) {
+        console.error(err)
+      }
+      expect(err).to.be.null;
+      data = JSON.parse(data)
+      validate_us_region(data)
+      expect(data.name).to.equal('fubar')
+      expect(data.description).to.equal('description2')
+      expect(data.country).to.equal('country')
+      expect(data.locale).to.equal('locale')
+      expect(data.provider).to.be.an('object')
+      expect(data.provider.name).to.equal('provider_name')
+      expect(data.provider.region).to.equal('provider_region')
+      expect(data.provider.availability_zones).to.be.an('array')
+      expect(data.provider.availability_zones[0]).to.equal('zone1')
+      expect(data.provider.availability_zones[1]).to.equal('zone2')
+      expect(data.high_availability).to.equal(false)
+      expect(data.private_capable).to.equal(true)
+      done();
+    });
+  });
+
   it("covers not allowing duplicate names", (done) => {
     let payload = {"name":"fubar", "description":"description","country":"country","locale":"locale","provider":{"name":"provider_name","region":"provider_region","availability_zones":["zone1","zone2"]},"high_availability":false, "private_capable":true}
     httph.request('post', 'http://localhost:5000/regions', alamo_headers, JSON.stringify(payload), (err, data) => {
@@ -175,7 +200,7 @@ describe("regions: list and get available regions", function() {
       data = JSON.parse(data)
       validate_us_region(data)
       expect(data.name).to.equal('fubar')
-      expect(data.description).to.equal('description')
+      expect(data.description).to.equal('description2')
       expect(data.country).to.equal('country')
       expect(data.locale).to.equal('locale')
       expect(data.provider).to.be.an('object')
@@ -204,7 +229,7 @@ describe("regions: list and get available regions", function() {
         if(data.name === "fubar") {
           fubar_found = true
           expect(data.name).to.equal('fubar')
-          expect(data.description).to.equal('description')
+          expect(data.description).to.equal('description2')
           expect(data.country).to.equal('country')
           expect(data.locale).to.equal('locale')
           expect(data.provider).to.be.an('object')
@@ -231,7 +256,7 @@ describe("regions: list and get available regions", function() {
       data = JSON.parse(data)
       validate_us_region(data)
       expect(data.name).to.equal('fubar')
-      expect(data.description).to.equal('description')
+      expect(data.description).to.equal('description2')
       expect(data.country).to.equal('country')
       expect(data.locale).to.equal('locale')
       expect(data.provider).to.be.an('object')

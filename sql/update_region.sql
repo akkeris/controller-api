@@ -10,6 +10,7 @@ update regions set
 	deprecated = coalesce($10, deprecated),
 	updated = now()
 where
-	region::varchar(128) = $1::varchar(128)
+	(region::varchar(128) = $1::varchar(128) OR name::varchar(128) = $1::varchar(128)) and
+	deleted = false
 returning *
 	

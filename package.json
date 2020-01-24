@@ -5,21 +5,21 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors -u exports --reporter spec --reporter mocha-jenkins-reporter --reporter-options=junit_report_path=./coverage/report.xml --exit",
+    "test": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors -u exports --reporter spec  --reporter mocha-jenkins-reporter --reporter-options=junit_report_path=./coverage/report.xml --exit",
     "cover": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors -u exports --reporter spec --reporter mocha-jenkins-reporter --reporter-options=junit_report_path=./coverage/report.xml --exit && cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage"
   },
   "author": "O.C. Tanner",
   "license": "Apache-2.0",
   "dependencies": {
-    "elasticsearch": "^16.6.0",
+    "elasticsearch": "15.5.0",
     "node-jose": "^1.1.3",
     "pg": "^7.17.1",
-    "uuid": "^3.4.0"
+    "uuid": "2.0.3"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "codacy-coverage": "^3.4.0",
-    "mocha": "^7.0.0",
+    "mocha": "5.2.0",
     "mocha-jenkins-reporter": "0.4.2",
     "ngrok": "^3.2.7",
     "nyc": "^15.0.0"

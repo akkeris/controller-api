@@ -15,7 +15,9 @@ describe("filters: ensure filters can be created and applied.", function() {
   let testapp = null
   let testapp_filter = null
   let testapp_filter2 = null
+  let testapp_filter3 = null
   let testapp_filter_attachment = null
+  let testapp_filter_attachment2 = null
 
   it("create: check for required field when creating a filter", async () => {
     testapp = await init.create_test_app('default')
@@ -94,6 +96,41 @@ describe("filters: ensure filters can be created and applied.", function() {
     expect(testapp_filter2.organization).to.be.an('object')
     expect(testapp_filter2.organization.id).to.be.a('string')
     expect(testapp_filter2.id).to.be.a('string')
+
+    payload = {
+      "name":"test-filter-name3",
+      "organization":"test",
+      "type":"cors",
+      "description":"my cors filter",
+      "options":{
+        "allow_origin":["*"],
+        "allow_methods":["get","post"],
+        "allow_headers":["x-request-id"],
+        "expose_headers":["content-type"],
+        "max_age":3600,
+        "allow_credentials":true,
+      }
+    }
+    testapp_filter3 = JSON.parse(await httph.request('post', `http://localhost:5000/filters`, alamo_headers, JSON.stringify(payload)))
+    expect(testapp_filter3.name).to.equal("test-filter-name3")
+    expect(testapp_filter3.description).to.equal("my cors filter")
+    expect(testapp_filter3.type).to.equal("cors")
+    expect(testapp_filter3.options.allow_origin).to.be.an('array')
+    expect(testapp_filter3.options.allow_origin[0]).to.equal("*")
+    expect(testapp_filter3.options.allow_methods).to.be.an('array')
+    expect(testapp_filter3.options.allow_methods[0]).to.equal("get")
+    expect(testapp_filter3.options.allow_methods[1]).to.equal("post")
+    expect(testapp_filter3.options.allow_headers).to.be.an('array')
+    expect(testapp_filter3.options.allow_headers[0]).to.equal("x-request-id")
+    expect(testapp_filter3.options.expose_headers).to.be.an('array')
+    expect(testapp_filter3.options.expose_headers[0]).to.equal("content-type")
+    expect(testapp_filter3.options.max_age).to.equal(3600)
+    expect(testapp_filter3.options.allow_credentials).to.equal(true)
+    expect(testapp_filter3.created_at).to.be.a('string')
+    expect(testapp_filter3.updated_at).to.be.a('string')
+    expect(testapp_filter3.organization).to.be.an('object')
+    expect(testapp_filter3.organization.id).to.be.a('string')
+    expect(testapp_filter3.id).to.be.a('string')
   });
 
   it("list filters", async () => {
@@ -287,6 +324,7 @@ describe("filters: ensure filters can be created and applied.", function() {
   it("delete: ensure a filter can be removed", async () => {
     await httph.request('delete', 'http://localhost:5000/filters/test-filter-name', alamo_headers, null)
     await httph.request('delete', 'http://localhost:5000/filters/test-filter-name2', alamo_headers, null)
+    await httph.request('delete', 'http://localhost:5000/filters/test-filter-name3', alamo_headers, null)
   })
 
   it("delete: clean up after ourselves", async () => {

@@ -5231,9 +5231,7 @@ This event occurs when an app has a new version and is now available for request
 
 ### Pipeline Promotion Event Payload
 
-This event occurs upon a successful pipeline promotion. It fires on the target apps in the coupling, and includes information about the source app (`promoted_from`) and the new release (`release`).
-
-#### Target App
+This event occurs upon a successful pipeline promotion. It fires on the target apps in the coupling, and includes information about the source app (`promoted_from`), the new release (`release`), and the build (`build`).
 
 `POST [callback end point]`
 
@@ -5256,11 +5254,12 @@ This event occurs upon a successful pipeline promotion. It fires on the target a
       "name":"source-space"
     }
   },
+  "build": {
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621"
+  },
   "release":{
     "id":"1edbac4b-6a5e-09e1-ef3a-08084a904623",
     "status":"queued",
-    "created_at":"2016-08-09T12:00:00Z",
-    "version":13,
     "description":"Promotion from sourceapp-source-space"
   }
 }

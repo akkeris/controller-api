@@ -126,6 +126,7 @@ describe("preview sites: ensure preview sites work appropriately", function() {
     let previews = await init.get_previews(previewapp1)
     expect(previews).to.be.an('array')
     expect(previews.length).to.equal(1)
+    await init.wait(5000)
     let data2 = await init.fake_github_notice(previewapp1, './test/support/github-webhook-pr-closed.json')
     previews = await init.get_previews(previewapp1)
     expect(previews).to.be.an('array')

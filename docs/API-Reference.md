@@ -5211,6 +5211,12 @@ This event occurs when an app has a new version and is now available for request
    "dyno":{
     "type":"web"
    },
+   "release": {
+     "id": "d7c9f3cc-95a2-4476-8519-34f92af7dd68",
+     "created_at": "2018-08-23T15:38:15.010Z",
+     "updated_at": "2018-08-23T15:38:16.010Z",
+     "version": 4
+   },
    "slug":{  
       "image":"docker.akkeris.io/org/yourappname-08b17a6f-f2e7-4698-b60a-6f89f6f2f00c:0.4",
       "source_blob":{  
@@ -5218,7 +5224,7 @@ This event occurs when an app has a new version and is now available for request
          "url":null,
          "version":"Optional Version Info",
          "commit":"abcde3234fdsadf32342efasdf23432",
-         "author":"John Smith",
+         "author":"Jimbo Jones",
          "repo":"https://github.com/org/repo",
          "branch":"my_branch",
          "message":"My commit message"

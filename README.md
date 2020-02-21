@@ -1,7 +1,7 @@
 # Akkeris Controller API #
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2ca150dbc553444dab5b8ed8e0ecd296)](https://www.codacy.com/app/Akkeris/controller-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=akkeris/controller-api&amp;utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/2ca150dbc553444dab5b8ed8e0ecd296)](https://www.codacy.com/app/Akkeris/controller-api?utm_source=github.com&utm_medium=referral&utm_content=akkeris/controller-api&utm_campaign=Badge_Coverage)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fcc7c79fe0b349a7ac6f9b731b3e00ca)](https://www.codacy.com/gh/akkeris/controller-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=akkeris/controller-api&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/fcc7c79fe0b349a7ac6f9b731b3e00ca)](https://www.codacy.com/gh/akkeris/controller-api?utm_source=github.com&utm_medium=referral&utm_content=akkeris/controller-api&utm_campaign=Badge_Coverage)
 [![CircleCI](https://circleci.com/gh/akkeris/controller-api.svg?style=svg)](https://circleci.com/gh/akkeris/controller-api)
 
 ## Setting Up ##

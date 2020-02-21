@@ -4432,13 +4432,17 @@ A service, app or other addon may use webhooks to listen to various events that 
   "events":[
     "release",
     "released",
+    "preview",
     "preview-released",
     "build",
     "formation_change",
+    "feature_change",
     "logdrain_change",
+    "pipeline_promotion",
     "addon_change",
     "config_change",
-    "destroy"
+    "destroy",
+    "updated",
   ],
   "active":true,
   "secret":"some secret for hash"
@@ -4453,13 +4457,17 @@ A service, app or other addon may use webhooks to listen to various events that 
   "events":[
     "release",
     "released",
+    "preview",
     "preview-released",
     "build",
     "formation_change",
+    "feature_change",
     "logdrain_change",
+    "pipeline_promotion",
     "addon_change",
     "config_change",
-    "destroy"
+    "destroy",
+    "updated",
   ],
   "active":true,
   "created_at":"2016-08-09T12:00:00Z",
@@ -4482,13 +4490,17 @@ Note any of these fields may be provided or left out and a partial update is app
   "events":[
     "release",
     "released",
+    "preview",
     "preview-released",
     "build",
     "formation_change",
+    "feature_change",
     "logdrain_change",
+    "pipeline_promotion",
     "addon_change",
     "config_change",
-    "destroy"
+    "destroy",
+    "updated",
   ],
   "secret":"some secret for hash"
 }
@@ -4502,13 +4514,17 @@ Note any of these fields may be provided or left out and a partial update is app
   "events":[
     "release",
     "released",
+    "preview",
     "preview-released",
     "build",
     "formation_change",
+    "feature_change",
     "logdrain_change",
+    "pipeline_promotion",
     "addon_change",
     "config_change",
-    "destroy"
+    "destroy",
+    "updated",
   ],
   "active":true,
   "created_at":"2016-08-09T12:00:00Z",
@@ -4531,13 +4547,17 @@ Upon successfully being updated the API responds with 200 and the body contains 
   "events":[
     "release",
     "released",
+    "preview",
     "preview-released",
     "build",
     "formation_change",
+    "feature_change",
     "logdrain_change",
+    "pipeline_promotion",
     "addon_change",
     "config_change",
-    "destroy"
+    "destroy",
+    "updated",
   ],
   "active":true,
   "created_at":"2016-08-09T12:00:00Z",
@@ -4560,13 +4580,17 @@ Upon successful deletion the API responds with 200.
   "events":[
     "release",
     "released",
+    "preview",
     "preview-released",
     "build",
     "formation_change",
+    "feature_change",
     "logdrain_change",
+    "pipeline_promotion",
     "addon_change",
     "config_change",
-    "destroy"
+    "destroy",
+    "updated",
   ],
   "active":true,
   "created_at":"2016-08-09T12:00:00Z",
@@ -4799,6 +4823,7 @@ The following events exist for hooks to listen to:
 * released
 * crashed
 * pipeline_promotion
+* updated
 
 When a hook is called, the URL provided is called with a `POST` method. While the body of the `POST` may differ slightly depending on the event, it will always have the property "action" that equals the event name. 
 
@@ -5300,6 +5325,28 @@ This event occurs upon a successful pipeline promotion. It fires on the target a
     "status":"queued",
     "description":"Promotion from sourceapp-source-space"
   }
+}
+```
+
+### App Updated Event Payload
+
+This event occurs if an applications description, labels or maintenance mode is changed.  The properties for `description`, `labels` and `maintenance` only are available on the object if the values change.
+
+`POST [callback end point]`
+
+```json
+{
+  "action":"pipeline_promotion",
+  "app":{
+    "name":"targetapp",
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621",
+    "description":"This property exists if the description is updated.",
+    "labels":"This property exists if the lables property is updated.",
+    "maintenance":true,
+  },
+  "space":{
+    "name":"target-space"
+  },
 }
 ```
 

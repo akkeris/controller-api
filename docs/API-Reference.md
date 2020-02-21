@@ -1037,6 +1037,42 @@ curl \
 ```
 
 
+### Dyno Attach
+
+Executes (white listed) commands on a dyno, the provided command is ran on the same server under the same context under the same memory and CPU limitations. The output of the stdout and stderr is returned. An error is returned if the command takes more than one minute. 
+
+White listed commands are hard coded and cannot be changed dynamically.  The current white list is:
+
+* `/^kill \-[0-9]+ \-1$/`
+
+`POST /apps/{appname}/dynos/{dyno_id_or_name}/actions/attach`
+
+|   Name   |       Type      | Description                                                                                                                                                                                                | Example                                                                                                                            |
+|:--------:|:---------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
+|   command      | required array of strings | The command to execute (as an array of strings where the first entry is the executable) |  ["echo", "hello"] |
+|   stdin        | string | The initial set of stdin  | "" |
+
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X POST \
+  https://apps.akkeris.io/apps/someapp-default/web.12333ns-nda11/actions/attach \
+  -d '{"command":["echo","Hello"], "stdin":""}'
+```
+
+**202 "Accepted" Response**
+
+```json
+{
+  "stdout":"Hello",
+  "stderr":""
+}
+```
+
+
 ## Builds
 
 Builds are not necessarily builds in the sense of "testing", but the process of taking already existing source code from a URL and building a docker image to deploy.  If a docker image is already supplied from an external build process the image is copied and used (and no build occurs).  Builds can be tied into github for convenience to auto-build and deploy based on status check rules. 

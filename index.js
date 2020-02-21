@@ -192,6 +192,10 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/dynos$')
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/dynos/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.dynos.http.restart_dyno_type.bind(alamo.dynos.http.restart_dyno_type, pg_pool))
           .and.authorization([simple_key,jwt_key]);
+// Send Command to Specific Dyno
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/dynos/([A-z0-9\\-\\_\\.]+)/actions/attach$')
+          .run(alamo.dynos.http.attach_dyno.bind(alamo.dynos.http.attach_dyno, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
 // Stop Specific Dyno
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/dynos/([A-z0-9\\-\\_\\.]+)/actions/stop$')
           .run(alamo.dynos.http.restart_dyno.bind(alamo.dynos.http.restart_dyno, pg_pool))

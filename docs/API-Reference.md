@@ -1039,7 +1039,11 @@ curl \
 
 ### Dyno Attach
 
-Executes (white listed) commands on a dyno, the provided command is ran on the same server under the same context under the same memory and CPU limitations. The output of the stdout and stderr is returned. An error is returned if the command takes more than one minute. White listed commands are programmatically hard coded and cannot be changed.
+Executes (white listed) commands on a dyno, the provided command is ran on the same server under the same context under the same memory and CPU limitations. The output of the stdout and stderr is returned. An error is returned if the command takes more than one minute. 
+
+White listed commands are hard coded and cannot be changed dynamically.  The current white list is:
+
+* `/^kill \-[0-9]+ \-1$/`
 
 `POST /apps/{appname}/dynos/{dyno_id_or_name}/actions/attach`
 

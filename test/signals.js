@@ -25,7 +25,7 @@ describe("signals and executing debug commands", function() {
   });
 
   it("test that SIGHUP is sent and triggered", async () => {
-    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["kill","-1","-1"], "stdin":""}));
+    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["sh", "-c", "kill -1 -1"], "stdin":""}));
     await test.wait(1000);
     let signals = JSON.parse(await request('get', signalsapp.web_url, {}, null));
     expect(Object.keys(signals).length).to.equal(1);
@@ -33,7 +33,7 @@ describe("signals and executing debug commands", function() {
   });
 
   it("test that SIGINT is sent and triggered", async () => {
-    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["kill","-2","-1"], "stdin":""}))
+    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["sh", "-c", "kill -2 -1"], "stdin":""}))
     let signals = JSON.parse(await request('get', signalsapp.web_url, {}, null))
     expect(Object.keys(signals).length).to.equal(2);
     expect(signals["SIGHUP"]).to.equal(true);
@@ -41,7 +41,7 @@ describe("signals and executing debug commands", function() {
   });
 
   it("test that SIGTERM is sent and triggered", async () => {
-    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["kill","-15","-1"], "stdin":""}))
+    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["sh", "-c", "kill -15 -1"], "stdin":""}))
     let signals = JSON.parse(await request('get', signalsapp.web_url, {}, null))
     expect(Object.keys(signals).length).to.equal(3);
     expect(signals["SIGHUP"]).to.equal(true);
@@ -50,7 +50,7 @@ describe("signals and executing debug commands", function() {
   });
 
   it("test that SIGQUIT is sent and triggered", async () => {
-    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["kill","-3","-1"], "stdin":""}))
+    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["sh", "-c", "kill -3 -1"], "stdin":""}))
     let signals = JSON.parse(await request('get', signalsapp.web_url, {}, null))
     expect(Object.keys(signals).length).to.equal(4);
     expect(signals["SIGHUP"]).to.equal(true);
@@ -60,7 +60,7 @@ describe("signals and executing debug commands", function() {
   });
 
   it("test that SIGABRT is sent and triggered", async () => {
-    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["kill","-6","-1"], "stdin":""}))
+    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["sh", "-c", "kill -6 -1"], "stdin":""}))
     let signals = JSON.parse(await request('get', signalsapp.web_url, {}, null))
     expect(Object.keys(signals).length).to.equal(5);
     expect(signals["SIGHUP"]).to.equal(true);
@@ -71,7 +71,7 @@ describe("signals and executing debug commands", function() {
   });
 
   it("test that SIGABRT is sent and triggered", async () => {
-    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["kill","-10","-1"], "stdin":""}))
+    await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/web.${dynos[0].name}/actions/attach`, test.alamo_headers, JSON.stringify({"command":["sh", "-c", "kill -10 -1"], "stdin":""}))
     let signals = JSON.parse(await request('get', signalsapp.web_url, {}, null))
     expect(Object.keys(signals).length).to.equal(6);
     expect(signals["SIGHUP"]).to.equal(true);
@@ -84,7 +84,7 @@ describe("signals and executing debug commands", function() {
 
   it("test to ensure signals cannot be sent to unknown dynos", async () => {
     try {
-      await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/does-not-exist/actions/attach`, {"x-silent-error":"true", ...test.alamo_headers}, JSON.stringify({"command":["kill","-10","-1"], "stdin":""}));
+      await request('post', `http://localhost:5000/apps/${signalsapp.id}/dynos/does-not-exist/actions/attach`, {"x-silent-error":"true", ...test.alamo_headers}, JSON.stringify({"command":["sh", "-c", "kill -10 -1"], "stdin":""}));
       expect(false).to.equal(true);
     } catch (e) {
       expect(e.code).to.equal(404);

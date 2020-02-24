@@ -1043,7 +1043,7 @@ Executes (white listed) commands on a dyno, the provided command is ran on the s
 
 White listed commands are hard coded and cannot be changed dynamically.  The current white list is:
 
-* `/^kill \-[0-9]+ \-1$/`
+* `/^sh -c kill \-[0-9]+ \-1$/`
 
 `POST /apps/{appname}/dynos/{dyno_id_or_name}/actions/attach`
 

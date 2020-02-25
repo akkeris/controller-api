@@ -1,7 +1,7 @@
 update filters set 
-	name = $2,
-	type = $3,
-	description = $4,
+	name = coalesce($2, name),
+	type = coalesce($3, name),
+	description = coalesce($4, name),
 	options = $5,
 	updated = now()
 where

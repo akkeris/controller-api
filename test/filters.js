@@ -133,6 +133,28 @@ describe("filters: ensure filters can be created and applied.", function() {
     expect(testapp_filter3.id).to.be.a('string')
   });
 
+  it("ensure invalid values are not allowed in cors filters", async () => {
+      try {
+        let payload = {
+          "name":"test-filter-name4",
+          "organization":"test",
+          "type":"cors",
+          "description":"my cors filter",
+          "options":{
+            "allow_origin":["^%$#@"],
+            "allow_methods":["get","post"],
+            "allow_headers":["x-requ  est-id"],
+            "expose_headers":["content-type"],
+            "max_age":3600,
+            "allow_credentials":true,
+          }
+        }
+        await httph.request('post', `http://localhost:5000/filters`, alamo_headers, payload)
+      } catch (e) {
+        // do nothing
+      }
+  })
+
   it("list filters", async () => {
     let filters = JSON.parse(await httph.request('get', 'http://localhost:5000/filters', alamo_headers, null))
 
@@ -172,6 +194,18 @@ describe("filters: ensure filters can be created and applied.", function() {
 
   it("update a filter", async () => {
     let payload = {}
+
+    // ensure we can update a filter without a description, type, or name.
+    payload.options = {}
+    payload.options.jwks_uri = "https://foobar2.com"
+    try {
+      await httph.request('put', 'http://localhost:5000/filters/test-filter-name', alamo_headers, payload)
+      expect(true).to.equal(false)
+    } catch (e) {
+      // do nothing
+    }
+    delete payload.options
+
     payload.name = 'test-filter-name'
     try {
       await httph.request('put', 'http://localhost:5000/filters/test-filter-name', alamo_headers, payload)

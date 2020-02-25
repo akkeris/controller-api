@@ -74,6 +74,7 @@ describe("builds: conversion between payload, response and database", function()
 
   //let builds = require('../lib/builds.js')
   const httph = require('../lib/http_helper.js')
+  let build_id_after_test = null;
 
   it("covers ensuring soft error on non-uuid", function(done) {
     this.timeout(0);
@@ -103,7 +104,7 @@ describe("builds: conversion between payload, response and database", function()
           expect(build_info).to.be.a('string');
           let build_obj = JSON.parse(build_info);
           validate_build_obj(build_obj)
-
+          build_id_after_test = build_obj.id;
           wait_for_build(httph, appname_brand_new + '-default', build_obj.id, (wait_err, building_info) => {
             if(wait_err) {
               console.error("Error waiting for build:", wait_err);
@@ -269,4 +270,8 @@ describe("builds: conversion between payload, response and database", function()
       done()
     });
   });
+
+  it("ensures we can still fetch the build as a slug after the app was deleted", async () => {
+    validate_build_obj(JSON.parse(await httph.request('get', `http://localhost:5000/slugs/${build_id_after_test}`, alamo_headers, null)))
+  })
 })

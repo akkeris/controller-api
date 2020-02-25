@@ -31,7 +31,7 @@ from
     join organizations on apps.org = organizations.org 
 where 
   builds.build = $1 and 
-  apps.deleted = false and 
   builds.deleted = false and 
-  spaces.deleted = false and 
-  organizations.deleted = false
+  ((apps.deleted = false and $2 = false) or ($2 = true)) and
+  ((spaces.deleted = false and $2 = false) or ($2 = true)) and
+  ((organizations.deleted = false and $2 = false) or ($2 = true))

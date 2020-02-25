@@ -1077,7 +1077,7 @@ curl \
 
 Builds are not necessarily builds in the sense of "testing", but the process of taking already existing source code from a URL and building a docker image to deploy.  If a docker image is already supplied from an external build process the image is copied and used (and no build occurs).  Builds can be tied into github for convenience to auto-build and deploy based on status check rules. 
 
-Note that a "slug" as its termed here is the id of a successful build image, and not the build id, the build id may differ from the slug id based on whether the build had to be repeated due to an infrastructure failure (and not due to the application failure). 
+Note that a "slug" as its termed here is the id of a successful build image, and not the build id, the build id may differ from the slug id based on whether the build had to be repeated due to an infrastructure failure (and not due to the application failure).  The slug is also idempotent and is always available, the build however may no longer be available if the application is removed. 
 
 ### Create a new build
 
@@ -1334,7 +1334,7 @@ This is returned when the builds sources are unavialable (they've been archived 
 
 ### View Slug Details
 
-A slug is an image produced by build, a slug may be associated as running on one or more applications at any point in time using pipeline promotions.  Slugs are therefore unassociated with a specific application and have their own unique end point.  However slugs do return the near same structure as builds.
+A slug is an image produced by build, a slug may be associated as running on one or more applications at any point in time using pipeline promotions.  Slugs are therefore unassociated with a specific application and have their own unique end point.  However slugs do return the near same structure as builds. Unlike the builds API end point, the slug end point is always available (even when the application that caused the slug to be built is destroyed).
 
 `GET /slugs/{slug_uuid}`
 

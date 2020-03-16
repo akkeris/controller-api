@@ -1,1 +1,1 @@
-update pipeline_couplings set required_status_checks = $2 where pipeline_coupling = $1 and deleted = false
+update pipeline_couplings set required_status_checks = $2, updated=now() where pipeline_coupling = $1 and deleted = false

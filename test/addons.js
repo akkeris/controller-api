@@ -370,6 +370,21 @@ describe("addons: provisioning postgres, redis, influx, and cassandra services."
     });
   });
 
+  it("covers global /addons/{addon_id} end point", async () => {
+    let obj = JSON.parse(await httph.request('get', `http://localhost:5000/addons/${postgres_response.id}`, alamo_headers, null));
+    expect(obj.id).to.equal(postgres_response.id);
+  });
+
+  it("covers global /addons/{addon_id}/config end point", async () => {
+    let obj = JSON.parse(await httph.request('get', `http://localhost:5000/addons/${postgres_response.id}/config`, alamo_headers, null));
+    expect(obj.DATABASE_URL).to.be.a('string');
+  });
+
+  it("covers global /addons end point", async () => {
+    let obj = JSON.parse(await httph.request('get', `http://localhost:5000/addons`, alamo_headers, null));
+    expect(obj).to.be.an('array');
+  });
+
   it("covers listing all services and checking for postgres", (done) => {
     expect(postgres_response).to.be.an('object');
     expect(postgres_plan).to.be.an('object');

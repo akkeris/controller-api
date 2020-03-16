@@ -496,10 +496,16 @@ routes.add.get('/ssl-endpoints/([A-z0-9\\-\\_\\.]+)$')
           .run(alamo.certificates.get.bind(alamo.certificates.get, pg_pool))
           .and.authorization([simple_key,jwt_key]);
 
-// -- global addon stuff TODO
-// GET    /addons
-// GET    /addons/{addon_id_or_name}
-// GET    /addons/{addon_id_or_name}/config
+// -- global addons end points
+routes.add.get('/addons$')
+          .run(alamo.addons.http.list_all.bind(alamo.addons.http.list_all, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
+routes.add.get('/addons/([A-z0-9\\-\\_\\.]+)$')
+          .run(alamo.addons.http.get_by_id.bind(alamo.addons.http.get_by_id, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
+routes.add.get('/addons/([A-z0-9\\-\\_\\.]+)/config$')
+          .run(alamo.addons.http.get_config.bind(alamo.addons.http.get_config, pg_pool))
+          .and.authorization([simple_key,jwt_key]);
 
 // -- addon attachments
 routes.add.get('/addons/([A-z0-9\\-\\_\\.]+)/addon-attachments$')

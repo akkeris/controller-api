@@ -1,0 +1,1 @@
+update pipelines set updated = now() where pipeline = $1 and deleted = false

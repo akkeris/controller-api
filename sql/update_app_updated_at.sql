@@ -1,0 +1,1 @@
+update apps set updated = now() where app = $1 and deleted = false

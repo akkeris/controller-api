@@ -2644,6 +2644,7 @@ curl \
     "supports_multiple_installations": true,
     "supports_sharing": true,
     "supports_upgrading":true,
+    "plans":[],
     "updated_at": "2016-08-09T12:00:00Z"
   },
   {
@@ -2658,6 +2659,7 @@ curl \
     "supports_multiple_installations": true,
     "supports_sharing": true,
     "supports_upgrading":false,
+    "plans":[],
     "updated_at": "2016-08-09T12:00:00Z"
   }
 ]
@@ -2695,6 +2697,7 @@ curl \
   "supports_multiple_installations": true,
   "supports_sharing": true,
   "supports_upgrading":true,
+  "plans":[],
   "updated_at": "2016-08-09T12:00:00Z"
 }
 ```
@@ -2899,7 +2902,148 @@ curl \
 }
 ```
 
-### List Addons ##
+### List All Addons ##
+
+Lists all the addons for all applications. This is the same response as other addons end points but does not contain the attachments nor the configuration environment variables for the addon.
+
+`GET /addons`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/addons
+```
+
+**200 "OK" Response**
+
+```json
+[
+  {
+    "actions": [],
+    "addon_service": {
+      "id": "1124611d-2971-2533-3338-a816a4a95ff1",
+      "name": "akkeris-s3"
+    },
+    "app": {
+      "id": "4505b947-346d-400b-a986-a1faeb2c321f",
+      "name": "events-api-us"
+    },
+    "billed_price": {
+      "cents": 5000,
+      "unit": "month",
+      "contract": false
+    },
+    "created_at": "2018-11-15T17:14:09.270Z",
+    "id": "42222315-1155-4772-bc87-fdda79df06ee",
+    "name": "amazon-s3-shock-2047",
+    "plan": {
+      "id": "1328e0b0-429a-1fa8-32a0-aaad9e121cbb",
+      "name": "akkeris-s3:basic"
+    },
+    "primary": true,
+    "provider_id": "akkeris",
+    "state": "provisioned",
+    "state_description": "",
+    "updated_at": "2018-11-15T17:14:09.270Z",
+    "web_url": "/apps/events-api-us",
+  }
+]
+```
+
+### Get Addons ##
+
+Gets more information on an addon
+
+`GET /addons/{addon_id_or_name}`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/addons/amazon-s3-shock-2047
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "actions": [],
+  "addon_service": {
+    "id": "1124611d-2971-2533-3338-a816a4a95ff1",
+    "name": "akkeris-s3"
+  },
+  "app": {
+    "id": "4505b947-346d-400b-a986-a1faeb2c321f",
+    "name": "events-api-us"
+  },
+  "billed_price": {
+    "cents": 5000,
+    "unit": "month",
+    "contract": false
+  },
+  "config_vars": {
+    "S3_BUCKET": "8839-1f32bb231",
+    "S3_LOCATION": "1f42bb239.s3.amazonaws.com",
+    "S3_REGION": "us-west-2",
+    "S3_SECRET_KEY": "abcdefg+hjklmnopqrstuvwxyz",
+    "S3_ACCESS_KEY": "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  },
+  "created_at": "2018-11-15T17:14:09.270Z",
+  "id": "42222315-1155-4772-bc87-fdda79df06ee",
+  "name": "amazon-s3-shock-2047",
+  "plan": {
+    "id": "1328e0b0-429a-1fa8-32a0-aaad9e121cbb",
+    "name": "akkeris-s3:basic"
+  },
+  "primary": true,
+  "provider_id": "akkeris",
+  "state": "provisioned",
+  "state_description": "",
+  "updated_at": "2018-11-15T17:14:09.270Z",
+  "web_url": "/apps/events-api-us",
+  "attached_to": [
+    {
+      "id": "4505b947-346d-400b-a986-a1faeb2c321f",
+      "name": "events-api-us",
+      "owner": true
+    }
+  ]
+}
+```
+
+### Get Addon's Config ##
+
+Gets the configuration variables injected into applications or resources that use this addon.
+
+`GET /addons/{addon_id_or_name}/config`
+
+**CURL Example**
+
+```bash
+curl \
+  -H 'Authorization: ...' \
+  -X GET \
+  https://apps.akkeris.io/addons/amazon-s3-shock-2047/config
+```
+
+**200 "OK" Response**
+
+```json
+{
+  "S3_BUCKET": "8811-1f32bb231",
+  "S3_LOCATION": "1f42bb239.s3.amazonaws.com",
+  "S3_REGION": "us-west-2",
+  "S3_SECRET_KEY": "abcdefg+hjklmnopqrstuvwxyz",
+  "S3_ACCESS_KEY": "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+}
+``` 
+
+### List Addons By App ##
 
 Lists all the addons for an application.
 
@@ -2943,7 +3087,9 @@ curl \
 ]
 ```
 
-### Get Addon ##
+### Get Addon By App ##
+
+Get information on an addon constrained by the application.
 
 `GET /apps/{appname}/addons/{addon_id}`
 

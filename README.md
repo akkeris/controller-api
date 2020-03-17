@@ -33,6 +33,7 @@
 * `BLACKLIST_ENV` - A comma delimited list of socs keywords causing config vars to be redacted, defaults to `PASS,KEY,SECRET,PRIVATE,TOKEN,SALT,AUTH,HASH`
 * `DYNO_DEFAULT_SIZE` - The default dyno size to use. The set default is `gp1` if no other is specified.
 * `RESERVED_SPACES` - A list of reserved spaces to add to the reserved list.  The default reserved spaces are `kube-system, brokers, k2-poc, kube-public, akkeris-system, istio-system, cert-manager`. Note, setting this will only add to the list, not override it.
+* `TTL_TEMP_TOKEN` - How long (in ms) should temporary JWT tokens last for? Defaults to 3600000 (1 hour)
 
 ### Integration Variables
 To disable custom formatting for outgoing webhooks set these to true.

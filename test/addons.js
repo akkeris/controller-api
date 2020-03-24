@@ -53,7 +53,7 @@ function wait_for_build(httph, app, build_id, callback, iteration) {
   });
 }
 
-describe("addons: provisioning postgres, redis, influx, and cassandra services.", function() {  
+describe("addons: provisioning postgres, redis, influx, and services.", function() {  
   this.timeout(100000);
 
   let appname_brand_new = "alamotest" + Math.floor(Math.random() * 10000)
@@ -74,12 +74,10 @@ describe("addons: provisioning postgres, redis, influx, and cassandra services."
   let redis_plan = null;
   let es_plan = null;
   let influxdb_plan = null;
-  let cassandra_plan = null;
   let postgres_response = null;
   let postgresonprem_response = null;
   let redis_response = null;
   let influxdb_response = null;
-  let cassandra_response = null;
   
   if(process.env.SMOKE_TESTS) {
     it("covers getting a influxdb plans", (done) => {
@@ -146,69 +144,6 @@ describe("addons: provisioning postgres, redis, influx, and cassandra services."
       });
     });
 
-    it("covers getting a cassandra plans", (done) => {
-      httph.request('get', 'http://localhost:5000/addon-services/alamo-cassandra/plans', alamo_headers, null,
-      (err, data) => {
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        let obj = JSON.parse(data);
-        expect(obj).to.be.an('array');
-        obj.forEach(function(plan) {
-          if(plan.name === "alamo-cassandra:small") {
-            cassandra_plan = plan;
-          }
-        });
-        expect(cassandra_plan).to.be.an('object');
-        done();
-      });
-    });
-
-    it("covers creating an cassandra instance and being able to add an addon to an app without a formation running", (done) => {
-      expect(cassandra_plan).to.be.an('object');
-      expect(cassandra_plan.id).to.be.a('string');
-      httph.request('post', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons', alamo_headers, JSON.stringify({"plan":cassandra_plan.id}),
-      (err, data) => {
-        if(err) {
-          console.log(err);
-        }
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        let obj = JSON.parse(data);
-        expect(obj).to.be.an('object');
-        cassandra_response = obj;
-        done();
-      });
-    });
-
-    it("covers getting info on a running cassandra service", (done) => {
-      expect(cassandra_response).to.be.an('object');
-      expect(cassandra_plan).to.be.an('object');
-      expect(cassandra_plan.id).to.be.a('string');
-      httph.request('get', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons' + '/' + cassandra_response.id, alamo_headers, null,
-      (err, data) => {
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        let obj = JSON.parse(data);
-        expect(obj).to.be.an('object');
-        expect(obj.id).to.equal(cassandra_response.id);
-        done();
-      });
-    });
-
-    it("covers removing a cassandra service", (done) => {
-      expect(cassandra_response).to.be.an('object');
-      expect(cassandra_plan).to.be.an('object');
-      expect(cassandra_plan.id).to.be.a('string');
-      httph.request('delete', 'http://localhost:5000/apps/' + appname_brand_new + '-default/addons' + '/' + cassandra_response.id, alamo_headers, null,
-      (err, data) => {
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        let obj = JSON.parse(data);
-        expect(obj).to.be.an('object');
-        expect(obj.id).to.equal(cassandra_response.id);
-        done();
-      });
-    });
 
     it("covers getting a redis plans", (done) => {
       expect(postgres_plan).to.be.an('object');

@@ -59,7 +59,7 @@ const alamo_headers = {
 // }
 
 
-describe("addons: provisioning postgres, redis, influx, and services.", function() {  
+describe('addons: provisioning postgres, redis, influx, and services.', function () {
   this.timeout(100000);
 
   const appname_brand_new = `alamotest${Math.floor(Math.random() * 10000)}`;
@@ -82,18 +82,21 @@ describe("addons: provisioning postgres, redis, influx, and services.", function
   let postgres_response = null;
   let redis_response = null;
   let influxdb_response = null;
-  if(process.env.SMOKE_TESTS) {
-    it("covers getting a influxdb plans", (done) => {
-      httph.request('get', 'http://localhost:5000/addon-services/alamo-influxdb/plans', alamo_headers, null, 
-      (err, data) => {
-        expect(err).to.be.null;
-        expect(data).to.be.a('string');
-        let obj = JSON.parse(data);
-        expect(obj).to.be.an('array');
-        obj.forEach(function(plan) {
-          if(plan.name === "alamo-influxdb:shared") {
-            influxdb_plan = plan;
-          }
+  if (process.env.SMOKE_TESTS) {
+    it('covers getting a influxdb plans', (done) => {
+      httph.request('get', 'http://localhost:5000/addon-services/alamo-influxdb/plans', alamo_headers, null,
+        (err, data) => {
+          expect(err).to.be.null;
+          expect(data).to.be.a('string');
+          const obj = JSON.parse(data);
+          expect(obj).to.be.an('array');
+          obj.forEach((plan) => {
+            if (plan.name === 'alamo-influxdb:shared') {
+              influxdb_plan = plan;
+            }
+          });
+          expect(influxdb_plan).to.be.an('object');
+          done();
         });
     });
 

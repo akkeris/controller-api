@@ -1,17 +1,18 @@
-"use strict"
-
-process.env.DEFAULT_PORT = "5000";
+/* eslint-disable no-unused-expressions */
+process.env.DEFAULT_PORT = '5000';
 process.env.PORT = 5000;
-process.env.ALAMO_API_URL = 'http://nope.com'
+process.env.ALAMO_API_URL = 'http://nope.com';
 process.env.AUTH_KEY = 'hello';
-const alamo_headers = {"Authorization":process.env.AUTH_KEY, "User-Agent":"Hello", "x-username":"test", "x-elevated-access":"true"};
+// const alamo_headers = {
+//   Authorization: process.env.AUTH_KEY, 'User-Agent': 'Hello', 'x-username': 'test', 'x-elevated-access': 'true',
+// };
 
-describe("builds: ensure logs are properly tripped", function() {  
-  const expect = require("chai").expect;
+describe('builds: ensure logs are properly tripped', () => {
+  const { expect } = require('chai');
 
-  it("covers removing test app for builds", (done) => {
-    let builds = require('../lib/builds.js')
-    let result = builds.strip_build_results(`
+  it('covers removing test app for builds', (done) => {
+    const builds = require('../lib/builds.js');
+    const result = builds.strip_build_results(`
 Started by user ss-dd-aapp
 [Pipeline] node
 Running on perm_dockerbuild_a (i-0265b83805255b3dc) in /jenkins/workspace/api-62dc0fd3-2cba-4925-8fca-d1129d296d2c
@@ -1382,9 +1383,9 @@ b6ca02dfe5e6: Pushed
 [Pipeline] End of Pipeline
 Finished: SUCCESS
 `);
-    expect(result.indexOf('fugazi') === -1, 'Something leaked through.')
-    expect(result.indexOf('RUN mkdir') !== -1, 'Build command did not make it through.')
-    expect(result.indexOf('CMD npm start') !== -1, 'Run command did not make it through.')
-    done()
+    expect(result.indexOf('fugazi') === -1, 'Something leaked through.');
+    expect(result.indexOf('RUN mkdir') !== -1, 'Build command did not make it through.');
+    expect(result.indexOf('CMD npm start') !== -1, 'Run command did not make it through.');
+    done();
   });
-})
+});

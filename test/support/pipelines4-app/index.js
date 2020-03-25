@@ -2,7 +2,7 @@ const http = require('http');
 
 const server = http.createServer((req, res) => {
   res.writeHead(200, {});
-  res.write("pipeline3");
+  res.write('pipeline3');
   res.end();
 });
 server.on('clientError', (err, socket) => {

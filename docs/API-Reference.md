@@ -4974,6 +4974,7 @@ The following events exist for hooks to listen to:
 * crashed
 * pipeline_promotion
 * updated
+* security_scan
 
 When a hook is called, the URL provided is called with a `POST` method. While the body of the `POST` may differ slightly depending on the event, it will always have the property "action" that equals the event name. 
 
@@ -5486,7 +5487,7 @@ This event occurs if an applications description, labels or maintenance mode is 
 
 ```json
 {
-  "action":"pipeline_promotion",
+  "action":"updated",
   "app":{
     "name":"targetapp",
     "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621",
@@ -5497,6 +5498,32 @@ This event occurs if an applications description, labels or maintenance mode is 
   "space":{
     "name":"target-space"
   },
+}
+```
+
+### Security Scan Event Payload
+
+This event occurs when an external security scanning service has something to report concerning the application. For example, a security scan might have started or finished on the application.
+
+This payload will always include a status, service name, and message. It may also include a link that could lead to further information or scan results. For specifics on possible values for the `status` field, see the third-party security scanning application's documentation.
+
+`POST [callback end point]`
+
+```json
+{
+  "action":"security_scan",
+  "app":{
+    "name":"yourappname",
+    "id":"7edbac4b-6a5e-09e1-ef3a-08084a904621",
+  },
+  "space":{
+    "name":"default"
+  },
+  "key":"yourappname-default",
+  "status":"success",
+  "service_name":"detectify",
+  "message":"Security scan for yourname-default.akkeris.io passed!",
+  "link":"https://detectify-scanner.akkeris.io/results?yourname-default_akkeris_io"
 }
 ```
 

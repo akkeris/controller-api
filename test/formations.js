@@ -34,7 +34,6 @@ function wait_for_app_content(http_helper, app, content, callback, iteration) {
   }, 1000);
 }
 
-
 function wait_for_build(http_helper, app, build_id, callback, iteration) {
   iteration = iteration || 1;
   if (iteration === 1) {
@@ -79,6 +78,41 @@ describe('formations: creating, updating and deleting dynos and process types', 
         done();
       });
   });
+  it('Ensures dummy dyno is created when port is updated with no dyno types.', (done) => {
+    const bu_payload = [{
+      port: 8282,
+    }];
+    httph.request('patch', `http://localhost:5000/apps/${appname_brand_new}-default/formation/web`, alamo_headers,
+      JSON.stringify(bu_payload),
+      (err, data) => {
+        if (err) {
+          console.log('error with update:', err);
+        }
+        expect(err).to.be.null;
+        expect(data).to.be.a('string');
+        done();
+        // TODO:
+        // - try changing command
+        // - confirm changes for port
+        // - confirm changes for quantity.
+      });
+  });
+
+  it('Covers deleting a web', (done) => {
+    // avoid queuing issues by waiting briefly.
+    setTimeout(() => {
+      httph.request('delete', `http://localhost:5000/apps/${appname_brand_new}-default/formation/web`, alamo_headers, null,
+        (err, data) => {
+          if (err) {
+            console.log('error with delete:', err);
+          }
+          expect(err).to.be.null;
+          expect(data).to.be.a('string');
+          done();
+        });
+    }, 500);
+  });
+
   it('Ensures processes cannot create invalid ports.', (done) => {
     httph.request('post', `http://localhost:5000/apps/${appname_brand_new}-default/formation`,
       { Authorization: process.env.AUTH_KEY },
@@ -418,6 +452,7 @@ describe('formations: creating, updating and deleting dynos and process types', 
         });
     }, 500);
   });
+
   it('Covers listing formations, confirming deletion', (done) => {
     httph.request('get', `http://localhost:5000/apps/${appname_brand_new}-default/formation`, alamo_headers, null,
       (err, data) => {

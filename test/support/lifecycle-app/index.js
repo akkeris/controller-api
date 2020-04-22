@@ -1,11 +1,13 @@
+/* eslint-disable strict */
 
-"use strict"
+'use strict';
 
 const http = require('http');
-process.env.RETURN_VALUE = process.env.RETURN_VALUE || "setting return value failed."
+
+process.env.RETURN_VALUE = process.env.RETURN_VALUE || 'setting return value failed.';
 const server = http.createServer((req, res) => {
   res.writeHead(200, {});
-  res.write("[" + process.env.RETURN_VALUE + "] with port [" + process.env.PORT + "]");
+  res.write(`[${process.env.RETURN_VALUE}] with port [${process.env.PORT}]`);
   res.end();
 });
 server.on('clientError', (err, socket) => {

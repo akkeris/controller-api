@@ -1,8 +1,12 @@
-"use strict"
+/* eslint-disable strict */
+
+'use strict';
+
 const http = require('http');
+
 const server = http.createServer((req, res) => {
   res.writeHead(200, {});
-  res.write("web process on " + process.env.PORT + " with " + process.env.RETURN_VALUE);
+  res.write(`web process on ${process.env.PORT} with ${process.env.RETURN_VALUE}`);
   res.end();
 });
 server.on('clientError', (err, socket) => {

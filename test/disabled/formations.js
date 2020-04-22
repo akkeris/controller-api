@@ -2,7 +2,7 @@
 /*
  * Thus test is very problematic, it fails frequently due to race
  * conditions..
- 
+
   let cover_worker_done = false;
   it("Covers ensuring worker is functioning", (done) => {
     expect(web_type_functioning).to.equal(true);
@@ -18,7 +18,12 @@
           data = data.toString();
           data = data.split('\n');
           data.forEach((line) => {
-            if(line.indexOf('--worker') > -1 && line.indexOf('worker test') > -1 && line.indexOf(appname_brand_new) > -1 && line.indexOf('interval') > -1) {
+            if(
+              line.indexOf('--worker') > -1 &&
+              line.indexOf('worker test') > -1 &&
+              line.indexOf(appname_brand_new) > -1 &&
+              line.indexOf('interval') > -1
+              ) {
               success = true;
             }
           });

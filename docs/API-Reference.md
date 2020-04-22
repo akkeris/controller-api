@@ -2904,7 +2904,7 @@ curl \
 
 ### List All Addons ##
 
-Lists all the addons for all applications. This is the same response as other addons end points but does not contain the attachments nor the configuration environment variables for the addon.
+Lists all the addons for all applications. This is the same response as other addons end points but does not contain the attachments, the addon state nor the configuration environment variables for the addon.
 
 `GET /addons`
 
@@ -2945,8 +2945,6 @@ curl \
     },
     "primary": true,
     "provider_id": "akkeris",
-    "state": "provisioned",
-    "state_description": "",
     "updated_at": "2018-11-15T17:14:09.270Z",
     "web_url": "/apps/events-api-us",
   }

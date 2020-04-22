@@ -56,8 +56,8 @@ describe('jwt tokens: ensure temporary tokens work appropriately', function () {
       ele: false,
       aud: 'http://localhost:5000', // who this token is intended for. (https://tools.ietf.org/html/rfc7519#section-4.1.3)
       iss: 'http://localhost:5000', // who issued this token. (https://tools.ietf.org/html/rfc7519#section-4.1.1)
-      exp: (new Date()).getTime() - TTL_TEMP_TOKEN * 40, // expiration date (https://tools.ietf.org/html/rfc7519#section-4.1.4)
-      nbf: (new Date()).getTime() - TTL_TEMP_TOKEN * 50, // token is not valid before (https://tools.ietf.org/html/rfc7519#section-4.1.5)
+      exp: Math.floor((new Date()).getTime() / 1000) - TTL_TEMP_TOKEN * 40, // expiration date (https://tools.ietf.org/html/rfc7519#section-4.1.4)
+      nbf: Math.floor((new Date()).getTime() / 1000) - TTL_TEMP_TOKEN * 50, // token is not valid before (https://tools.ietf.org/html/rfc7519#section-4.1.5)
       jti: Math.round(Math.random() * (Number.MAX_VALUE - 1)), // Random unique identifier for this temp token. (https://tools.ietf.org/html/rfc7519#section-4.1.7)
     };
     const token = common.sign_to_token(await common.jwks_sign(private_key, payload));
@@ -82,8 +82,8 @@ describe('jwt tokens: ensure temporary tokens work appropriately', function () {
       ele: false,
       aud: 'http://localhost:5000', // who this token is intended for. (https://tools.ietf.org/html/rfc7519#section-4.1.3)
       iss: 'http://localhost:5000', // who issued this token. (https://tools.ietf.org/html/rfc7519#section-4.1.1)
-      exp: (new Date()).getTime() + TTL_TEMP_TOKEN * 50, // expiration date (https://tools.ietf.org/html/rfc7519#section-4.1.4)
-      nbf: (new Date()).getTime() + TTL_TEMP_TOKEN * 20, // token is not valid before (https://tools.ietf.org/html/rfc7519#section-4.1.5)
+      exp: Math.floor((new Date()).getTime() / 1000) + TTL_TEMP_TOKEN * 50, // expiration date (https://tools.ietf.org/html/rfc7519#section-4.1.4)
+      nbf: Math.floor((new Date()).getTime() / 1000) + TTL_TEMP_TOKEN * 20, // token is not valid before (https://tools.ietf.org/html/rfc7519#section-4.1.5)
       jti: Math.round(Math.random() * (Number.MAX_VALUE - 1)), // Random unique identifier for this temp token. (https://tools.ietf.org/html/rfc7519#section-4.1.7)
     };
     const token = common.sign_to_token(await common.jwks_sign(private_key, payload));
@@ -108,8 +108,8 @@ describe('jwt tokens: ensure temporary tokens work appropriately', function () {
       ele: false,
       aud: 'http://localhost:5000', // who this token is intended for. (https://tools.ietf.org/html/rfc7519#section-4.1.3)
       iss: 'http://nope:5000', // who issued this token. (https://tools.ietf.org/html/rfc7519#section-4.1.1)
-      exp: (new Date()).getTime() + TTL_TEMP_TOKEN * 50, // expiration date (https://tools.ietf.org/html/rfc7519#section-4.1.4)
-      nbf: (new Date()).getTime() + TTL_TEMP_TOKEN * 20, // token is not valid before (https://tools.ietf.org/html/rfc7519#section-4.1.5)
+      exp: Math.floor((new Date()).getTime() / 1000) + TTL_TEMP_TOKEN * 50, // expiration date (https://tools.ietf.org/html/rfc7519#section-4.1.4)
+      nbf: Math.floor((new Date()).getTime() / 1000) + TTL_TEMP_TOKEN * 20, // token is not valid before (https://tools.ietf.org/html/rfc7519#section-4.1.5)
       jti: Math.round(Math.random() * (Number.MAX_VALUE - 1)), // Random unique identifier for this temp token. (https://tools.ietf.org/html/rfc7519#section-4.1.7)
     };
     const token = common.sign_to_token(await common.jwks_sign(private_key, payload));
@@ -134,8 +134,8 @@ describe('jwt tokens: ensure temporary tokens work appropriately', function () {
       ele: false,
       aud: 'http://nope:5000', // who this token is intended for. (https://tools.ietf.org/html/rfc7519#section-4.1.3)
       iss: 'http://localhost:5000', // who issued this token. (https://tools.ietf.org/html/rfc7519#section-4.1.1)
-      exp: (new Date()).getTime() + TTL_TEMP_TOKEN * 50, // expiration date (https://tools.ietf.org/html/rfc7519#section-4.1.4)
-      nbf: (new Date()).getTime() + TTL_TEMP_TOKEN * 20, // token is not valid before (https://tools.ietf.org/html/rfc7519#section-4.1.5)
+      exp: Math.floor((new Date()).getTime() / 1000) + TTL_TEMP_TOKEN * 50, // expiration date (https://tools.ietf.org/html/rfc7519#section-4.1.4)
+      nbf: Math.floor((new Date()).getTime() / 1000) + TTL_TEMP_TOKEN * 20, // token is not valid before (https://tools.ietf.org/html/rfc7519#section-4.1.5)
       jti: Math.round(Math.random() * (Number.MAX_VALUE - 1)), // Random unique identifier for this temp token. (https://tools.ietf.org/html/rfc7519#section-4.1.7)
     };
     const token = common.sign_to_token(await common.jwks_sign(private_key, payload));

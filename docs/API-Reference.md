@@ -6,6 +6,7 @@ You can use this API to programmatically create apps, provision add-ons, promote
 
 ## Table of Contents
 
+- [Authentication](Authentication.md)
 - [Apps](Apps.md)
 - [App Setups](App-Setups.md)
 - [Formations](Formations.md)

@@ -37,6 +37,162 @@ describe('hooks:', function () {
     expect(slackHook.test('https://hooks.slackss.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX')).to.equal(false);
   });
 
+  it('covers testing hook type special formatting', async() => {
+    const formatReleasedWithSlug = slackHook.formatter({
+      "app": {
+        "name": "abcdefx",
+        "id": "342bb9eb-b146-4938-80c2-163823a1a6e5"
+      },
+      "space": {
+        "name": "qwz-fyi"
+      },
+      "dyno": {
+        "type": "web"
+      },
+      "release": {
+        "id": "17bd2bf7-403c-4892-8ffc-df4c12633b53",
+        "created_at": "2020-06-05T17:00:03.671Z",
+        "updated_at": "2020-06-05T17:00:03.671Z",
+        "version": 63
+      },
+      "key": "abcdefx-qwz-fyi",
+      "action": "released",
+      "slug": {
+        "image": "some.example.com/org/abcdefx-1082e549-7243-462f-b091-6903e615a405:1.436",
+        "source_blob": {
+          "checksum": "already-validated-auto-build",
+          "url": "",
+          "version": "https://github.com/akkeris/abcdefx/commit/11d55c2637815359394023d06024b2912a8f7622",
+          "commit": "11d55c2637815359394023d06024b2912a8f7622",
+          "author": "John Smith (johnsmith)",
+          "repo": "https://github.com/akkeris/abcdefx",
+          "branch": "master",
+          "message": "wip: FOO-2124: Some commit message\n\nWith additional lines."
+        },
+        "id": "1ec275ce-651c-4907-8745-d4210aff631"
+      },
+      "released_at": "2020-06-05T17:00:34.488Z"
+    });
+    expect(formatReleasedWithSlug.text).to.equal("*abcdefx-qwz-fyi* web were released! `v63`\n```\nJohn Smith (johnsmith) - wip: FOO-2124: Some commit message\n\nWith additional lines.\n```\nFrom https://github.com/akkeris/abcdefx master `11d55c2`")
+    const formatReleasedWithoutSlug = slackHook.formatter({
+      "app": {
+        "name": "abcdefx",
+        "id": "342bb9eb-b146-4938-80c2-163823a1a6e5"
+      },
+      "space": {
+        "name": "qwz-fyi"
+      },
+      "dyno": {
+        "type": "web"
+      },
+      "release": {
+        "id": "17bd2bf7-403c-4892-8ffc-df4c12633b53",
+        "created_at": "2020-06-05T17:00:03.671Z",
+        "updated_at": "2020-06-05T17:00:03.671Z",
+        "version": 63
+      },
+      "key": "abcdefx-qwz-fyi",
+      "action": "released",
+      "slug": {
+        "image": "some.example.com/org/abcdefx-1082e549-7243-462f-b091-6903e615a405:1.436",
+        "id": "1ec275ce-651c-4907-8745-d4210aff631"
+      },
+      "released_at": "2020-06-05T17:00:34.488Z"
+    });
+    expect(formatReleasedWithoutSlug.text).to.equal("*abcdefx-qwz-fyi* web were released! `v63`\nFrom some.example.com/org/abcdefx-1082e549-7243-462f-b091-6903e615a405:1.436");
+    const formatReleasedWithoutSlugOrRelease = slackHook.formatter({
+      "app": {
+        "name": "abcdefx",
+        "id": "342bb9eb-b146-4938-80c2-163823a1a6e5"
+      },
+      "space": {
+        "name": "qwz-fyi"
+      },
+      "dyno": {
+        "type": "web"
+      },
+      "release": {
+        "id": "17bd2bf7-403c-4892-8ffc-df4c12633b53",
+      },
+      "key": "abcdefx-qwz-fyi",
+      "action": "released",
+      "slug": {
+        "image": "some.example.com/org/abcdefx-1082e549-7243-462f-b091-6903e615a405:1.436",
+        "id": "1ec275ce-651c-4907-8745-d4210aff631"
+      },
+      "released_at": "2020-06-05T17:00:34.488Z"
+    });
+    expect(formatReleasedWithoutSlugOrRelease.text).to.equal("*abcdefx-qwz-fyi* web were released! `17bd2bf7-403c-4892-8ffc-df4c12633b53`\nFrom some.example.com/org/abcdefx-1082e549-7243-462f-b091-6903e615a405:1.436")
+    const formatCrashed = slackHook.formatter({
+      "app": {
+        "name": "abcdefx",
+        "id": "342bb9eb-b146-4938-80c2-163823a1a6e5"
+      },
+      "space": {
+        "name": "qwz-fyi"
+      },
+      "dynos": [
+        {
+          "dyno": "abcdefx-6df6bc55c4-ldt45",
+          "type": "web"
+        }
+      ],
+      "key": "abcdefx-qwz-fyi",
+      "action": "crashed",
+      "description": "App crashed",
+      "code": "H10",
+      "restarts": 0,
+      "crashed_at": "2020-06-02T17:45:40.656Z"
+    });
+    expect(formatCrashed.text).to.equal("*abcdefx-qwz-fyi* dyno crashed! `H10 - App crashed`\n```\nweb.6df6bc55c4-ldt45\n```");
+    const formatCrashedMultipleDynos = slackHook.formatter({
+      "app": {
+        "name": "abcdefx",
+        "id": "342bb9eb-b146-4938-80c2-163823a1a6e5"
+      },
+      "space": {
+        "name": "qwz-fyi"
+      },
+      "dynos": [
+        {
+          "dyno": "abcdefx-6df6bc55c4-ldt45",
+          "type": "web"
+        },
+        {
+          "dyno": "abcdefx-6df6bc55c4-abz55",
+          "type": "web"
+        },
+        {
+          "dyno": "abcdefx-6df6bc55c4-fff55",
+          "type": "worker"
+        }
+      ],
+      "key": "abcdefx-qwz-fyi",
+      "action": "crashed",
+      "description": "App crashed",
+      "code": "H10",
+      "restarts": 0,
+      "crashed_at": "2020-06-02T17:45:40.656Z"
+    });
+    expect(formatCrashedMultipleDynos.text).to.equal("*abcdefx-qwz-fyi* dynos crashed! `H10 - App crashed`\n```\nweb.6df6bc55c4-ldt45\nweb.6df6bc55c4-abz55\nworker.6df6bc55c4-fff55\n```");
+    const formatCrashedNoDynos = slackHook.formatter({
+      "app": {
+        "name": "abcdefx",
+        "id": "342bb9eb-b146-4938-80c2-163823a1a6e5"
+      },
+      "space": {
+        "name": "qwz-fyi"
+      },
+      "key": "abcdefx-qwz-fyi",
+      "action": "crashed",
+      "description": "App crashed",
+      "code": "H15",
+      "restarts": 0,
+      "crashed_at": "2020-06-02T17:45:40.656Z"
+    });
+    expect(formatCrashedNoDynos.text).to.equal("*abcdefx-qwz-fyi* dyno crashed! `H15 - App crashed`");
+  });
+
   it('covers creating a an app and a hook', async () => {
     testapp = await test.create_test_app('default');
     const data = await test.add_hook(

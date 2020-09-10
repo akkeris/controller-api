@@ -41,6 +41,30 @@ function wait(time) {
   return new Promise((resolve) => setTimeout(() => resolve(), time));
 }
 
+
+async function remove_stale_apps() {
+  try {
+    await Promise.all(JSON.parse(await httph.request('get', `http://localhost:5000/apps`, alamo_headers, null))
+      .filter((app) => app.key.startsWith('alamotest') || app.key.startsWith('altest') || app.key === 'pl1-pipline-test-space1' || app.key === 'pl2-pipline-test-space1' || app.key === 'pl1-pipline-test-space2' || app.key === 'pl4-pipline-test-space3' || app.space.name === 'preview')
+      .map((app) => http.request('delete', `http://localhost:5000/apps/${app.key}`, alamo_headers, null)));
+  } catch (e) {
+    console.error('unable to remove applications during remove_stale_apps on the controller:')
+    console.error(e)
+  }
+  try {
+    await Promise.all(JSON.parse(await httph.request('get', `${process.env.MARU_STACK_API}/v1/space/default/apps`, alamo_headers, null))
+      .filter((app) => app.appname.startsWith('alamotest') || app.appname.startsWith('altest') || (app.appname === 'pl1' && app.space === 'pipline-test-space1') || (app.appname === 'pl2' && app.space === 'pipline-test-space1') || (app.appname === 'pl1' && app.space === 'pipline-test-space2') || (app.appname === 'pl4' && app.space === 'pipline-test-space3') || app.space === 'preview')
+      .map((app) => [
+        http.request('delete', `${process.env.MARU_STACK_API}/v1/config/set/${app.key}`, alamo_headers, null),
+        http.request('delete', `${process.env.MARU_STACK_API}/v1/space/app/${app.key}`, alamo_headers, null),
+        http.request('delete', `${process.env.MARU_STACK_API}/v1/app/${app.key}`, alamo_headers, null),
+      ]));
+  } catch (e) {
+    console.error('unable to remove applications during remove_stale_apps on the region api:')
+    console.error(e)
+  }
+}
+
 async function wait_for_app_content(url, content, path, headers) {
   if (!url) {
     throw new Error(`The passed in url for wait_for_app_content was bunk! ${url}`);
@@ -69,12 +93,19 @@ async function wait_for_app_content(url, content, path, headers) {
       }
       // eslint-disable-next-line no-await-in-loop
       const data = await httph.request('get', url, headers, null);
+
+      if(process.env.TEST_WAIT_FOR_APP_CONTENT == "true") {
+        console.log('\nFound:', data)
+      }
       if (content && data && data.indexOf(content) === -1) {
         throw new Error('Content could not be found.');
       }
       process.stdout.write('\n');
       return data;
     } catch (e) {
+      if(process.env.TEST_WAIT_FOR_APP_CONTENT == "true") {
+        console.log('\nError:',e)
+      }
       process.stdout.write('.');
       // eslint-disable-next-line no-await-in-loop
       await wait(750);
@@ -106,9 +137,18 @@ async function wait_for_build(app, build_id) {
       ));
       if (build_info.status === 'pending' || build_info.status === 'queued') {
         process.stdout.write('.');
-      } else {
+      } else if (build_info.status === 'succeeded') {
         process.stdout.write('\n');
         return build_info;
+      } else {
+        process.stdout.write(' - build failed:\n');
+        console.log(await httph.request(
+          'get',
+          `http://localhost:5000/apps/${app}/builds/${build_id}/result`,
+          alamo_headers,
+          null,
+        ))
+        throw new Error('build failed')
       }
     } catch (err) {
       if (err.code !== 423) {
@@ -526,8 +566,6 @@ module.exports = {
   remove_app,
   get_config_vars,
   update_config_vars,
-  // alamo_headers,
-  // wait,
   wait_for_app_content,
   wait_for_build,
   create_test_app,

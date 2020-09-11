@@ -287,7 +287,6 @@ describe('sites/routes', function () {
   });
 
   it("covers adding 'default' route", async () => {
-    await support.wait(15000);
     const payload = {
       app: testapp2.id, site: new_site, source_path: '/', target_path: '/',
     };
@@ -295,6 +294,7 @@ describe('sites/routes', function () {
   });
 
   it("covers checking 'default' route", async () => {
+    await support.wait(25000) // wait for DNS propagation
     await support.wait_for_app_content(`https://${new_site}/testing123`, 'testapp2');
   });
 

@@ -16,6 +16,7 @@ select
   organizations.name org_name, 
   organizations.org org_uuid, 
   apps.url, 
+  (select array_to_json(array_agg(json_build_object('id', formations.formation, 'type', formations.type, 'port', formations.port, 'quantity', formations.quantity, 'size', formations.size, 'command', formations.command, 'created_at', formations.created, 'updated_at',formations.updated, 'healthcheck',formations.healthcheck))) from formations where formations.app = apps.app and formations.deleted = false limit 100) formation,
   (select repo from auto_builds where apps.app = auto_builds.app and auto_builds.deleted = false limit 1) repo,
   (select branch from auto_builds where apps.app = auto_builds.app and auto_builds.deleted = false limit 1) repo_branch,
   (select max(created) from releases where apps.app = releases.app limit 1) released,

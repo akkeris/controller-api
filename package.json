@@ -13,19 +13,19 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "elasticsearch": "15.5.0",
-    "node-jose": "^1.1.4",
+    "node-jose": "^2.0.0",
     "pg": "^8.3.3",
     "uuid": "2.0.3"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "codacy-coverage": "^3.4.0",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-plugin-import": "^2.22.0",
+    "eslint": "^7.10.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.1",
     "mocha": "5.2.0",
-    "mocha-jenkins-reporter": "0.4.2",
-    "ngrok": "^3.2.7",
+    "mocha-jenkins-reporter": "0.4.5",
+    "ngrok": "^3.3.0",
     "nyc": "^15.1.0"
   }
 }

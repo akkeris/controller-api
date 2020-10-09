@@ -76,7 +76,7 @@ cat sql/create.sql | psql $DATABASE_URL
 cat sql/create_testing.sql | psql $DATABASE_URL
 ```
 
-2. Set the environment variables above, also save DATABASE_URL as part of your config/environment. There are some additional options that should be set when developing locally or testing.  Some of these are optional. The tests that run are integration tests that require real services setup. See the setting up section above for additional required environment variables.
+2. Set the environment variables above, also save `DATABASE_URL` as part of your config/environment. There are some additional options that should be set when developing locally or testing.  Some of these are optional. The tests that run are integration tests that require real services setup. See the setting up section above for additional required environment variables.
 
 * `TEST_REGION` - the region to test, e.g., us-seattle, eu-ireland
 * `NGROK_TOKEN` - When testing a public URI is needed to test callbacks from other integrated systems, get a token at www.ngrok.com and place it in this envirionment variable.
@@ -87,7 +87,7 @@ cat sql/create_testing.sql | psql $DATABASE_URL
 * `CODACY_PROJECT_TOKEN` - While optional this is useful when running test coverage to report the results to www.codacy.com. 
 * `MARU_STACK_API` - Set to the alamo api, MARU is the name of our test cluster
 * `US_SEATTLE_REGION_API` - Set to the alamo api, US_SEATTLE is the name of our test region.
-* `ALAMO_APP_CONTROLLER_URL` - The API url for this host, you'll want to set this to http://localhost:5000
+* `AKKERIS_APP_CONTROLLER_URL` - The API url for this host, you'll want to set this to http://localhost:5000
 * `BUILD_SHUTTLE_URL` - The build shuttle is a small footprint API that manages specific build system such as jenkins. (see https://github.com/akkeris/buildshuttle).  This has no default.
 * `AKKERIS_API_URL` - Public URI (https://somehost/) for the appkit api in front of this api, generally appkit api url that handles user account/authorization (defaults to http://localhost:5000)
 * `JWT_RS256_PRIVATE_KEY` - This can be loaded from `test/support/sample-jwt-private-key.pem` - DO NOT USE THIS FOR RUNNING CONTROLLERS!

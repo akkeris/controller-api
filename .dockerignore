@@ -1,7 +1,5 @@
 .DS_Store
 .nyc_output
-# *.env*
-# env
 node_modules
 coverage
 .github

@@ -2,11 +2,24 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch via NPM",
+      "name": "npm test",
       "request": "launch",
       "runtimeArgs": [
         "run-script",
         "test"
+      ],
+      "runtimeExecutable": "npm",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node"
+    },
+    {
+      "name": "npm dev",
+      "request": "launch",
+      "runtimeArgs": [
+        "run-script",
+        "dev"
       ],
       "runtimeExecutable": "npm",
       "skipFiles": [

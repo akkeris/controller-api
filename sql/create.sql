@@ -266,6 +266,7 @@ begin
     description text not null default '',
     message text,
     author varchar(1024),
+    scm_metadata text, -- generally used to store id's for github deployments
     deleted boolean not null default false,
     auto_build uuid references auto_builds(auto_build),
     foreign_build_key varchar(128) not null default ''
@@ -657,15 +658,23 @@ begin
 
   if not exists (SELECT NULL 
               FROM INFORMATION_SCHEMA.COLUMNS
-             WHERE table_name = 'releases'
+              WHERE table_name = 'releases'
               AND column_name = 'scm_metadata'
-              and table_schema = 'public') then
+              AND table_schema = 'public') then
     alter table releases add column scm_metadata text;
   end if;
 
   if not exists (SELECT NULL 
+              FROM INFORMATION_SCHEMA.COLUMNS
+              WHERE table_name = 'builds'
+              AND column_name = 'scm_metadata'
+              AND table_schema = 'public') then
+    alter table builds add column scm_metadata text;
+  end if;
+
+  if not exists (SELECT NULL 
     FROM INFORMATION_SCHEMA.COLUMNS
-   WHERE table_name = 'hooks'
+    WHERE table_name = 'hooks'
     AND column_name = 'secret'
     and table_schema = 'public'
     and character_maximum_length = 128) then

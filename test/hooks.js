@@ -73,7 +73,7 @@ describe('hooks:', function () {
       },
       "released_at": "2020-06-05T17:00:34.488Z"
     });
-    expect(formatReleasedWithSlug.text).to.equal("*abcdefx-qwz-fyi* web were released! `v63`\n```\nJohn Smith (johnsmith) - wip: FOO-2124: Some commit message\n\nWith additional lines.\n```\nFrom https://github.com/akkeris/abcdefx master `11d55c2`")
+    expect(formatReleasedWithSlug.text).to.equal("*abcdefx-qwz-fyi* web was released! `v63`\n```\nJohn Smith (johnsmith) - wip: FOO-2124: Some commit message\n\nWith additional lines.\n```\nFrom https://github.com/akkeris/abcdefx master `11d55c2`")
     const formatReleasedWithoutSlug = slackHook.formatter({
       "app": {
         "name": "abcdefx",
@@ -99,7 +99,7 @@ describe('hooks:', function () {
       },
       "released_at": "2020-06-05T17:00:34.488Z"
     });
-    expect(formatReleasedWithoutSlug.text).to.equal("*abcdefx-qwz-fyi* web were released! `v63`\nFrom some.example.com/org/abcdefx-1082e549-7243-462f-b091-6903e615a405:1.436");
+    expect(formatReleasedWithoutSlug.text).to.equal("*abcdefx-qwz-fyi* web was released! `v63`\nFrom some.example.com/org/abcdefx-1082e549-7243-462f-b091-6903e615a405:1.436");
     const formatReleasedWithoutSlugOrRelease = slackHook.formatter({
       "app": {
         "name": "abcdefx",
@@ -122,7 +122,7 @@ describe('hooks:', function () {
       },
       "released_at": "2020-06-05T17:00:34.488Z"
     });
-    expect(formatReleasedWithoutSlugOrRelease.text).to.equal("*abcdefx-qwz-fyi* web were released! `17bd2bf7-403c-4892-8ffc-df4c12633b53`\nFrom some.example.com/org/abcdefx-1082e549-7243-462f-b091-6903e615a405:1.436")
+    expect(formatReleasedWithoutSlugOrRelease.text).to.equal("*abcdefx-qwz-fyi* web was released! `17bd2bf7-403c-4892-8ffc-df4c12633b53`\nFrom some.example.com/org/abcdefx-1082e549-7243-462f-b091-6903e615a405:1.436")
     const formatCrashed = slackHook.formatter({
       "app": {
         "name": "abcdefx",
@@ -191,6 +191,37 @@ describe('hooks:', function () {
       "crashed_at": "2020-06-02T17:45:40.656Z"
     });
     expect(formatCrashedNoDynos.text).to.equal("*abcdefx-qwz-fyi* dyno crashed! `H15 - App crashed`");
+    const formatConfigChange = slackHook.formatter({
+      "action": "config_change",
+      "app": {
+        "name": "robots",
+        "id": "56e63fb9-57b1-4af3-9290-5f1ff5e9a0ea"
+      },
+      "space": {
+        "name": "calaway"
+      },
+      "changes": [
+        {
+          "type": "update",
+          "name": "FOO"
+        },
+        {
+          "type": "delete",
+          "name": "BAZ"
+        },
+        {
+          "type": "create",
+          "name": "BUZ"
+        }
+      ],
+      "config_vars": {
+        "PORT": "5000",
+        "FOO": "1",
+        "BAR": "5",
+        "BUZ": "0"
+      }
+    });
+    expect(formatConfigChange.text).to.equal('Config var change(s) on app `robots-calaway`:\n    • Updated `FOO`\n    • Deleted `BAZ`\n    • Created `BUZ`');
   });
 
   it('covers creating a an app and a hook', async () => {

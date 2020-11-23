@@ -135,17 +135,25 @@ curl \
 
 ### Dyno Attach
 
-Executes (white listed) commands on a dyno, the provided command is ran on the same server under the same context under the same memory and CPU limitations. The output of the stdout and stderr is returned. An error is returned if the command takes more than one minute. 
+Executes approved commands on a dyno. The provided command is run in the same context as the dyno, and is subject to the same memory and CPU limitations. The output of stdout and stderr is returned.
 
-White listed commands are hard coded and cannot be changed dynamically.  The current white list is:
+> Please note that an error is returned if the command takes more than one minute.
+
+Allowed commands are hardcoded and cannot be changed dynamically. The current regex allowlist is:
 
 * `/^sh -c kill \-[0-9]+ \-1$/`
+
+Alternatively, you may specify a command alias instead of a command. This is useful for certain complicated commands that don't need any arguments and will be run the same way each time. These commands are also hardcoded and cannot be changed dynamically. The available aliases are:
+
+* `java_heap_dump` - Run `jcmd 0 GC.heap_dump` and return the output as a base64/gzip encoded string.
+  * Here's an example of how to transform the results into a file for further analysis (assuming the API response was stored in `response.json`): `cat response.json | jq -r '.stdout' | base64 -D | gzip -d > heap_dump.hprof`
 
 `POST /apps/{appname}/dynos/{dyno_id_or_name}/actions/attach`
 
 |   Name   |       Type      | Description                                                                                                                                                                                                | Example                                                                                                                            |
 |:--------:|:---------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-|   command      | required array of strings | The command to execute (as an array of strings where the first entry is the executable) |  ["echo", "hello"] |
+|   command      | optional array of strings | The command to execute (as an array of strings where the first entry is the executable) (*Required if `alias` is not provided*) |  ["echo", "hello"] |
+|   alias      | optional string | The alias of a pre-validated command to execute (*Required if `command` is not provided*) | "java_heap_dump" |
 |   stdin        | string | The initial set of stdin  | "" |
 
 

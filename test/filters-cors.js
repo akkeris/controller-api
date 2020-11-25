@@ -19,7 +19,7 @@ describe('CORS filters', function () {
   };
 
   function httpsGet(url, options) {
-    return new Promise((resolve, _) => {
+    return new Promise((resolve) => {
       https.get(url, options, (res) => {
         resolve(res);
       });
@@ -61,37 +61,39 @@ describe('CORS filters', function () {
       await httph.request('delete', 'http://localhost:5000/filters/my-cors-filter', alamo_headers, null);
     });
 
-    describe('request from same origin', function () {
-      it('returns no access-control headers', async function () {
-        await init.wait(1000); // Give Istio a second to apply the filter
+    describe('when sending a simple request', function () {
+      describe('from the same origin', function () {
+        it('returns no access-control headers', async function () {
+          await init.wait(1000); // Give Istio a second to apply the filter
 
-        const options = { headers: { Origin: testapp.web_url } };
-        const response = await httpsGet(testapp.web_url, options);
-        expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
+          const options = { headers: { Origin: testapp.web_url } };
+          const response = await httpsGet(testapp.web_url, options);
+          expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
+        });
       });
-    });
 
-    describe('request from disallowed origin', function () {
-      it('returns no access-control headers', async function () {
-        await init.wait(1000); // Give Istio a second to apply the filter
+      describe('from a disallowed origin', function () {
+        it('returns no access-control headers', async function () {
+          await init.wait(1000); // Give Istio a second to apply the filter
 
-        const options = { headers: { Origin: 'https://disallowed-origin.com' } };
-        const response = await httpsGet(testapp.web_url, options);
-        expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
+          const options = { headers: { Origin: 'https://disallowed-origin.com' } };
+          const response = await httpsGet(testapp.web_url, options);
+          expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
+        });
       });
-    });
 
-    describe('request from allowed origin', function () {
-      it('returns expected access-control headers', async function () {
-        this.retries(4);
-        if (this.test._currentRetry > 0) { await init.wait(1000); }
+      describe('from an allowed origin', function () {
+        it('returns expected access-control headers', async function () {
+          this.retries(4);
+          if (this.test._currentRetry > 0) { await init.wait(1000); }
 
-        const options = { headers: { Origin: 'https://allowed-origin.com' } };
-        const response = await httpsGet(testapp.web_url, options);
-        expect(response.headers).to.include({
-          'access-control-allow-origin': 'https://allowed-origin.com',
-          'access-control-allow-credentials': 'true',
-          'access-control-expose-headers': 'content-type',
+          const options = { headers: { Origin: 'https://allowed-origin.com' } };
+          const response = await httpsGet(testapp.web_url, options);
+          expect(response.headers).to.include({
+            'access-control-allow-origin': 'https://allowed-origin.com',
+            'access-control-allow-credentials': 'true',
+            'access-control-expose-headers': 'content-type',
+          });
         });
       });
     });

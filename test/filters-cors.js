@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const https = require('https');
 const httph = require('../lib/http_helper.js');
 
-describe.only('CORS filters', function () {
+describe('CORS filters', function () {
   this.timeout(64000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
@@ -61,13 +61,19 @@ describe.only('CORS filters', function () {
       await httph.request('delete', 'http://localhost:5000/filters/my-cors-filter', alamo_headers, null);
     });
 
-    it('request from allowed origin', async function () {
-      this.retries(4);
-      if (this.test._currentRetry > 0) await init.wait(1000);
+    describe('request from allowed origin', function () {
+      it('returns expected access-control headers', async function () {
+        this.retries(4);
+        if (this.test._currentRetry > 0) await init.wait(1000);
 
-      const options = { headers: { Origin: 'https://allowed-origin.com' } };
-      const res = await httpsGet(testapp.web_url, options);
-      expect(res.headers).to.have.property('access-control-allow-origin');
+        const options = { headers: { Origin: 'https://allowed-origin.com' } };
+        const res = await httpsGet(testapp.web_url, options);
+        expect(res.headers).to.include({
+          'access-control-allow-origin': 'https://allowed-origin.com',
+          'access-control-allow-credentials': 'true',
+          'access-control-expose-headers': 'content-type',
+        });
+      });
     });
   });
 });

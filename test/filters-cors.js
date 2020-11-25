@@ -61,10 +61,20 @@ describe('CORS filters', function () {
       await httph.request('delete', 'http://localhost:5000/filters/my-cors-filter', alamo_headers, null);
     });
 
+    describe('request from same origin', function () {
+      it('returns no access-control headers', async function () {
+        await init.wait(1000); // Give Istio a second to apply the filter
+
+        const options = { headers: { Origin: testapp.web_url } };
+        const res = await httpsGet(testapp.web_url, options);
+        expect(res.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
+      });
+    });
+
     describe('request from allowed origin', function () {
       it('returns expected access-control headers', async function () {
         this.retries(4);
-        if (this.test._currentRetry > 0) await init.wait(1000);
+        if (this.test._currentRetry > 0) { await init.wait(1000); }
 
         const options = { headers: { Origin: 'https://allowed-origin.com' } };
         const res = await httpsGet(testapp.web_url, options);

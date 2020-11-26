@@ -102,7 +102,7 @@ describe('CORS filters', function () {
       });
 
       describe('when sending a preflight request', function () {
-        describe('from an disallowed origin', function () {
+        describe('from the same origin', function () {
           it('returns expected access-control headers', async function () {
             await init.wait(1000); // Give Istio a second to apply the filter
 
@@ -115,7 +115,24 @@ describe('CORS filters', function () {
               },
             };
             const response = await httpsRequest(testapp.web_url, options);
-            console.log('response.headers: ', JSON.stringify(response.headers, null, 2));
+
+            expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-allow-methods', 'access-control-allow-headers', 'access-control-max-age');
+          });
+        });
+
+        describe('from a disallowed origin', function () {
+          it('returns expected access-control headers', async function () {
+            await init.wait(1000); // Give Istio a second to apply the filter
+
+            const options = {
+              method: 'OPTIONS',
+              headers: {
+                Origin: 'https://disallowed-origin.com',
+                'Access-Control-Request-Method': 'POST',
+                'Access-Control-Request-Headers': 'X-PINGOTHER, Content-Type',
+              },
+            };
+            const response = await httpsRequest(testapp.web_url, options);
 
             expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-allow-methods', 'access-control-allow-headers', 'access-control-max-age');
           });
@@ -135,7 +152,6 @@ describe('CORS filters', function () {
               },
             };
             const response = await httpsRequest(testapp.web_url, options);
-            console.log('response.headers: ', JSON.stringify(response.headers, null, 2));
 
             expect(response.headers).to.include({
               'access-control-allow-origin': 'https://allowed-origin.com',

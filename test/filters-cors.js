@@ -70,6 +70,7 @@ describe('CORS filters', function () {
           const options = { method: 'GET', headers: { Origin: testapp.web_url } };
           const response = await httpsRequest(testapp.web_url, options);
 
+          expect(response.statusCode).to.equal(200);
           expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
         });
       });
@@ -81,6 +82,7 @@ describe('CORS filters', function () {
           const options = { method: 'GET', headers: { Origin: 'https://disallowed-origin.com' } };
           const response = await httpsRequest(testapp.web_url, options);
 
+          expect(response.statusCode).to.equal(200);
           expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
         });
       });
@@ -93,6 +95,7 @@ describe('CORS filters', function () {
           const options = { method: 'GET', headers: { Origin: 'https://allowed-origin.com' } };
           const response = await httpsRequest(testapp.web_url, options);
 
+          expect(response.statusCode).to.equal(200);
           expect(response.headers).to.include({
             'access-control-allow-origin': 'https://allowed-origin.com',
             'access-control-allow-credentials': 'true',
@@ -116,6 +119,7 @@ describe('CORS filters', function () {
             };
             const response = await httpsRequest(testapp.web_url, options);
 
+            expect(response.statusCode).to.equal(200);
             expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-allow-methods', 'access-control-allow-headers', 'access-control-max-age');
           });
         });
@@ -134,6 +138,7 @@ describe('CORS filters', function () {
             };
             const response = await httpsRequest(testapp.web_url, options);
 
+            expect(response.statusCode).to.equal(200);
             expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-allow-methods', 'access-control-allow-headers', 'access-control-max-age');
           });
         });
@@ -153,6 +158,7 @@ describe('CORS filters', function () {
             };
             const response = await httpsRequest(testapp.web_url, options);
 
+            expect(response.statusCode).to.equal(200);
             expect(response.headers).to.include({
               'access-control-allow-origin': 'https://allowed-origin.com',
               'access-control-allow-credentials': 'true',

@@ -18,11 +18,12 @@ describe('CORS filters', function () {
     'x-elevated-access': 'true',
   };
 
-  function httpsGet(url, options) {
+  function httpsRequest(url, options) {
     return new Promise((resolve) => {
-      https.get(url, options, (res) => {
+      const req = https.request(url, options, (res) => {
         resolve(res);
       });
+      req.end();
     });
   }
 
@@ -66,8 +67,8 @@ describe('CORS filters', function () {
         it('returns no access-control headers', async function () {
           await init.wait(1000); // Give Istio a second to apply the filter
 
-          const options = { headers: { Origin: testapp.web_url } };
-          const response = await httpsGet(testapp.web_url, options);
+          const options = { method: 'GET', headers: { Origin: testapp.web_url } };
+          const response = await httpsRequest(testapp.web_url, options);
           expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
         });
       });
@@ -76,8 +77,8 @@ describe('CORS filters', function () {
         it('returns no access-control headers', async function () {
           await init.wait(1000); // Give Istio a second to apply the filter
 
-          const options = { headers: { Origin: 'https://disallowed-origin.com' } };
-          const response = await httpsGet(testapp.web_url, options);
+          const options = { method: 'GET', headers: { Origin: 'https://disallowed-origin.com' } };
+          const response = await httpsRequest(testapp.web_url, options);
           expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
         });
       });
@@ -87,8 +88,8 @@ describe('CORS filters', function () {
           this.retries(4);
           if (this.test._currentRetry > 0) { await init.wait(1000); }
 
-          const options = { headers: { Origin: 'https://allowed-origin.com' } };
-          const response = await httpsGet(testapp.web_url, options);
+          const options = { method: 'GET', headers: { Origin: 'https://allowed-origin.com' } };
+          const response = await httpsRequest(testapp.web_url, options);
           expect(response.headers).to.include({
             'access-control-allow-origin': 'https://allowed-origin.com',
             'access-control-allow-credentials': 'true',

@@ -69,6 +69,7 @@ describe('CORS filters', function () {
 
           const options = { method: 'GET', headers: { Origin: testapp.web_url } };
           const response = await httpsRequest(testapp.web_url, options);
+
           expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
         });
       });
@@ -79,6 +80,7 @@ describe('CORS filters', function () {
 
           const options = { method: 'GET', headers: { Origin: 'https://disallowed-origin.com' } };
           const response = await httpsRequest(testapp.web_url, options);
+
           expect(response.headers).to.not.have.any.keys('access-control-allow-origin', 'access-control-allow-credentials', 'access-control-expose-headers');
         });
       });
@@ -90,10 +92,39 @@ describe('CORS filters', function () {
 
           const options = { method: 'GET', headers: { Origin: 'https://allowed-origin.com' } };
           const response = await httpsRequest(testapp.web_url, options);
+
           expect(response.headers).to.include({
             'access-control-allow-origin': 'https://allowed-origin.com',
             'access-control-allow-credentials': 'true',
             'access-control-expose-headers': 'content-type',
+          });
+        });
+      });
+
+      describe('when sending a preflight request', function () {
+        describe('from an allowed origin', function () {
+          it('returns expected access-control headers', async function () {
+            this.retries(4);
+            if (this.test._currentRetry > 0) { await init.wait(1000); }
+
+            const options = {
+              method: 'OPTIONS',
+              headers: {
+                Origin: 'https://allowed-origin.com',
+                'Access-Control-Request-Method': 'POST',
+                'Access-Control-Request-Headers': 'X-PINGOTHER, Content-Type',
+              },
+            };
+            const response = await httpsRequest(testapp.web_url, options);
+            console.log('response.headers: ', JSON.stringify(response.headers, null, 2));
+
+            expect(response.headers).to.include({
+              'access-control-allow-origin': 'https://allowed-origin.com',
+              'access-control-allow-credentials': 'true',
+              'access-control-allow-methods': 'GET,POST',
+              'access-control-allow-headers': 'x-request-id',
+              'access-control-max-age': '3600',
+            });
           });
         });
       });

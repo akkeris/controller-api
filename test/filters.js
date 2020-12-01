@@ -20,6 +20,7 @@ describe('filters: ensure filters can be created and applied.', function () {
   let testapp_filter = null;
   let testapp_filter2 = null;
   let testapp_filter3 = null;
+  let testapp_filter4 = null;
   let testapp_filter_attachment = null;
   let testapp_filter_attachment2 = null;
 
@@ -135,6 +136,11 @@ describe('filters: ensure filters can be created and applied.', function () {
     expect(testapp_filter3.organization).to.be.an('object');
     expect(testapp_filter3.organization.id).to.be.a('string');
     expect(testapp_filter3.id).to.be.a('string');
+
+    payload.name = 'test-filter-name4';
+    payload.options.allow_origin = ['https://www.octanner.app', 'http://localhost:3000'];
+    testapp_filter4 = JSON.parse(await httph.request('post', 'http://localhost:5000/filters', alamo_headers, JSON.stringify(payload)));
+    expect(testapp_filter4.options.allow_origin).to.eql(['https://www.octanner.app', 'http://localhost:3000']);
   });
 
   it('ensure invalid values are not allowed in cors filters', async () => {
@@ -420,6 +426,7 @@ describe('filters: ensure filters can be created and applied.', function () {
     await httph.request('delete', 'http://localhost:5000/filters/test-filter-name', alamo_headers, null);
     await httph.request('delete', 'http://localhost:5000/filters/test-filter-name2', alamo_headers, null);
     await httph.request('delete', 'http://localhost:5000/filters/test-filter-name3', alamo_headers, null);
+    await httph.request('delete', 'http://localhost:5000/filters/test-filter-name4', alamo_headers, null);
   });
 
   it('delete: clean up after ourselves', async () => {

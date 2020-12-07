@@ -187,7 +187,7 @@ describe('filters: ensure filters can be created and applied.', function () {
     expect(filter.id).to.be.a('string');
   });
 
-  it('get a filter', async () => {
+  it('get a filter with no attachments', async () => {
     const filter = JSON.parse(await httph.request('get', 'http://localhost:5000/filters/test-filter-name', alamo_headers, null));
     expect(filter).to.be.an('object');
     expect(filter.name).to.equal('test-filter-name');
@@ -200,6 +200,7 @@ describe('filters: ensure filters can be created and applied.', function () {
     expect(filter.organization).to.be.an('object');
     expect(filter.organization.id).to.be.a('string');
     expect(filter.id).to.be.a('string');
+    expect(filter.attached_apps).to.eql([]);
   });
 
   it('update a filter', async () => {
@@ -389,6 +390,24 @@ describe('filters: ensure filters can be created and applied.', function () {
     expect(fa.filter.id).to.equal(testapp_filter.id);
     expect(fa.created_at).to.be.a('string');
     expect(fa.updated_at).to.be.a('string');
+  });
+
+  it('get a filter with attachments', async () => {
+    const filter = JSON.parse(await httph.request('get', `http://localhost:5000/filters/${testapp_filter.id}`, alamo_headers, null));
+    expect(filter).to.be.an('object');
+    expect(filter.name).to.equal('test-filter-name');
+    expect(filter.description).to.equal('second desc');
+    expect(filter.type).to.equal('jwt');
+    expect(filter.options.jwks_uri).to.equal('https://foobar2.com');
+    expect(filter.options.issuer).to.equal('fooissuer2');
+    expect(filter.created_at).to.be.a('string');
+    expect(filter.updated_at).to.be.a('string');
+    expect(filter.organization).to.be.an('object');
+    expect(filter.organization.id).to.be.a('string');
+    expect(filter.id).to.be.a('string');
+    expect(filter.attached_apps).to.be.an('array').of.length(1);
+    expect(filter.attached_apps[0].name).to.match(/alamotest\n*/);
+    expect(filter.attached_apps[0].space).to.eql({ name: 'default' });
   });
 
   it('delete filter attachments on an app', async () => {

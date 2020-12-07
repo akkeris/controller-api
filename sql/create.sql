@@ -647,7 +647,7 @@ begin
     insert into formation_changes ( formation_change, formation, app, type, quantity, port, size, price ) values
       ( 'fa2b535d-de4d-4a14-be36-d44af53b5977', 'fa2b535d-de4d-4a14-be36-d44af53b5955', 'fa2b535d-de4d-4a14-be36-d44af53b59e3',
         'web', 1, 5000, 'gp2', 6000 );
-    insert into builds values
+    insert into builds (build, app, created, updated, sha, checksum, logs, app_logs, size, url, status, status_checks_passed, repo, branch, version, user_agent, description, message, author, deleted, auto_build, foreign_build_key) values
       ('9ec219f0-9227-47cb-b570-f996d50b980a','fa2b535d-de4d-4a14-be36-d44af53b59e3','2016-08-25 12:48:38.896000','2016-08-25 12:51:09.371629',
         '123456','sha256:93f16649a03d37aef081dfec3c2fecfa41bb22dd45de2b79f32dcda83bd69bcf','','',0,'',
         'succeeded',true,'repo','master','v1.0','curl/7.43.0','jenkins','message','author', false, NULL, 107);

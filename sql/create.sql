@@ -3,7 +3,7 @@ begin
 
 
   -- IMPORTANT: THIS SCRIPT RUNS **ALWAYS** AT STARTUP
-  --            DO NOT PLACE ANYTHING IN HERE THAT IF RAN 
+  --            DO NOT PLACE ANYTHING IN HERE THAT IF RAN
   --            MULTIPLE TIMES WOULD CREATE SIDE EFFECTS OR
   --            DUPLCIATE ROWS, EVERYTHING MUST CHECK IF IT
   --            ALREADY EXISTS!
@@ -341,7 +341,7 @@ begin
     deleted boolean not null default false
   );
 
-  if not exists (SELECT NULL 
+  if not exists (SELECT NULL
               FROM INFORMATION_SCHEMA.COLUMNS
              WHERE table_name = 'pipeline_couplings'
               AND column_name = 'required_status_checks'
@@ -610,13 +610,13 @@ begin
 
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then
-    insert into regions 
-      (region, name, country, description, locale, private_capable, provider_name, provider_region, provider_availability_zones, high_availability, created, updated, deprecated, deleted) 
-    values 
+    insert into regions
+      (region, name, country, description, locale, private_capable, provider_name, provider_region, provider_availability_zones, high_availability, created, updated, deprecated, deleted)
+    values
       ('f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'us-seattle', 'United States', 'US West Coast', 'seattle', true, 'amazon-web-services', 'us-west-2', 'us-west-2a, us-west-2b', true, '2016-08-25 12:51:09.371629', now(), false, false);
   end if;
 
-  if (select count(*) from stacks where deleted = false) = 0 then 
+  if (select count(*) from stacks where deleted = false) = 0 then
     insert into stacks
       (stack, region, name, beta, "default", created, updated, deprecated, deleted)
     values
@@ -632,7 +632,7 @@ begin
 
   -- drop unique constraint on table name
   ALTER TABLE topics DROP CONSTRAINT IF EXISTS topics_name_key;
-  
+
   -- create default api and bootstrap data.
   if (select count(*) from apps where name='api' and deleted = false) = 0 then
     insert into organizations ( org, name ) values ( '0b26ccb5-83cc-4d33-a01f-100c383e0064', 'main');
@@ -647,7 +647,7 @@ begin
     insert into formation_changes ( formation_change, formation, app, type, quantity, port, size, price ) values
       ( 'fa2b535d-de4d-4a14-be36-d44af53b5977', 'fa2b535d-de4d-4a14-be36-d44af53b5955', 'fa2b535d-de4d-4a14-be36-d44af53b59e3',
         'web', 1, 5000, 'gp2', 6000 );
-    insert into builds values
+    insert into builds (build, app, created, updated, sha, checksum, logs, app_logs, size, url, status, status_checks_passed, repo, branch, version, user_agent, description, message, author, deleted, auto_build, foreign_build_key) values
       ('9ec219f0-9227-47cb-b570-f996d50b980a','fa2b535d-de4d-4a14-be36-d44af53b59e3','2016-08-25 12:48:38.896000','2016-08-25 12:51:09.371629',
         '123456','sha256:93f16649a03d37aef081dfec3c2fecfa41bb22dd45de2b79f32dcda83bd69bcf','','',0,'',
         'succeeded',true,'repo','master','v1.0','curl/7.43.0','jenkins','message','author', false, NULL, 107);
@@ -656,7 +656,7 @@ begin
        'fa2b535d-de4d-4a14-be36-d44af53b59e3', '9ec219f0-9227-47cb-b570-f996d50b980a', 'Chrome');
   end if;
 
-  if not exists (SELECT NULL 
+  if not exists (SELECT NULL
               FROM INFORMATION_SCHEMA.COLUMNS
               WHERE table_name = 'releases'
               AND column_name = 'scm_metadata'
@@ -664,7 +664,7 @@ begin
     alter table releases add column scm_metadata text;
   end if;
 
-  if not exists (SELECT NULL 
+  if not exists (SELECT NULL
               FROM INFORMATION_SCHEMA.COLUMNS
               WHERE table_name = 'builds'
               AND column_name = 'scm_metadata'
@@ -672,7 +672,7 @@ begin
     alter table builds add column scm_metadata text;
   end if;
 
-  if not exists (SELECT NULL 
+  if not exists (SELECT NULL
     FROM INFORMATION_SCHEMA.COLUMNS
     WHERE table_name = 'hooks'
     AND column_name = 'secret'

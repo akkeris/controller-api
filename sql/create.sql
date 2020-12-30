@@ -130,6 +130,43 @@ begin
     alter table app_setups add column status_messages text;
   end if;
 
+  create table if not exists actions (
+    action uuid not null primary key,
+    app uuid references apps("app"),
+    name alpha_numeric not null,
+    description varchar(1024) not null default '',
+    created_by varchar(1024) not null default '',
+    labels jsonb not null default '{}'::jsonb,
+    env_vars jsonb not null default '{}'::jsonb,
+    command varchar(1024) null,
+    dyno_size varchar(128) null,
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    deleted boolean not null default false
+  );
+
+  create table if not exists actions_attachments (
+    actions_attachment uuid not null primary key,
+    action uuid references actions("action"),
+    app uuid references apps("app"),
+    events text,
+    env_vars jsonb not null default '{}'::jsonb,
+    command varchar(1024) null,
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    deleted boolean not null default false
+  );
+
+  create table if not exists action_results (
+    action_result uuid not null primary key,
+    action uuid references actions("action"),
+    actions_attachment uuid references actions_attachments("action_attachment") null,
+    status varchar(128) not null,
+    exit_code integer null,
+    logs_url href null,
+    created timestamptz not null default now()
+  );
+
   create table if not exists config_var_notes (
     app uuid references apps("app"),
     created timestamptz not null default now(),

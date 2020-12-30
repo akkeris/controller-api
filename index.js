@@ -18,6 +18,7 @@ const { simple_key, jwt_key } = require('./lib/auth.js')(config.simple_key, conf
 const common = require('./lib/common.js');
 
 const alamo = {
+  actions: require('./lib/actions.js'),
   addon_attachments: require('./lib/addon-attachments.js'),
   addon_services: require('./lib/addon-services.js'),
   addons: require('./lib/addons.js'),
@@ -131,6 +132,18 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)$')
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)$')
   .run(alamo.apps.http.get.bind(alamo.apps.http.get, pg_pool))
   .and.authorization([simple_key, jwt_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+  .run(alamo.actions.http.get.bind(alamo.actions.http.get, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/actions$')
+  .run(alamo.actions.http.create.bind(alamo.actions.http.create, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/actions$')
+  .run(alamo.actions.http.list.bind(alamo.actions.http.list, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+  .run(alamo.actions.http.delete.bind(alamo.actions.http.delete, pg_pool))
+  .and.authorization([simple_key]); // jwt tokens may not delete formations.
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/formation/([A-z0-9\\-\\_\\.]+)$')
   .run(alamo.formations.http.get.bind(alamo.formations.http.get, pg_pool))
   .and.authorization([simple_key, jwt_key]);

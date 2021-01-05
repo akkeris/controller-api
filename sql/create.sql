@@ -189,8 +189,24 @@ begin
     size varchar(128) null,
     price float not null default 6000,
     deleted boolean not null default false,
-    healthcheck varchar(1024) null
+    healthcheck varchar(1024) null,
+    oneoff boolean not null default false,
+    oneoff_options json,                      -- contains overrides specific to one-offs, e.g. image, env vars
+    constraint oneoff_options_ck check(       -- if row represents a one-off formation, ensure that options are present (even if {}) 
+      not oneoff 
+      or not (oneoff_options is null)
+    )
   );
+
+  -- add one-off columns and constraints to existing formations tables
+  alter table formations add column if not exists oneoff boolean not null default false;
+  alter table formations add column if not exists oneoff_options json;
+  if not exists(select 1 from pg_constraint where conname='oneoff_options_ck') then
+    alter table formations add constraint oneoff_options_ck check(
+      not oneoff 
+      or not (oneoff_options is null)
+    );
+  end if;
 
   create table if not exists formation_changes (
     "formation_change" uuid not null primary key,

@@ -9,7 +9,9 @@ select
   formations.type,
   formations.port,
   formations.updated,
-  formations.healthcheck
+  formations.healthcheck,
+  formations.oneoff,
+  formations.oneoff_options
 from 
   formations 
     join apps on formations.app = apps.app

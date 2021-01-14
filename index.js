@@ -33,7 +33,7 @@ const alamo = {
   formations: require('./lib/formations.js'),
   releases: require('./lib/releases.js'),
   git: require('./lib/git.js'),
-  logs: require('./lib/logs.js'),
+  logs: config.use_logtail ? require('./lib/log-sessions.js') : require('./lib/logs.js'),
   log_drains: require('./lib/log-drains.js'),
   metrics: require('./lib/metrics.js'),
   config_var: require('./lib/config-var.js'),

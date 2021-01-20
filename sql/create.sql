@@ -608,6 +608,18 @@ begin
     cache text not null
   );
 
+  create table if not exists recommendations
+  (
+    recommendation uuid not null,
+    app uuid not null references apps(app),
+    service varchar(1024) not null,               -- Service that supplied the recommendation (i.e. turbonomic)
+    resource_type varchar(1024) not null,         -- What are we targeting? Dyno, addon, etc?
+    details json not null,                        -- This will be different depending on resource, but contains how to apply the recommendation, human readable description, etc
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    primary key (app, service, resource_type)     -- We only store the latest recommendation for the app, service, and resource_type
+  );
+
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then
     insert into regions

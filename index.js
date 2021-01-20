@@ -114,7 +114,6 @@ ready.catch((e) => {
   process.exit(1);
 });
 
-
 // -- apps
 routes.add.get('/apps$')
   .run(alamo.apps.http.list.bind(alamo.apps.http.list, pg_pool))
@@ -167,7 +166,6 @@ routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/filters/([A-z0-9\\-\\_\\.]+)$')
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/filters/([A-z0-9\\-\\_\\.]+)$')
   .run(alamo.filters.http.attach.delete.bind(alamo.filters.http.attach.delete, pg_pool))
   .and.authorization([simple_key]); // jwt tokens may not delete filter attachments.
-
 
 // -- dynos
 // Get dyno sizes
@@ -314,7 +312,6 @@ routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/log-drains/([A-z0-9\\-\\_\\.]+)$')
   .run(alamo.log_drains.http.delete.bind(alamo.log_drains.http.delete, pg_pool))
   .and.authorization([simple_key, jwt_key]);
 
-
 routes.add.post('/sites/([A-z0-9\\-\\_\\.]+)/log-sessions$')
   .run(alamo.logs.http.create.bind(alamo.logs.http.create, pg_pool))
   .and.authorization([simple_key, jwt_key]);
@@ -338,7 +335,6 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/previews$')
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/previews/([A-z0-9\\-\\_\\.]+)$')
   .run(alamo.previews.http.get.bind(alamo.previews.http.get, pg_pool))
   .and.authorization([simple_key, jwt_key]);
-
 
 // -- addons
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/addons$')
@@ -387,7 +383,6 @@ routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/(
 routes.add.put('/apps/([A-z0-9\\-\\_\\.]+)/addons/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/([A-z0-9\\-\\_\\.]+)$')
   .run(alamo.addons.http.actions.bind(alamo.addons.http.actions, pg_pool))
   .and.authorization([simple_key, jwt_key]);
-
 
 // GET /apps/{app_name_or_id}/addons/{addon_name_or_id}/config ?
 
@@ -472,7 +467,6 @@ routes.add.get('/addon-services/([A-z0-9\\-\\_\\.]+)/plans$')
 routes.add.get('/addon-services/([A-z0-9\\-\\_\\.]+)/plans/([A-z0-9\\-\\_\\.\\:]+)$')
   .run(alamo.addon_services.plans.get.bind(alamo.addon_services.plans.get, pg_pool))
   .and.authorization([simple_key, jwt_key]);
-
 
 // -- ssl endpoint and orders, requires ssl plugin
 routes.add.get('/ssl-orders$')
@@ -616,7 +610,6 @@ routes.add.delete('/stacks/([A-z0-9\\-\\_\\.]+)$')
   .run(alamo.stacks.http.delete.bind(alamo.stacks.http.delete, pg_pool))
   .and.authorization([simple_key, jwt_key]);
 
-
 routes.add.get('/pipeline-promotions$')
   .run(alamo.pipelines.promotions.http.list.bind(alamo.pipelines.promotions.http.list, pg_pool))
   .and.authorization([simple_key, jwt_key]);
@@ -758,7 +751,6 @@ routes.add.post('/clusters/([A-z0-9_.-]+)/consumer-groups/([A-z0-9_.-]+)/seek$')
   .run(alamo.consumer_groups.seek.bind(null, pg_pool))
   .and.authorization([simple_key, jwt_key]);
 
-
 // Schemas
 routes.add.get('/clusters/([A-z0-9_.-]+)/schemas$')
   .run(alamo.topic_schemas.list_schemas.bind(null, pg_pool))
@@ -822,6 +814,12 @@ routes.add.get('/\\.well-known/jwks.json$')
 // List available webhooks and their descriptions
 routes.add.get('/docs/hooks$')
   .run(alamo.hooks.descriptions)
+  .and.authorization([simple_key, jwt_key]);
+
+// Recommendations
+
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/recommendations')
+  .run()
   .and.authorization([simple_key, jwt_key]);
 
 routes.add.default((req, res) => {

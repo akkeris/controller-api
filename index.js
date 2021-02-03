@@ -836,6 +836,8 @@ const server = http.createServer((req, res) => {
   }
 });
 
+server.keepAliveTimeout = 1000 * (60 * 6); // 6 minutes
+
 process.on('uncaughtException', (e) => {
   console.error(e.message);
   console.error(e.stack);

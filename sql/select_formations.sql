@@ -11,7 +11,7 @@ select
   formations.updated,
   formations.healthcheck,
   formations.oneoff,
-  formations.oneoff_options
+  formations.options
 from 
   formations 
     join apps on formations.app = apps.app

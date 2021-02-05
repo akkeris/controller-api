@@ -191,22 +191,12 @@ begin
     deleted boolean not null default false,
     healthcheck varchar(1024) null,
     oneoff boolean not null default false,
-    options json,
-    constraint oneoff_options_ck check(       -- if row represents a one-off formation, ensure that options are present (even if {}) 
-      not oneoff 
-      or not (options is null)
-    )
+    options json not null default '{}'::json
   );
 
   -- add one-off columns and constraints to existing formations tables
   alter table formations add column if not exists oneoff boolean not null default false;
-  alter table formations add column if not exists options json;
-  if not exists(select 1 from pg_constraint where conname='oneoff_options_ck') then
-    alter table formations add constraint oneoff_options_ck check(
-      not oneoff 
-      or not (options is null)
-    );
-  end if;
+  alter table formations add column if not exists options json not null default '{}'::json;
 
   create table if not exists formation_changes (
     "formation_change" uuid not null primary key,

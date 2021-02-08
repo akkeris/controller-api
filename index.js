@@ -184,7 +184,7 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/dynos/([A-z0-9\\-\\_\\.]+)$')
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/dynos$')
   .run(alamo.dynos.http.restart_all_dyno_types.bind(alamo.dynos.http.restart_all_dyno_types, pg_pool))
   .and.authorization([simple_key, jwt_key]);
-// Restart Specific Dyno
+// Restart Specific Dyno (or stop oneoff dyno)
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/dynos/([A-z0-9\\-\\_\\.]+)$')
   .run(alamo.dynos.http.restart_dyno_type.bind(alamo.dynos.http.restart_dyno_type, pg_pool))
   .and.authorization([simple_key, jwt_key]);

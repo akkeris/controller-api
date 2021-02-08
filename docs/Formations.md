@@ -16,6 +16,8 @@ Create a new process or formation type. Note that formations can be automaticall
 |   port   | optional integer| The port number to run on. | 9000 |
 | command  | optional string | The command to run when the build image spins up, this if left off will default to the RUN command in the docker image. | null |
 | healthcheck | option string | A relative URL that will be used to inspect the running app to determine if its healthy, this should be a relative url. | /health |
+| oneoff | option boolean | Indicates whether or not this formation is a "one-off" formation | false |
+| options | option object | Formation options - currently used to specify one-off overrides like environment or image | { "env": { "key": "value" }, "image": "hello-world:latest" } |
 
 **CURL Example**
 

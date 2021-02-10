@@ -612,12 +612,13 @@ begin
   (
     recommendation uuid not null,
     app uuid not null references apps(app),
-    service varchar(1024) not null,               -- Service that supplied the recommendation (i.e. turbonomic)
+    service varchar(1024) not null,               -- Service that supplied the recommendation (e.g. turbonomic)
     resource_type varchar(1024) not null,         -- What are we targeting? Dyno, addon, etc?
+    action varchar(1024) not null,                -- Action to take on the resource type (differs by type, e.g. resize)
     details json not null,                        -- This will be different depending on resource, but contains how to apply the recommendation, human readable description, etc
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
-    primary key (app, service, resource_type)     -- We only store the latest recommendation for the app, service, and resource_type
+    primary key (app, service, resource_type, action) -- We only store the latest recommendation for the app, service, resource_type, and action
   );
 
   -- create default regions and stacks

@@ -819,8 +819,8 @@ routes.add.get('/docs/hooks$')
 
 // Recommendations
 
-routes.add.post('/docs/recommendation_resource_types$')
-  .run(alamo.recommendations.http.get_resource_types)
+routes.add.get('/docs/recommendation_resource_types$')
+  .run(alamo.recommendations.http.get_resource_types.bind(alamo.recommendations.http.get_resource_types, pg_pool))
   .and.authorization([simple_key, jwt_key]);
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/recommendations$')
   .run(alamo.recommendations.http.create.bind(alamo.recommendations.http.create, pg_pool))

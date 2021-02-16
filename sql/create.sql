@@ -189,8 +189,14 @@ begin
     size varchar(128) null,
     price float not null default 6000,
     deleted boolean not null default false,
-    healthcheck varchar(1024) null
+    healthcheck varchar(1024) null,
+    oneoff boolean not null default false,
+    options json not null default '{}'::json
   );
+
+  -- add one-off columns and constraints to existing formations tables
+  alter table formations add column if not exists oneoff boolean not null default false;
+  alter table formations add column if not exists options json not null default '{}'::json;
 
   create table if not exists formation_changes (
     "formation_change" uuid not null primary key,

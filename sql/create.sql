@@ -614,6 +614,37 @@ begin
     cache text not null
   );
 
+  create table if not exists recommendation_resource_types
+  (
+    resource_type uuid not null primary key,
+    name varchar(1024) not null unique,              -- e.g. formation
+    actions text not null,                           -- Comma separated list of actions - e.g. "scale,resize"
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    deleted bool not null default false
+  );
+
+  -- Insert default recommendation types
+  if not exists (select 1 from recommendation_resource_types where name = 'formation' ) then
+    insert into recommendation_resource_types
+      (resource_type, name, actions)
+    values
+      ('354d810d-304c-46ef-83db-145ed94cd352', 'formation', 'resize,scale');
+  end if;
+
+  create table if not exists recommendations
+  (
+    recommendation uuid not null,
+    app uuid not null references apps(app),
+    service varchar(1024) not null,                                                        -- Service that supplied the recommendation (e.g. turbonomic)
+    resource_type uuid not null references recommendation_resource_types(resource_type),   -- What are we targeting? Dyno, addon, etc?
+    action varchar(1024) not null,                                                         -- Action to take on the resource type (differs by type, e.g. resize)
+    details json not null,                                                                 -- This will be different depending on resource_type, but contains how to apply the recommendation, which resource, human readable description, etc
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    primary key (app, service, resource_type, action) -- We only store the latest recommendation for the app, service, resource_type, and action
+  );
+
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then
     insert into regions

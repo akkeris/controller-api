@@ -57,6 +57,7 @@ const alamo = {
   topic_configs: require('./lib/topic_configs.js'),
   topic_schemas: require('./lib/topic_schemas.js'),
   topic_clusters: require('./lib/topic_clusters.js'),
+  recommendations: require('./lib/recommendations.js'),
 };
 
 const db_url = new url.URL(config.database_url);
@@ -814,6 +815,15 @@ routes.add.get('/\\.well-known/jwks.json$')
 // List available webhooks and their descriptions
 routes.add.get('/docs/hooks$')
   .run(alamo.hooks.descriptions)
+  .and.authorization([simple_key, jwt_key]);
+
+// Recommendations
+
+routes.add.get('/docs/recommendation_resource_types$')
+  .run(alamo.recommendations.http.get_resource_types.bind(alamo.recommendations.http.get_resource_types, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/recommendations$')
+  .run(alamo.recommendations.http.create.bind(alamo.recommendations.http.create, pg_pool))
   .and.authorization([simple_key, jwt_key]);
 
 routes.add.default((req, res) => {

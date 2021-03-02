@@ -18,6 +18,7 @@ const { simple_key, jwt_key } = require('./lib/auth.js')(config.simple_key, conf
 const common = require('./lib/common.js');
 
 const alamo = {
+  actions: require('./lib/actions.js'),
   addon_attachments: require('./lib/addon-attachments.js'),
   addon_services: require('./lib/addon-services.js'),
   addons: require('./lib/addons.js'),
@@ -824,6 +825,11 @@ routes.add.get('/docs/recommendation_resource_types$')
   .and.authorization([simple_key, jwt_key]);
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/recommendations$')
   .run(alamo.recommendations.http.create.bind(alamo.recommendations.http.create, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+
+// -- actions
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/actions$')
+  .run(alamo.actions.http.create.bind(alamo.actions.http.create, pg_pool))
   .and.authorization([simple_key, jwt_key]);
 
 routes.add.default((req, res) => {

@@ -645,6 +645,19 @@ begin
     primary key (app, service, resource_type, action) -- We only store the latest recommendation for the app, service, resource_type, and action
   );
 
+  create table if not exists actions
+  (
+    action uuid not null primary key,
+    app uuid not null references apps("app"),
+    formation uuid not null references formations("formation"),
+    name alpha_numeric not null,
+    description varchar(1024) not null default '',
+    created_by varchar(1024) not null default '',
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    deleted boolean not null default false
+  );
+
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then
     insert into regions

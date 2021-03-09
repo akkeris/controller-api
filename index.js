@@ -831,6 +831,9 @@ routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/recommendations$')
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/actions$')
   .run(alamo.actions.http.create.bind(alamo.actions.http.create, pg_pool))
   .and.authorization([simple_key, jwt_key]);
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/runs$')
+  .run(alamo.actions.http.runs.create.bind(alamo.actions.http.runs.create, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
 
 routes.add.default((req, res) => {
   res.writeHead(404, {});

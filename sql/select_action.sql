@@ -1,5 +1,12 @@
 select
+  actions.action,
+  actions.app,
   actions.name,
+  actions.description,
+  actions.created_by,
+  actions.created,
+  actions.updated,
+  actions.deleted,
   (
     select
       json_build_object('id', formations.formation, 'type', formations.type, 'size', formations.size, 'command', formations.command)

@@ -658,6 +658,16 @@ begin
     deleted boolean not null default false
   );
 
+  create table if not exists action_runs
+  (
+    action_run uuid not null primary key,
+    action uuid not null references actions("action"),
+    runid uuid not null,
+    status varchar(128) not null,
+    exit_code integer null,
+    created timestamptz not null default now()
+  );
+
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then
     insert into regions

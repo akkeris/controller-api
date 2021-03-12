@@ -74,6 +74,7 @@ describe('Actions', function () {
       expect(action_run.runid).to.match(uuid_regex);
       expect(action_run.status).to.equal('running');
       expect(action_run.exit_code).to.equal(null);
+      expect(action_run.created_by).to.equal('Calaway');
       expect(Date.now() - Date.parse(action_run.created)).to.be.lessThan(10000);
     });
   });

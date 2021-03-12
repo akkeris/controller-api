@@ -652,7 +652,7 @@ begin
     formation uuid not null references formations("formation"),
     name alpha_numeric not null,
     description varchar(1024) not null default '',
-    created_by varchar(1024) not null default '',
+    created_by varchar(1024) not null default 'unknown',
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
     deleted boolean not null default false
@@ -663,8 +663,9 @@ begin
     action_run uuid not null primary key,
     action uuid not null references actions("action"),
     runid uuid not null,
-    status varchar(128) not null,
+    status varchar(128) not null default 'unknown',
     exit_code integer null,
+    created_by varchar(1024) not null default 'unknown',
     created timestamptz not null default now()
   );
 

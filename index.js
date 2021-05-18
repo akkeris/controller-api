@@ -825,6 +825,14 @@ routes.add.get('/docs/recommendation_resource_types$')
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/recommendations$')
   .run(alamo.recommendations.http.create.bind(alamo.recommendations.http.create, pg_pool))
   .and.authorization([simple_key, jwt_key]);
+// List all recommendations for an app
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/recommendations$')
+  .run(alamo.recommendations.http.list.bind(alamo.recommendations.http.list, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+// Get specific recommendation for an app
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/recommendations(\\?[A-z0-9\\-\\_\\.\\=\\&]+)+$')
+  .run(alamo.recommendations.http.get.bind(alamo.recommendations.http.get, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
 
 routes.add.default((req, res) => {
   res.writeHead(404, {});

@@ -34,4 +34,5 @@ You can use this API to programmatically create apps, provision add-ons, promote
 - [Routes](Routes.md)
 - [Audits](Audits.md)
 - [Filters](Filters.md) 
+- [Recommendations](Recommendations.md) 
 

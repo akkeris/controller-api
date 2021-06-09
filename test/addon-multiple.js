@@ -193,7 +193,7 @@ describe('addons multiple: test the ability to promote and primary/secondary add
   });
 
   it('ensure attached addons and owned addons can co-exist', async () => {
-    postgres3_testapp2 = await test.create_addon(testapp2, 'akkeris-postgresql', 'hobby');
+    postgres3_testapp2 = await test.create_addon(testapp2, 'akkeris-postgresql', 'standard-0');
     attached_testapp2 = await test.attach_addon(testapp2, postgres2_testapp1);
 
     const prefix = attached_testapp2.name.split('-').slice(2).join('-').replace(/-/g, '_')

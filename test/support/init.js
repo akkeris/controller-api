@@ -26,16 +26,17 @@ before(async function () {
     running_app = require('../../index.js');
     await running_app.ready;
   }
+  process.on('exit', () => {
+    running_app.server.close(async () => {
+      if (process.env.NGROK_TOKEN) {
+        await ngrok.disconnect();
+        await ngrok.kill();
+      }
+    });
+  })
 });
 
-after(async () => {
-  running_app.server.close(async () => {
-    if (process.env.NGROK_TOKEN) {
-      await ngrok.disconnect();
-      await ngrok.kill();
-    }
-  });
-});
+after(async () => {});
 
 function wait(time) {
   return new Promise((resolve) => setTimeout(() => resolve(), time));
@@ -476,7 +477,7 @@ async function remove_hook(app, hook_id) {
 }
 
 async function create_test_site() {
-  const site_name = `alamotest${Math.floor(Math.random() * 10000)}${process.env.BASE_DOMAIN}`;
+  const site_name = `alamotest${Math.floor(Math.random() * 10000)}${process.env.BASE_DOMAIN || process.env.BASE_DOMAIN}`;
   return JSON.parse(await httph.request('post', 'http://localhost:5000/sites', alamo_headers, JSON.stringify({ domain: site_name })));
 }
 

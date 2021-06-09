@@ -135,7 +135,7 @@ describe('preview apps: ensure preview apps work appropriately', function () {
       'post',
       `http://localhost:5000/apps/${app_name}-preview/addons`,
       alamo_headers,
-      JSON.stringify({ plan: 'akkeris-postgresql:hobby' }),
+      JSON.stringify({ plan: 'akkeris-postgresql:standard-0' }),
     );
     if (process.env.SMOKE_TESTS) {
       await httph.request(

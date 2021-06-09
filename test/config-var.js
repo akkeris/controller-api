@@ -166,7 +166,7 @@ describe('config-vars: creating, updating and deleting a config vars', function 
       'post',
       `http://localhost:5000/apps/${appname_brand_new}-default/addons`,
       alamo_headers,
-      JSON.stringify({ plan: 'akkeris-postgresql:hobby' }),
+      JSON.stringify({ plan: 'akkeris-postgresql:standard-0' }),
     ));
     const info = JSON.parse(await httph.request(
       'get',

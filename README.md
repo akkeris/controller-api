@@ -43,7 +43,6 @@
 * `TTL_TEMP_TOKEN` - How long (in ms) should temporary JWT tokens last for? Defaults to 3600000 (1 hour)
 * `CSP_REPORT_URI` - The URI to report CSP violations for apps that have CSP features on their app enabled. Should be the publically available URI for the CSP reporter.
 * `CSP_IGNORE_DOMAINS` - A comma delimited list of domains that should not be included in CSP allowed list. The list of allowed is pulled from domains available for sites.
-* 
 
 ### Integration Variables
 To disable custom formatting for outgoing webhooks set these to true.

@@ -52,9 +52,9 @@ const pipeline2_sources = {
 //   docker_password: '',
 // };
 
-const init = require('./support/init.js'); // eslint-disable-line
 
 describe('pipelines', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(300000);
   const httph = require('../lib/http_helper.js');
   const { expect } = require('chai');

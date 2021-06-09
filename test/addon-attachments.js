@@ -3,7 +3,6 @@ process.env.DEFAULT_PORT = '5000';
 process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
 const { expect } = require('chai');
-const support = require('./support/init.js');
 const httph = require('../lib/http_helper.js');
 
 const alamo_headers = {
@@ -11,6 +10,7 @@ const alamo_headers = {
 };
 
 describe('addons attachments:', function () {
+  const support = require('./support/init.js');
   this.timeout(200000);
 
   const appname_brand_new = `alamotest${Math.floor(Math.random() * 10000)}`;

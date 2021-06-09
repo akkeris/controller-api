@@ -7,9 +7,9 @@ const { expect } = require('chai');
 const pg = require('pg');
 const url = require('url');
 const { request } = require('../lib/http_helper.js');
-const test = require('./support/init.js');
 
 describe('addons multiple: test the ability to promote and primary/secondary addons', function () {
+  const test = require('./support/init.js');
   this.timeout(1000 * 1000);
 
   let testapp1 = null;

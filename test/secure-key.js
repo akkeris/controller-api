@@ -5,7 +5,6 @@ process.env.AUTH_KEY = 'hello';
 
 const { expect } = require('chai');
 const util = require('util');
-const init = require('./support/init.js'); // eslint-disable-line
 const httph = require('../lib/http_helper.js');
 
 const alamo_headers = { Authorization: process.env.AUTH_KEY, 'User-Agent': 'Hello', 'x-elevated-access': 'true' };
@@ -13,6 +12,7 @@ const alamo_headers = { Authorization: process.env.AUTH_KEY, 'User-Agent': 'Hell
 const request = util.promisify(httph.request);
 
 describe('secure keys: creating, attaching and deleting', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(1000000);
 
   const first_app = `alamotestsk${Math.floor(Math.random() * 10000)}`;

@@ -4,7 +4,6 @@ process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
 
 const { expect } = require('chai');
-const init = require('./support/init.js'); // eslint-disable-line
 const httph = require('../lib/http_helper.js');
 
 const alamo_headers = {
@@ -59,6 +58,7 @@ function wait_for_build(http_helper, app, build_id, callback, iteration) {
 }
 
 describe('formations: creating, updating and deleting dynos and process types', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(30000);
   const appname_brand_new = `alamotest${Math.floor(Math.random() * 10000)}`;
   // set return value

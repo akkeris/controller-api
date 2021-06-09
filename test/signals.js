@@ -5,9 +5,9 @@ process.env.AUTH_KEY = 'hello';
 
 const { expect } = require('chai');
 const { request } = require('../lib/http_helper.js');
-const test = require('./support/init.js');
 
 describe('signals and executing debug commands', function () {
+  const test = require('./support/init.js');
   this.timeout(10000000);
   let signalsapp = null;
   let dynos = [];

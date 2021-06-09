@@ -11,11 +11,11 @@ const alamo_headers = {
 const user_alamo_headers = { Authorization: process.env.AUTH_KEY, 'User-Agent': 'Hello', 'x-username': 'this-is-me' };
 // const http = require('http');
 const { expect } = require('chai');
-const init = require('./support/init.js'); // eslint-disable-line
 
 let default_stack_name = null;
 
 describe('stacks: list and get available stacks', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(100000);
   const httph = require('../lib/http_helper.js');
 

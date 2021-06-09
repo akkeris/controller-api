@@ -5,7 +5,6 @@ process.env.AUTH_KEY = 'hello';
 const alamo_headers = {
   Authorization: process.env.AUTH_KEY, 'User-Agent': 'Hello', 'x-username': 'test', 'x-elevated-access': 'true',
 };
-const test = require('./support/init.js');
 const circleCiHook = require('../lib/hook-types/circleci.js');
 const msTeamsHook = require('../lib/hook-types/microsoft-teams.js');
 const opsGenieHook = require('../lib/hook-types/opsgenie.js');
@@ -13,6 +12,8 @@ const rollBarHook = require('../lib/hook-types/rollbar.js');
 const slackHook = require('../lib/hook-types/slack.js');
 
 describe('hooks:', function () {
+  const test = require('./support/init.js');
+
   this.timeout(100000);
   const server = test.create_callback_server();
   const httph = require('../lib/http_helper.js');

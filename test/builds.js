@@ -8,24 +8,6 @@ const alamo_headers = {
 
 const { expect } = require('chai');
 
-// function wait_for_build_start(httph, app, build_id, callback, iteration) {
-//   iteration = iteration || 1;
-//   if (iteration === 1) {
-//     process.stdout.write('    ~ Waiting for build to start');
-//   }
-//   httph.request('get',`http://localhost:5000/apps/${app}/builds/${build_id}`,alamo_headers,null,(err, data) => {
-//     if (err && err.code === 423) {
-//       process.stdout.write('.');
-//       setTimeout(wait_for_build_start.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-//     } else if (err) {
-//       callback(err, null);
-//     } else {
-//       process.stdout.write('\n');
-//       callback(null, data);
-//     }
-//   });
-// }
-
 function wait_for_build(httph, app, build_id, callback, iteration) {
   iteration = iteration || 1;
   if (iteration === 1) {
@@ -74,9 +56,10 @@ function validate_build_obj(build_obj) {
   expect(build_obj.user.email).to.be.a('string');
 }
 
-const support = require('./support/init.js');
 
 describe('builds: conversion between payload, response and database', function () {
+  const support = require('./support/init.js');
+
   this.timeout(300000);
 
   // let builds = require('../lib/builds.js')

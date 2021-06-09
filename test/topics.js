@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
-const support = require('./support/init.js'); // eslint-disable-line
 
 describe('CRUD actions for topics', function () {
+  const support = require('./support/init.js'); // eslint-disable-line
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.TEST_MODE = 'true'; // prevents creating actual topics. Since we can't delete them, we bail out before committing.

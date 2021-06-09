@@ -1,36 +1,11 @@
 /* eslint-disable no-unused-expressions */
 process.env.TEST_MODE = 'true';
-const init = require('./support/init.js'); // eslint-disable-line
 describe('github: ensure we can attach auto builds, submit auto builds, and remove auto builds.', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(10 * 60 * 1000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
   process.env.DEFAULT_PORT = '5000';
-
-  // function wait_for_build(httph, app, build_id, callback, iteration) {
-  //   iteration = iteration || 1;
-  //   if (iteration === 1) {
-  //     process.stdout.write('    ~ Waiting for build');
-  //   }
-  //   httph.request('get', `http://localhost:5000/apps/${app}/builds/${build_id}`, alamo_headers, null, (err, data) => {
-  //     if (err && err.code === 423) {
-  //       process.stdout.write('.');
-  //       setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-  //     } else if (err) {
-  //       callback(err, null);
-  //     } else {
-  //       const build_info = JSON.parse(data);
-  //       if (build_info.status === 'pending' || build_info.status === 'queued') {
-  //         process.stdout.write('.');
-  //         setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-  //       } else {
-  //         process.stdout.write('\n');
-  //         callback(null, data);
-  //       }
-  //     }
-  //   });
-  // }
-
   const fs = require('fs');
   const httph = require('../lib/http_helper.js');
   const git = require('../lib/git.js');

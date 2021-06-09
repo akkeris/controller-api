@@ -3,7 +3,6 @@ process.env.DEFAULT_PORT = '5000';
 process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
 const { expect } = require('chai');
-const init = require('./support/init.js'); // eslint-disable-line
 const httph = require('../lib/http_helper.js');
 
 const alamo_headers = {
@@ -13,53 +12,8 @@ const alamo_headers = {
   'x-elevated-access': 'true',
 };
 
-// function wait_for_app(httph, app, callback, iteration) {
-//   iteration = iteration || 1;
-//   if (iteration === 1) {
-//     process.stdout.write('    ~ Waiting for app to turn up');
-//   }
-//   if (iteration === 30) {
-//     process.stdout.write('\n');
-//     callback({ code: 0, message: 'Timeout waiting for app to turn up.' });
-//   }
-//   httph.request('get', `https://${app}${process.env.ALAMO_BASE_DOMAIN}`, { 'X-Timeout': 500 }, null, (err, data) => {
-//     if (err) {
-//       process.stdout.write('.');
-//       setTimeout(wait_for_app.bind(null, httph, app, callback, (iteration + 1)), 500);
-//       // callback(err, null);
-//     } else {
-//       process.stdout.write('\n');
-//       callback(null, data);
-//     }
-//   });
-// }
-
-// function wait_for_build(httph, app, build_id, callback, iteration) {
-//   iteration = iteration || 1;
-//   if (iteration === 1) {
-//     process.stdout.write('    ~ Waiting for build');
-//   }
-//   httph.request('get', `http://localhost:5000/apps/${app}/builds/${build_id}`, alamo_headers, null, (err, data) => {
-//     if (err && err.code === 423) {
-//       process.stdout.write('.');
-//       setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-//     } else if (err) {
-//       callback(err, null);
-//     } else {
-//       const build_info = JSON.parse(data);
-//       if (build_info.status === 'pending') {
-//         process.stdout.write('.');
-//         setTimeout(wait_for_build.bind(null, httph, app, build_id, callback, (iteration + 1)), 500);
-//       } else {
-//         process.stdout.write('\n');
-//         callback(null, data);
-//       }
-//     }
-//   });
-// }
-
-
 describe('addons: provisioning postgres, redis, influx, and services.', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(100000);
 
   const appname_brand_new = `alamotest${Math.floor(Math.random() * 10000)}`;

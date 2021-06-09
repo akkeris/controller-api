@@ -8,16 +8,24 @@
 
 ### Storage 
 * `DATABASE_URL` - The database url to store build, release information.  This has no default.  Must be a postgres 9.5+ instance. See create.sql in sql folder for creating the tables and schema.
+* `ES_URL` - The elastic search url (https://somehost, without any port information).
 
 ### Security
+* `AUTH_KEY` - This is a shared secret simple authentication, this should be used in all API calls in the Authorization header.
 * `ENCRYPT_KEY` - A private key used to encrypt secretive information in postgres.  This has no default.  Must be 24 bytes long.
 * `AKKERIS_UI_URL` - Public URI (https://somehost/) for the appkit ui used by developers.
 * `JWT_RS256_PRIVATE_KEY` - The private key used to issue temporary JWT tokens for webhooks. Must be RS256 PEM encoded. See `test/support/generate-jwt-public-private.sh` to create one.
 * `JWT_RS256_PUBLIC_CERT` - The public key used to validate temporary JWT tokens for webhooks. Must be RS256 PEM encoded. See `test/support/generate-jwt-public-private.sh` to create one.
+* `SUPPORT_EMAIL` - The email address to use for notifications, and where users can each support staff.
+
+### Logging
+* `LOG_SESSION_URL` - The URL (http://somehost) for the log session, this should (generally) always be set to `http://logsession.akkeris-system.svc.cluster.local`
+* `LOG_SHUTTLE_URL` - The URL (http://somehost) for the log shuttle, this should (generally) always be set to `http://logshuttle.akkeris-system.svc.cluster.local`
 
 ### Build Information
 * `DEFAULT_GITHUB_USERNAME` - When watching github source control, use this default username if none is provided.  (should be set with `DEFAULT_GITHUB_TOKEN`)
 * `DEFAULT_GITHUB_TOKEN` - When watching github source control, use this default token if none is provided. (should be set with `DEFAULT_GITHUB_USERNAME`)
+* `BUILD_SHUTTLE_URL` - The URL (http://somehost) for the buildshuttle, unless external availble this should always be set to `http://buildshuttle.akkeris-system.svc.cluster.local`
 
 ### Deployment Information
 * `[STACKNAME]_STACK_API` - The URI for the stack api by the name of STACKNAME, for example if a stack exists called FOO the uri for the stack api must be set at FOO_STACK_API
@@ -29,13 +37,13 @@
 ### Optional Environment Variables
 * `ANOMALY_METRICS_DRAIN` - The syslog drain end point for the opentsdb custom metrics collector. This has no default.
 * `PAPERTRAIL_DRAIN` - The syslog standard drain end point for papertrail.  This has no default.
-* `AUTH_KEY` - If secure key addon isn't usued, this can be set as a shared secret simple authentication, this should be used in all API calls in the Authorization header.
 * `BLACKLIST_ENV` - A comma delimited list of socs keywords causing config vars to be redacted, defaults to `PASS,KEY,SECRET,PRIVATE,TOKEN,SALT,AUTH,HASH`
 * `DYNO_DEFAULT_SIZE` - The default dyno size to use. The set default is `gp1` if no other is specified.
 * `RESERVED_SPACES` - A list of reserved spaces to add to the reserved list.  The default reserved spaces are `kube-system, brokers, k2-poc, kube-public, akkeris-system, istio-system, cert-manager`. Note, setting this will only add to the list, not override it.
 * `TTL_TEMP_TOKEN` - How long (in ms) should temporary JWT tokens last for? Defaults to 3600000 (1 hour)
 * `CSP_REPORT_URI` - The URI to report CSP violations for apps that have CSP features on their app enabled. Should be the publically available URI for the CSP reporter.
 * `CSP_IGNORE_DOMAINS` - A comma delimited list of domains that should not be included in CSP allowed list. The list of allowed is pulled from domains available for sites.
+* 
 
 ### Integration Variables
 To disable custom formatting for outgoing webhooks set these to true.

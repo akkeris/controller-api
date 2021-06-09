@@ -48,7 +48,7 @@ describe('addons attachments:', function () {
     const obj = JSON.parse(data);
     expect(obj).to.be.an('array');
     obj.forEach((plan) => {
-      if (plan.name === 'akkeris-postgresql:hobby') {
+      if (plan.name === 'akkeris-postgresql:standard-0') {
         postgresql_plan = plan;
       }
     });

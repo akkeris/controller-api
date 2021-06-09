@@ -20,11 +20,11 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "codacy-coverage": "^3.4.0",
+    "codacy-coverage": "^3.2.0",
     "eslint": "^7.17.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.1",
-    "mocha": "5.2.0",
+    "mocha": "^9.0.0",
     "mocha-jenkins-reporter": "0.4.5",
     "ngrok": "^3.3.0",
     "nodemon": "^2.0.6",

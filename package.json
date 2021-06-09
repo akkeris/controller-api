@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors --reporter spec --reporter-options=junit_report_path=./coverage/report.xml --exit",
-    "cover": "bash -c './node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors --reporter spec --reporter-options=junit_report_path=./coverage/report.xml --exit && cat ./coverage/lcov.info | bash <(curl -Ls https://coverage.codacy.com/get.sh) report'"
+    "cover": "bash -c './node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors --reporter spec --reporter-options=junit_report_path=./coverage/report.xml --exit && bash <(curl -Ls https://coverage.codacy.com/get.sh) report --coverage-reports ./coverage/lcov.info --commit-uuid $COMMIT_SHA -t $CODACY_PROJECT_TOKEN'"
   },
   "author": "O.C. Tanner",
   "license": "Apache-2.0",

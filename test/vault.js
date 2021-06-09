@@ -52,6 +52,10 @@ describe('vault: provisioning, etc', function () {
   const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(100000);
 
+  if(process.env.SKIP_VAULT_TESTS) {
+    return;
+  }
+
   const appname_brand_new = `alamotest${Math.floor(Math.random() * 10000)}`;
   it('covers creating the test app for services', (done) => {
     httph.request('post', 'http://localhost:5000/apps', alamo_headers,

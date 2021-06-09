@@ -3,7 +3,6 @@ describe('preview apps: ensure preview apps work appropriately', function () {
   this.timeout(10 * 60 * 1000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
-  process.env.DEFAULT_PORT = '5000';
   process.env.TEST_MODE = 'true';
   const init = require('./support/init.js'); // eslint-disable-line
   const fs = require('fs');
@@ -48,16 +47,8 @@ describe('preview apps: ensure preview apps work appropriately', function () {
   }
 
   it('setup an app', async () => {
-    const req_data = JSON.stringify({
-      org: 'test', space: 'preview', name: app_name, size: 'gp2', quantity: 1, type: 'web', port: 9000,
-    });
-    await httph.request('post', 'http://localhost:5000/apps', alamo_headers, req_data);
-    await httph.request(
-      'patch',
-      `http://localhost:5000/apps/${app_name}-preview/config-vars`,
-      alamo_headers,
-      JSON.stringify({ FOO: 'GAZI' }),
-    );
+    const app = await init.create_test_app('preview', app_name, 5000);
+    await init.update_config_vars(app, { FOO: 'GAZI' });
   });
 
   it('setup an auto build', async () => {

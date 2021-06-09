@@ -163,14 +163,17 @@ async function wait_for_build(app, build_id) {
   throw new Error('Timeout waiting for build to finish.');
 }
 
-async function create_test_app(space = 'default') {
-  const name = `alamotest${Math.floor(Math.random() * 100000)}`;
-  return JSON.parse(await httph.request(
+async function create_test_app(space = 'default', name = `alamotest${Math.floor(Math.random() * 100000)}`, port) {
+  let app = JSON.parse(await httph.request(
     'post',
     'http://localhost:5000/apps',
     alamo_headers,
     JSON.stringify({ org: 'test', space, name }),
   ));
+  if(port) {
+    create_formation(app, 'web', null, port);
+  }
+  return app;
 }
 
 async function delete_app(app) {
@@ -184,13 +187,13 @@ async function delete_app(app) {
   return undefined;
 }
 
-async function create_formation(app, type = 'worker', command = 'none') {
+async function create_formation(app, type = 'worker', command = null, port = null) {
   return httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({
-    size: 'gp1', quantity: 1, type, command,
+    size: 'gp1', quantity: 1, type, command, port,
   }));
 }
 
-async function update_formation(app, type = 'worker', command = 'none', port = null) {
+async function update_formation(app, type = 'worker', command = null, port = null) {
   return httph.request('patch', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify([{
     size: 'gp1', quantity: 1, type, command, port,
   }]));

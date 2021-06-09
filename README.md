@@ -91,6 +91,8 @@ cat sql/create_testing.sql | psql $DATABASE_URL
 * `TEST_MODE` - Similar to ONE_PROCESS_MODE this should be set when running the automated tests, while ONE_PROCESS_MODE should be set when developing locally.  Just set it to true
 * `ALAMO_BASE_DOMAIN` - This should be in the format of .ds1.example.com (.cluster.domain.com), This is the base domain to use for newly created apps.
 * `SITE_BASE_DOMAIN` - This is the site base domain such as `.example.com`.
+* `SKIP_KAFKA_TESTS` - Skip the kafka tests if they're not being used in the cluster.
+* `SKIP_VAULT_TESTS` - Skip the vault tests if they're not being used in the cluster.
 * `CODACY_PROJECT_TOKEN` - While optional this is useful when running test coverage to report the results to www.codacy.com. 
 * `MARU_STACK_API` - Set to the alamo api, MARU is the name of our test cluster
 * `US_SEATTLE_REGION_API` - Set to the alamo api, US_SEATTLE is the name of our test region.

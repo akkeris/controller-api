@@ -41,9 +41,5 @@ jobs:
           SITE_BASE_DOMAIN='${{ secrets.SITE_BASE_DOMAIN }}'
           BASE_DOMAIN='${{ secrets.BASE_DOMAIN }}'
           US_SLC_REGION_API='${{ secrets.US_SLC_REGION_API }}'
-          wget https://nodejs.org/download/release/latest-v14.x/node-v14.17.0-linux-arm64.tar.gz
-          tar zxvf node-v14.17.0-linux-arm64.tar.gz
-          rm node-v14.17.0-linux-arm64.tar.gz
-          PATH=$PATH:$PWD/node-v14.17.0-linux-arm64/bin/
-          rm -rf node-v14.17.0-linux-arm64
+          sudo apk add nodejs
           npm cover

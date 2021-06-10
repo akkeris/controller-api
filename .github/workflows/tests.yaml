@@ -42,4 +42,5 @@ jobs:
           BASE_DOMAIN='${{ secrets.BASE_DOMAIN }}'
           US_SLC_REGION_API='${{ secrets.US_SLC_REGION_API }}'
           sudo apt-get -y install nodejs
+          npm install
           npm cover

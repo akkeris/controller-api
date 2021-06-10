@@ -22,9 +22,9 @@ jobs:
           export DOCKER_REGISTRY_AUTH='{}'
           export LOG_SESSION_URL=http://logsession.akkeris-system.svc.cluster.local
           export LOG_SHUTTLE_URL=http://logshuttle.akkeris-system.svc.cluster.local
-          export DS1_STACK_API="https://region-api.akkeris.io"
-          export US_SLC_REGION_API="https://region-api.akkeris.io"
-          export BUILD_SHUTTLE_URL="https://builds.akkeris.io"
+          export DS1_STACK_API="http://region-api.akkeris.io"
+          export US_SLC_REGION_API="http://region-api.akkeris.io"
+          export BUILD_SHUTTLE_URL="http://builds.akkeris.io"
           export SUPPORT_EMAIL=support@akkeris.io
           export NGROK_TOKEN='${{ secrets.NGROK_TOKEN }}'
           export AKKERIS_API='${{ secrets.AKKERIS_API }}'

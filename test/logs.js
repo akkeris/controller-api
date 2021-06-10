@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-expressions */
-const init = require('./support/init.js'); // eslint-disable-line
 
 describe('logs: ensure we can pull app logs', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
+
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';

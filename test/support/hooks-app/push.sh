@@ -1,4 +1,2 @@
 #!/bin/sh
-docker build . -t test-hooks:latest
-docker tag test-hooks:latest docker.io/akkeris/test-hooks:latest
-docker push docker.io/akkeris/test-hooks:latest
+docker buildx build --push --platform linux/arm/v7,linux/arm64/v8,linux/amd64 --tag docker.io/akkeris/test-hooks:latest .

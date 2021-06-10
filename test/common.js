@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-expressions */
 const { expect } = require('chai');
-const init = require('./support/init.js'); // eslint-disable-line
 const httph = require('../lib/http_helper.js');
 
 process.env.AUTH_KEY = 'hello';
@@ -12,6 +11,7 @@ const alamo_headers = {
 };
 
 describe('base: Ensure helper tools work correctly.', () => {
+  const init = require('./support/init.js'); // eslint-disable-line
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';
   const common = require('../lib/common.js');

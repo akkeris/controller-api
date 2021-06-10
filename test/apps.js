@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
-const init = require('./support/init.js'); // eslint-disable-line
-
 describe('apps: ensure we can create an app, list apps, view app info and delete apps', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
+  
   this.timeout(10 * 60 * 1000);
   process.env.PORT = 5000;
   process.env.AUTH_KEY = 'hello';

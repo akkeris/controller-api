@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
-const init = require('./support/init.js'); // eslint-disable-line
 describe('spaces: ensure we can pull and list spaces', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(10000);
   process.env.PORT = 5000;
   process.env.TEST_MODE = 'true'; // prevents creating actual spaces.  Since we cant delete them, we bail out before committing.

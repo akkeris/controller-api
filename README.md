@@ -8,16 +8,24 @@
 
 ### Storage 
 * `DATABASE_URL` - The database url to store build, release information.  This has no default.  Must be a postgres 9.5+ instance. See create.sql in sql folder for creating the tables and schema.
+* `ES_URL` - The elastic search url (https://somehost, without any port information).
 
 ### Security
+* `AUTH_KEY` - This is a shared secret simple authentication, this should be used in all API calls in the Authorization header.
 * `ENCRYPT_KEY` - A private key used to encrypt secretive information in postgres.  This has no default.  Must be 24 bytes long.
 * `AKKERIS_UI_URL` - Public URI (https://somehost/) for the appkit ui used by developers.
 * `JWT_RS256_PRIVATE_KEY` - The private key used to issue temporary JWT tokens for webhooks. Must be RS256 PEM encoded. See `test/support/generate-jwt-public-private.sh` to create one.
 * `JWT_RS256_PUBLIC_CERT` - The public key used to validate temporary JWT tokens for webhooks. Must be RS256 PEM encoded. See `test/support/generate-jwt-public-private.sh` to create one.
+* `SUPPORT_EMAIL` - The email address to use for notifications, and where users can each support staff.
+
+### Logging
+* `LOG_SESSION_URL` - The URL (http://somehost) for the log session, this should (generally) always be set to `http://logsession.akkeris-system.svc.cluster.local`
+* `LOG_SHUTTLE_URL` - The URL (http://somehost) for the log shuttle, this should (generally) always be set to `http://logshuttle.akkeris-system.svc.cluster.local`
 
 ### Build Information
 * `DEFAULT_GITHUB_USERNAME` - When watching github source control, use this default username if none is provided.  (should be set with `DEFAULT_GITHUB_TOKEN`)
 * `DEFAULT_GITHUB_TOKEN` - When watching github source control, use this default token if none is provided. (should be set with `DEFAULT_GITHUB_USERNAME`)
+* `BUILD_SHUTTLE_URL` - The URL (http://somehost) for the buildshuttle, unless external availble this should always be set to `http://buildshuttle.akkeris-system.svc.cluster.local`
 
 ### Deployment Information
 * `[STACKNAME]_STACK_API` - The URI for the stack api by the name of STACKNAME, for example if a stack exists called FOO the uri for the stack api must be set at FOO_STACK_API
@@ -29,7 +37,6 @@
 ### Optional Environment Variables
 * `ANOMALY_METRICS_DRAIN` - The syslog drain end point for the opentsdb custom metrics collector. This has no default.
 * `PAPERTRAIL_DRAIN` - The syslog standard drain end point for papertrail.  This has no default.
-* `AUTH_KEY` - If secure key addon isn't usued, this can be set as a shared secret simple authentication, this should be used in all API calls in the Authorization header.
 * `BLACKLIST_ENV` - A comma delimited list of socs keywords causing config vars to be redacted, defaults to `PASS,KEY,SECRET,PRIVATE,TOKEN,SALT,AUTH,HASH`
 * `DYNO_DEFAULT_SIZE` - The default dyno size to use. The set default is `gp1` if no other is specified.
 * `RESERVED_SPACES` - A list of reserved spaces to add to the reserved list.  The default reserved spaces are `kube-system, brokers, k2-poc, kube-public, akkeris-system, istio-system, cert-manager`. Note, setting this will only add to the list, not override it.
@@ -82,8 +89,10 @@ cat sql/create_testing.sql | psql $DATABASE_URL
 * `NGROK_TOKEN` - When testing a public URI is needed to test callbacks from other integrated systems, get a token at www.ngrok.com and place it in this envirionment variable.
 * `ONE_PROCESS_MODE` - When developing locally this must be set, it imports what normally would be in the worker into the main process. Just set it to true
 * `TEST_MODE` - Similar to ONE_PROCESS_MODE this should be set when running the automated tests, while ONE_PROCESS_MODE should be set when developing locally.  Just set it to true
-* `ALAMO_BASE_DOMAIN` - This should be in the format of .some.example.com, This is the base domain to use for newly created apps.
+* `ALAMO_BASE_DOMAIN` - This should be in the format of .ds1.example.com (.cluster.domain.com), This is the base domain to use for newly created apps.
 * `SITE_BASE_DOMAIN` - This is the site base domain such as `.example.com`.
+* `SKIP_KAFKA_TESTS` - Skip the kafka tests if they're not being used in the cluster.
+* `SKIP_VAULT_TESTS` - Skip the vault tests if they're not being used in the cluster.
 * `CODACY_PROJECT_TOKEN` - While optional this is useful when running test coverage to report the results to www.codacy.com. 
 * `MARU_STACK_API` - Set to the alamo api, MARU is the name of our test cluster
 * `US_SEATTLE_REGION_API` - Set to the alamo api, US_SEATTLE is the name of our test region.

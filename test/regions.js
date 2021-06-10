@@ -9,8 +9,8 @@ const user_alamo_headers = { Authorization: process.env.AUTH_KEY, 'User-Agent': 
 // const http = require('http');
 const { expect } = require('chai');
 
-const init = require('./support/init.js'); // eslint-disable-line
 describe('regions: list and get available regions', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(100000);
   const httph = require('../lib/http_helper.js');
 

@@ -43,4 +43,4 @@ jobs:
           US_SLC_REGION_API='${{ secrets.US_SLC_REGION_API }}'
           sudo apt-get -y install nodejs npm
           npm install
-          npm cover
+          npm run cover

@@ -41,5 +41,5 @@ jobs:
           SITE_BASE_DOMAIN='${{ secrets.SITE_BASE_DOMAIN }}'
           BASE_DOMAIN='${{ secrets.BASE_DOMAIN }}'
           US_SLC_REGION_API='${{ secrets.US_SLC_REGION_API }}'
-          sudo apk add nodejs
+          sudo apt-get install nodejs
           npm cover

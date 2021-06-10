@@ -29,7 +29,6 @@ jobs:
           AKKERIS_UI_URL='${{ secrets.AKKERIS_UI_URL }}'
           AUTH_KEY='${{ secrets.AUTH_KEY }}'
           BUILD_SHUTTLE_URL='${{ secrets.BUILD_SHUTTLE_URL }}'
-          DATABASE_URL="${{ secrets.DATABASE_URL }}"
           DOCKER_REGISTRY_HOST='${{ secrets.DOCKER_REGISTRY_HOST }}'
           DS1_STACK_API='${{ secrets.DS1_STACK_API }}'
           ENCRYPT_KEY='${{ secrets.ENCRYPT_KEY }}'

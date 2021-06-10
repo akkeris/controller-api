@@ -20,6 +20,7 @@ jobs:
           export DEFAULT_GITHUB_TOKEN=12345
           export DEFAULT_GITHUB_USERNAME=akkerisbot
           export DOCKER_REGISTRY_AUTH='{}'
+          export DOCKER_REGISTRY_ORG=akkeris
           export LOG_SESSION_URL=http://logsession.akkeris-system.svc.cluster.local
           export LOG_SHUTTLE_URL=http://logshuttle.akkeris-system.svc.cluster.local
           export DS1_STACK_API="http://region-api.akkeris.io"

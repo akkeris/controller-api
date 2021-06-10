@@ -45,4 +45,4 @@ jobs:
           sudo apt-get -y install nodejs npm
           node -v
           npm install
-          npm run cover
+          npm test

@@ -25,13 +25,13 @@ jobs:
           export DS1_STACK_API="http://region-api.akkeris.io"
           export US_SLC_REGION_API="http://region-api.akkeris.io"
           export BUILD_SHUTTLE_URL="http://builds.akkeris.io"
+          export DOCKER_REGISTRY_HOST="https://registry.akkeris.io"
           export SUPPORT_EMAIL=support@akkeris.io
           export NGROK_TOKEN='${{ secrets.NGROK_TOKEN }}'
           export AKKERIS_API='${{ secrets.AKKERIS_API }}'
           export AKKERIS_API_URL='${{ secrets.AKKERIS_API_URL }}'
           export AKKERIS_UI_URL='${{ secrets.AKKERIS_UI_URL }}'
           export AUTH_KEY='${{ secrets.AUTH_KEY }}'
-          export DOCKER_REGISTRY_HOST='${{ secrets.DOCKER_REGISTRY_HOST }}'
           export ENCRYPT_KEY='${{ secrets.ENCRYPT_KEY }}'
           export ENCRYPT_KEY_192_BITS='${{ secrets.ENCRYPT_KEY_192_BITS }}'
           export ES_URL='${{ secrets.ES_URL }}'

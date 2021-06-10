@@ -44,7 +44,6 @@ jobs:
           wget https://nodejs.org/download/release/latest-v14.x/node-v14.17.0-linux-arm64.tar.gz
           tar zxvf node-v14.17.0-linux-arm64.tar.gz
           rm node-v14.17.0-linux-arm64.tar.gz
-          mv node-v14.17.0-linux-arm64/bin/* /usr/local/bin
-          mv node-v14.17.0-linux-arm64/lib/* /usr/local/lib
+          PATH=$PATH:$PWD/node-v14.17.0-linux-arm64/bin/
           rm -rf node-v14.17.0-linux-arm64
           npm cover

@@ -187,13 +187,13 @@ async function delete_app(app) {
   return undefined;
 }
 
-async function create_formation(app, type = 'worker', command = null, port = null) {
+async function create_formation(app, type = 'worker', command = 'none', port = null) {
   return httph.request('post', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify({
     size: 'gp1', quantity: 1, type, command, port,
   }));
 }
 
-async function update_formation(app, type = 'worker', command = null, port = null) {
+async function update_formation(app, type = 'worker', command = 'none', port = null) {
   return httph.request('patch', `http://localhost:5000/apps/${app.id}/formation`, alamo_headers, JSON.stringify([{
     size: 'gp1', quantity: 1, type, command, port,
   }]));

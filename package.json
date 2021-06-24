@@ -13,7 +13,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "dotenv": "^10.0.0",
-    "elasticsearch": "15.5.0",
+    "elasticsearch": "16.7.2",
     "node-jose": "^2.0.0",
     "pg": "^8.3.3",
     "uuid": "2.0.3"

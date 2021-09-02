@@ -14,3 +14,4 @@ where
   and service = $2
   and resource_type = $3
   and action = $4
+  and deleted = false

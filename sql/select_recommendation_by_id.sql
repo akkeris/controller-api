@@ -10,4 +10,5 @@ select
 from
   recommendations
 where
-  recommendation = $1
+  recommendation = $1 and
+  deleted = false

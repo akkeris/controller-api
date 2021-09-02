@@ -833,6 +833,10 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/recommendations$')
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/recommendations(\\?[A-z0-9\\-\\_\\.\\=\\&]+)+$')
   .run(alamo.recommendations.http.get.bind(alamo.recommendations.http.get, pg_pool))
   .and.authorization([simple_key, jwt_key]);
+// Delete specific recommendation for an app
+routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/recommendations(\\?[A-z0-9\\-\\_\\.\\=\\&]+)+$')
+  .run(alamo.recommendations.http.delete.bind(alamo.recommendations.http.delete, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
 
 routes.add.default((req, res) => {
   res.writeHead(404, {});

@@ -655,8 +655,11 @@ begin
     details json not null,                                                                 -- This will be different depending on resource_type, but contains how to apply the recommendation, which resource, human readable description, etc
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
+    deleted bool not null default false,
     primary key (app, service, resource_type, action) -- We only store the latest recommendation for the app, service, resource_type, and action
   );
+
+alter table recommendations add column if not exists deleted bool not null default false;
 
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then

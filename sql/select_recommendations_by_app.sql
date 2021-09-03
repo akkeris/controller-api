@@ -11,3 +11,4 @@ from
   recommendations
 where
   app = $1
+  and deleted = false

@@ -8,9 +8,9 @@ const alamo_headers = {
   'x-username': 'test',
   'x-elevated-access': 'true',
 };
-const support = require('./support/init.js');
 
 describe('addon services: plans, services listing and getting.', function () {
+  const support = require('./support/init.js');
   this.timeout(10000);
 
   const httph = require('../lib/http_helper.js');

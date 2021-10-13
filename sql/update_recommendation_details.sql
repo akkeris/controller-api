@@ -3,4 +3,5 @@ update recommendations set
   updated = now()
 where
   recommendation::varchar(1024) = $1::varchar(1024)
+  and deleted = false
 returning *

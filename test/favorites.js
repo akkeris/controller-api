@@ -10,13 +10,13 @@ const user_alamo_headers = { Authorization: process.env.AUTH_KEY, 'User-Agent': 
 
 const uuid = require('uuid');
 const { expect } = require('chai');
-const init = require('./support/init.js'); // eslint-disable-line
 const httph = require('../lib/http_helper.js');
 
 const app_id = 'fa2b535d-de4d-4a14-be36-d44af53b59e3'; // default app populated in the DB
 
 
 describe('favorites: ensure we can create, list and delete favorites', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(10000);
 
   function headers(username) {

@@ -4,7 +4,6 @@ process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
 
 const { expect } = require('chai');
-const init = require('./support/init.js'); // eslint-disable-line
 const httph = require('../lib/http_helper.js');
 
 const alamo_headers = {
@@ -16,6 +15,7 @@ const alamo_headers = {
 
 
 describe('config-vars: creating, updating and deleting a config vars', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(100000);
   const appname_brand_new = `alamotest${Math.floor(Math.random() * 10000)}`;
   it('covers getting default config vars', (done) => {
@@ -166,7 +166,7 @@ describe('config-vars: creating, updating and deleting a config vars', function 
       'post',
       `http://localhost:5000/apps/${appname_brand_new}-default/addons`,
       alamo_headers,
-      JSON.stringify({ plan: 'akkeris-postgresql:hobby' }),
+      JSON.stringify({ plan: 'akkeris-postgresql:standard-0' }),
     ));
     const info = JSON.parse(await httph.request(
       'get',

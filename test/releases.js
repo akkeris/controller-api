@@ -4,7 +4,6 @@ process.env.DEFAULT_PORT = '5000';
 process.env.AUTH_KEY = 'hello';
 
 const { expect } = require('chai');
-const support = require('./support/init.js');
 
 function validate_release_object(obj) {
   expect(obj).is.an('object');
@@ -33,6 +32,8 @@ function validate_release_status_object(obj) {
 }
 
 describe('releases: list, get, create a release', function () {
+  const support = require('./support/init.js');
+
   this.timeout(0);
   const httph = require('../lib/http_helper.js');
 

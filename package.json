@@ -6,13 +6,13 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors -u exports --reporter spec --reporter mocha-jenkins-reporter --reporter-options=junit_report_path=./coverage/report.xml --exit",
-    "cover": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors -u exports --reporter spec --reporter mocha-jenkins-reporter --reporter-options=junit_report_path=./coverage/report.xml --exit && cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage"
+    "test": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors --reporter mocha-multi-reporters --reporter-options configFile=./test/mocha_config.json  --exit",
+    "cover": "bash -c './node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors --reporter mocha-multi-reporters --reporter-options configFile=./test/mocha_config.json --exit && bash <(curl -Ls https://coverage.codacy.com/get.sh) report --coverage-reports ./coverage/lcov.info -t $CODACY_PROJECT_TOKEN'"
   },
   "author": "O.C. Tanner",
   "license": "Apache-2.0",
   "dependencies": {
-    "dotenv": "^8.2.0",
+    "dotenv": "^10.0.0",
     "elasticsearch": "15.5.0",
     "node-jose": "^2.0.0",
     "pg": "^8.3.3",
@@ -20,12 +20,13 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "codacy-coverage": "^3.4.0",
-    "eslint": "^7.17.0",
-    "eslint-config-airbnb-base": "^14.2.0",
+    "codacy-coverage": "^3.2.0",
+    "eslint": "^7.29.0",
+    "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
-    "mocha": "5.2.0",
-    "mocha-jenkins-reporter": "0.4.5",
+    "mocha": "^9.0.0",
+    "mocha-junit-reporter": "^2.0.0",
+    "mocha-multi-reporters": "^1.5.1",
     "ngrok": "^3.3.0",
     "nodemon": "^2.0.6",
     "nyc": "^15.1.0"

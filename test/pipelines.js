@@ -1,20 +1,6 @@
 /* eslint-disable no-unused-expressions */
-process.env.DEFAULT_PORT = '5000';
-process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
 
-// const nonpipelined_sources = {
-//   sha: '123456',
-//   org: 'ocatnner',
-//   repo: 'https://github.com/abcd/some-repo',
-//   branch: 'master',
-//   version: 'v1.0',
-//   checksum: 'sha256:781a4cc4ae21966caf63b121f614c734c74f6a455504d18f53e85c47a80bd98b',
-//   url: 'docker://docker.io/akkeris/test-pipelines1:latest',
-//   docker_registry: '',
-//   docker_login: '',
-//   docker_password: '',
-// };
 const pipeline1_sources = {
   sha: '123456',
   org: 'ocatnner',
@@ -39,22 +25,10 @@ const pipeline2_sources = {
   docker_login: '',
   docker_password: '',
 };
-// const pipeline3_sources = {
-//   sha: '123456',
-//   org: 'ocatnner',
-//   repo: 'https://github.com/abcd/some-repo',
-//   branch: 'master',
-//   version: 'v1.0',
-//   checksum: 'sha256:3ba47b4dea485b1d5b362c453fd676c994ee3455f1848e203b7fa9cf8db79274',
-//   url: 'docker://docker.io/akkeris/test-pipelines4:latest',
-//   docker_registry: '',
-//   docker_login: '',
-//   docker_password: '',
-// };
 
-const init = require('./support/init.js'); // eslint-disable-line
 
 describe('pipelines', function () {
+  const init = require('./support/init.js'); // eslint-disable-line
   this.timeout(300000);
   const httph = require('../lib/http_helper.js');
   const { expect } = require('chai');
@@ -185,10 +159,7 @@ describe('pipelines', function () {
 
   it('creating multiple apps for pipelining (1).', async () => {
     this.timeout(0);
-    await httph.request('post', 'http://localhost:5000/apps', init.alamo_headers,
-      JSON.stringify({
-        org: 'test', space: 'pipline-test-space1', name: app1, size: 'gp2', quantity: 1, type: 'web', port: 5000,
-      }));
+    await init.create_test_app('pipline-test-space1', app1, 5000);
     const build_obj = JSON.parse(await httph.request(
       'post',
       `http://localhost:5000/apps/${app1}-pipline-test-space1/builds`,
@@ -204,30 +175,15 @@ describe('pipelines', function () {
   });
 
   it('creating multiple apps for pipelining (2).', async () => {
-    await httph.request(
-      'post',
-      'http://localhost:5000/apps',
-      init.alamo_headers,
-      JSON.stringify({ org: 'test', space: 'pipline-test-space1', name: app2 }),
-    );
+    await init.create_test_app('pipline-test-space1', app2, 5000);
   });
 
   it('creating multiple apps for pipelining (3).', async () => {
-    await httph.request(
-      'post',
-      'http://localhost:5000/apps',
-      init.alamo_headers,
-      JSON.stringify({ org: 'test', space: 'pipline-test-space2', name: app3 }),
-    );
+    await init.create_test_app('pipline-test-space2', app3, 5000);
   });
 
   it('creating multiple apps for pipelining (4).', async () => {
-    await httph.request(
-      'post',
-      'http://localhost:5000/apps',
-      init.alamo_headers,
-      JSON.stringify({ org: 'test', space: 'pipline-test-space3', name: app4 }),
-    );
+    await init.create_test_app('pipline-test-space3', app4, 5000);
   });
 
   it('creating pipeline coupling between app1 and app2 in same space.', async () => {

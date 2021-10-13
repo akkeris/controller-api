@@ -3,13 +3,13 @@ process.env.PORT = 5000;
 process.env.AUTH_KEY = 'hello';
 
 const { expect } = require('chai');
-const init = require('./support/init.js');
 const httph = require('../lib/http_helper.js');
 
 const alamo_headers = {
   Authorization: process.env.AUTH_KEY, 'User-Agent': 'Hello', 'x-username': 'test', 'x-elevated-access': 'true',
 };
 describe('lifecycle: ensure apps restart at appropriate times.', function () {
+  const init = require('./support/init.js');
   this.timeout(300000);
   process.env.DEFAULT_PORT = '9000';
   let build_info;

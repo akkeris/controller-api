@@ -619,17 +619,30 @@ begin
     resource_type uuid not null primary key,
     name varchar(1024) not null unique,              -- e.g. formation
     actions text not null,                           -- Comma separated list of actions - e.g. "scale,resize"
+    details json not null,                           -- Details of the resource type. Should include "description" (human-readable) and "action_fields", an object with keys representing the actions, and values as an array of valid fields to include in the recommendation details json. See below for an example.
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
     deleted bool not null default false
   );
 
+  -- Add the `details` column after deleting all recommendations & resource types.
+  -- This was only missing in testing so no actual recommendations will be affected by this. Can be removed in the future
+  if not exists (SELECT NULL
+                  FROM INFORMATION_SCHEMA.COLUMNS
+                  WHERE table_name = 'recommendation_resource_types'
+                  AND column_name = 'details'
+                  and table_schema = 'public') then
+    delete from recommendations;
+    delete from recommendation_resource_types;
+    alter table recommendation_resource_types add column details json not null;
+  end if;
+
   -- Insert default recommendation types
   if not exists (select 1 from recommendation_resource_types where name = 'formation' ) then
     insert into recommendation_resource_types
-      (resource_type, name, actions)
+      (resource_type, name, actions, details)
     values
-      ('354d810d-304c-46ef-83db-145ed94cd352', 'formation', 'resize,scale');
+      ('354d810d-304c-46ef-83db-145ed94cd352', 'formation', 'resize,scale', '{"description":"Resize - Change the plan of a formation. Scale - Change the quantity of a formation.","action_fields":{"resize":["resource","plan","description"],"scale":["resource","quantity","description"]}}');
   end if;
 
   create table if not exists recommendations
@@ -642,6 +655,7 @@ begin
     details json not null,                                                                 -- This will be different depending on resource_type, but contains how to apply the recommendation, which resource, human readable description, etc
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
+    deleted bool not null default false,
     primary key (app, service, resource_type, action) -- We only store the latest recommendation for the app, service, resource_type, and action
   );
 
@@ -668,6 +682,7 @@ begin
     created_by varchar(1024) not null default 'unknown',
     created timestamptz not null default now()
   );
+alter table recommendations add column if not exists deleted bool not null default false;
 
   -- create default regions and stacks
   if (select count(*) from regions where deleted = false) = 0 then

@@ -7,9 +7,9 @@ const { expect } = require('chai');
 const pg = require('pg');
 const url = require('url');
 const { request } = require('../lib/http_helper.js');
-const test = require('./support/init.js');
 
 describe('addons multiple: test the ability to promote and primary/secondary addons', function () {
+  const test = require('./support/init.js');
   this.timeout(1000 * 1000);
 
   let testapp1 = null;
@@ -193,7 +193,7 @@ describe('addons multiple: test the ability to promote and primary/secondary add
   });
 
   it('ensure attached addons and owned addons can co-exist', async () => {
-    postgres3_testapp2 = await test.create_addon(testapp2, 'akkeris-postgresql', 'hobby');
+    postgres3_testapp2 = await test.create_addon(testapp2, 'akkeris-postgresql', 'standard-0');
     attached_testapp2 = await test.attach_addon(testapp2, postgres2_testapp1);
 
     const prefix = attached_testapp2.name.split('-').slice(2).join('-').replace(/-/g, '_')

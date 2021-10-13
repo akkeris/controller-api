@@ -1,0 +1,17 @@
+select
+  action_runs.action_run,
+  action_runs.action,
+  action_runs.runid,
+  action_runs.status,
+  action_runs.exit_code,
+  action_runs.created_by,
+  action_runs.created
+from
+  action_runs
+  join
+    actions
+    on action_runs.action = actions.action
+where
+  actions.deleted = false
+  and action_runs.action::varchar(1024) = $1::varchar(1024)
+;

@@ -828,11 +828,33 @@ routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/recommendations$')
   .and.authorization([simple_key, jwt_key]);
 
 // -- actions
+// Create Action
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/actions$')
   .run(alamo.actions.http.create.bind(alamo.actions.http.create, pg_pool))
   .and.authorization([simple_key, jwt_key]);
+// Create Action Run
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/runs$')
   .run(alamo.actions.http.runs.create.bind(alamo.actions.http.runs.create, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+// Get Specific Action
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+  .run(alamo.actions.http.get.bind(alamo.actions.http.get, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+// List All Actions
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/actions$')
+  .run(alamo.actions.http.list.bind(alamo.actions.http.list, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+// Get Specific Action Run
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/runs/([A-z0-9\\-\\_\\.]+)$')
+  .run(alamo.actions.http.runs.get.bind(alamo.actions.http.runs.get, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+// List All Action Runs
+routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/runs$')
+  .run(alamo.actions.http.runs.list.bind(alamo.actions.http.runs.list, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
+// Delete Action
+routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+  .run(alamo.actions.http.delete.bind(alamo.actions.http.delete, pg_pool))
   .and.authorization([simple_key, jwt_key]);
 
 routes.add.default((req, res) => {

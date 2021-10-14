@@ -10,7 +10,7 @@ select
   formations.port,
   formations.updated,
   formations.healthcheck,
-  formations.oneoff
+  formations.oneoff,
   formations.options
 from 
   formations 

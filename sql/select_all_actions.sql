@@ -9,7 +9,7 @@ select
   actions.deleted,
   (
     select
-      json_build_object('id', formations.formation, 'type', formations.type, 'size', formations.size, 'command', formations.command)
+      json_build_object('id', formations.formation, 'type', formations.type, 'size', formations.size, 'command', formations.command, 'options', formations.options)
     from
       formations
     where

@@ -272,8 +272,6 @@ describe('apps: ensure we can create an app, list apps, view app info and delete
           expect(appobj.archived_at).to.be.undefined;
           expect(appobj.buildpack_provided_description).to.be.undefined;
           expect(appobj.build_stack).to.be.undefined;
-          expect(appobj.build_stack.id).to.be.undefined;
-          expect(appobj.build_stack.name).to.be.undefined;
           expect(appobj.created_at).to.be.a('string');
           expect(appobj.id).to.be.a('string');
           expect(appobj.maintenance).to.equal(false);

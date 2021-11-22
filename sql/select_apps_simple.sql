@@ -14,6 +14,7 @@ select
   regions.name region_name,
   organizations.name org_name,
   organizations.org org_uuid,
+  apps.url,
   (select preview from previews where apps.app = previews.target and previews.deleted = false limit 1) preview
 from
   apps

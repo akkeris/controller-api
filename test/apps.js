@@ -257,6 +257,47 @@ describe('apps: ensure we can create an app, list apps, view app info and delete
     });
   });
 
+  it('Ensures we can pull all applications in simple mode.', (done) => {
+    httph.request('get', 'http://localhost:5000/apps?simple=true', alamo_headers, null, (err, data) => {
+      if (err) {
+        console.error(err);
+      }
+      expect(err).to.be.null;
+      expect(data).to.be.a('string');
+      const appsobj = JSON.parse(data);
+      expect(appsobj).to.be.an('array');
+      appsobj.forEach((appobj) => {
+        if (appobj.name === 'alamotestapp-default') {
+          expect(appobj).to.be.an('object');
+          expect(appobj.archived_at).to.be.undefined;
+          expect(appobj.buildpack_provided_description).to.be.undefined;
+          expect(appobj.build_stack).to.be.undefined;
+          expect(appobj.build_stack.id).to.be.undefined;
+          expect(appobj.build_stack.name).to.be.undefined;
+          expect(appobj.created_at).to.be.a('string');
+          expect(appobj.id).to.be.a('string');
+          expect(appobj.maintenance).to.equal(false);
+          expect(appobj.name).to.equal('alamotestapp-default');
+          expect(appobj.key).to.equal('alamotestapp-default');
+          expect(appobj.owner).to.be.undefined;
+          expect(appobj.organization).to.be.an('object');
+          expect(appobj.organization.name).to.equal('test');
+          expect(appobj.region).to.be.an('object');
+          expect(appobj.region.name).to.be.a('string');
+          expect(appobj.released_at).to.be.undefined;
+          expect(appobj.repo_size).to.be.undefined;
+          expect(appobj.slug_size).to.be.undefined;
+          expect(appobj.space).to.be.an('object');
+          expect(appobj.space.name).to.equal('default');
+          expect(appobj.stack).to.be.undefined;
+          expect(appobj.updated_at).to.be.a('string');
+          expect(appobj.web_url).to.contain(`https://alamotestapp${process.env.ALAMO_BASE_DOMAIN}`);
+          done();
+        }
+      });
+    });
+  });
+
   it('Ensures we cannot delete an app in a socs/prod space.', (done) => {
     const new_headers = JSON.parse(JSON.stringify(alamo_headers));
     delete new_headers['x-elevated-access'];

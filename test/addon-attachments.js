@@ -43,16 +43,22 @@ describe('addons attachments:', function () {
   });
 
   it('covers getting a postres plans', async () => {
-    const data = await httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql/plans', alamo_headers, null);
-    expect(data).to.be.a('string');
-    const obj = JSON.parse(data);
-    expect(obj).to.be.an('array');
-    obj.forEach((plan) => {
-      if (plan.name === 'akkeris-postgresql:standard-0') {
-        postgresql_plan = plan;
-      }
-    });
-    expect(postgresql_plan).to.be.an('object');
+    try {
+      const data = await httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql/plans', alamo_headers, null);
+      console.log(data);
+      expect(data).to.be.a('string');
+      const obj = JSON.parse(data);
+      expect(obj).to.be.an('array');
+      obj.forEach((plan) => {
+        if (plan.name === 'akkeris-postgresql:standard-0') {
+          postgresql_plan = plan;
+        }
+      });
+      expect(postgresql_plan).to.be.an('object');
+    } catch (err) {
+      console.log(err);
+      expect(err).to.be.null;
+    }
   });
 
   it('covers creating a postgresql service', async () => {

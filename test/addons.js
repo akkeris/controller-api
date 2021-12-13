@@ -243,13 +243,8 @@ describe('addons: provisioning postgres, redis, influx, and services.', function
   }
 
   it('covers getting a postgres plans', (done) => {
-    console.log('test');
     httph.request('get', 'http://localhost:5000/addon-services/akkeris-postgresql/plans', alamo_headers, null,
       (err, data) => {
-        console.error(data);
-        if (err) {
-          console.error(err);
-        }
         expect(err).to.be.null;
         expect(data).to.be.a('string');
         const obj = JSON.parse(data);

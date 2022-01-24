@@ -614,6 +614,15 @@ begin
     cache text not null
   );
 
+  create table if not exists app_owner_details
+  (
+    id varchar(128) not null,
+    owner_name text not null,
+    owner_email text not null,
+    app uuid references apps("app"),
+    owner_organization text not null
+  );
+
   create table if not exists recommendation_resource_types
   (
     resource_type uuid not null primary key,

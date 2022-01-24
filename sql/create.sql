@@ -620,7 +620,7 @@ begin
     owner_name text not null,
     owner_email text not null,
     app uuid references apps("app"),
-    owner_organization text not null
+    owner_organization uuid not null references organizations("org")
   );
 
   create table if not exists recommendation_resource_types

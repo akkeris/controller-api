@@ -238,6 +238,9 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')
   .run(alamo.git.http.autobuild.delete.bind(alamo.git.http.autobuild.delete, pg_pool))
   .and.authorization([simple_key, jwt_key]);
+routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github/trigger$')
+  .run(alamo.git.http.manual_build.create.bind(alamo.git.http.manual_build.create, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
 
 // -- Github callbacks, no auth but authenticated through
 routes.add.post('/apps/([A-z0-9\\-\\_\\.]+)/builds/auto/github$')

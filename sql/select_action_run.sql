@@ -1,7 +1,6 @@
 select
   action_runs.action_run,
   action_runs.action,
-  action_runs.runid,
   action_runs.status,
   action_runs.exit_code,
   action_runs.created_by,

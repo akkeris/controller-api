@@ -864,6 +864,10 @@ routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/runs/([A
 routes.add.get('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)/runs$')
   .run(alamo.actions.http.runs.list.bind(alamo.actions.http.runs.list, pg_pool))
   .and.authorization([simple_key, jwt_key]);
+// Update Action
+routes.add.patch('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
+  .run(alamo.actions.http.update.bind(alamo.actions.http.update, pg_pool))
+  .and.authorization([simple_key, jwt_key]);
 // Delete Action
 routes.add.delete('/apps/([A-z0-9\\-\\_\\.]+)/actions/([A-z0-9\\-\\_\\.]+)$')
   .run(alamo.actions.http.delete.bind(alamo.actions.http.delete, pg_pool))

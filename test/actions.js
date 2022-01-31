@@ -71,7 +71,6 @@ describe('Actions', function () {
       const action_run = JSON.parse(action_runs)[0];
       expect(action_run.action_run).to.match(uuid_regex);
       expect(action_run.action).to.equal(test_action.action);
-      expect(action_run.runid).to.match(uuid_regex);
       expect(action_run.status).to.equal('running');
       expect(action_run.exit_code).to.equal(null);
       expect(action_run.created_by).to.equal('Calaway');

@@ -676,8 +676,10 @@ begin
   (
     action_run uuid not null primary key,
     action uuid not null references actions("action"),
-    status varchar(128) not null default 'unknown',
+    status varchar(128) not null default 'starting',
     exit_code integer null,
+    started_at timestamptz,
+    finished_at timestamptz,
     created_by varchar(1024) not null default 'unknown',
     created timestamptz not null default now()
   );

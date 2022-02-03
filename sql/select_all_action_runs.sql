@@ -3,6 +3,8 @@ select
   action_runs.action,
   action_runs.status,
   action_runs.exit_code,
+  action_runs.started_at,
+  action_runs.finished_at,
   action_runs.created_by,
   action_runs.created
 from

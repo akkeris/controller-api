@@ -51,6 +51,7 @@ To disable custom formatting for outgoing webhooks set these to true.
 * `WEBHOOK_DISABLE_CIRCLECI` - If set to `true` disable auto-formatting outgoing webhooks for CircleCI Jobs.
 * `WEBHOOK_DISABLE_SLACK` - If set to `true` disable auto-formatting outgoing webhooks for Slack Channel Notifications.
 * `WEBHOOK_DISABLE_OPSGENIE` - If set to `true` disable auto-formatting outgoing webhooks for OpsGenie Alerts.
+* `WEBHOOK_DISABLE_PAGERDUTY` - If set to `true` disable auto-formatting outgoing webhooks for PagerDuty Alerts.
 * `WEBHOOK_DISABLE_ROLLBAR` - If set to `true` disable auto-formatting outgoing release webhooks for notifying Rollbar of deployments.
 
 ## Installing ##

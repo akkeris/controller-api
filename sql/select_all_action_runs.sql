@@ -16,4 +16,4 @@ from
 where
   actions.deleted = false
   and action_runs.action::varchar(1024) = $1::varchar(1024)
-;
+order by created desc

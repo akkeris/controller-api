@@ -680,6 +680,7 @@ begin
     action uuid not null references actions("action"),
     status varchar(128) not null default 'starting',
     exit_code integer null,
+    source varchar(1024),
     started_at timestamptz,
     finished_at timestamptz,
     created_by varchar(1024) not null default 'unknown',

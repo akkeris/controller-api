@@ -3,6 +3,7 @@ select
   actions.app,
   actions.name,
   actions.description,
+  actions.events,
   actions.created_by,
   actions.created,
   actions.updated,

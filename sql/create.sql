@@ -666,10 +666,12 @@ begin
     formation uuid not null references formations("formation"),
     name alpha_numeric not null,
     description varchar(1024) not null default '',
+    events text,                                                      -- Comma separated list of events that will trigger the action
     created_by varchar(1024) not null default 'unknown',
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
-    deleted boolean not null default false
+    deleted boolean not null default false,
+    UNIQUE (action, app, name)
   );
 
   create table if not exists action_runs

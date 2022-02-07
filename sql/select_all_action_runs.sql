@@ -1,6 +1,7 @@
 select
   action_runs.action_run,
   action_runs.action,
+  action_runs.run_number,
   action_runs.status,
   action_runs.exit_code,
   action_runs.source,

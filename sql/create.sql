@@ -678,13 +678,15 @@ begin
   (
     action_run uuid not null primary key,
     action uuid not null references actions("action"),
+    run_number integer not null default 1,
     status varchar(128) not null default 'starting',
     exit_code integer null,
     source varchar(1024),
     started_at timestamptz,
     finished_at timestamptz,
     created_by varchar(1024) not null default 'unknown',
-    created timestamptz not null default now()
+    created timestamptz not null default now(),
+    UNIQUE (action, run_number)
   );
 alter table recommendations add column if not exists deleted bool not null default false;
 

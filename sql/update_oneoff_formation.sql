@@ -1,8 +1,7 @@
 update formations set 
-  type = coalesce($2, type),
-  size = coalesce($3, size),
-  command = coalesce($4, command),
-  options = coalesce($5, options)
+  size = coalesce($2, size),
+  command = coalesce($3, command),
+  options = coalesce($4, options)
 where
   (formation::varchar(1024) = $1)
 returning *

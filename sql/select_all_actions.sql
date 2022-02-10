@@ -30,4 +30,4 @@ where
   actions.deleted = false
   and apps.deleted = false
   and apps.app::varchar(1024) = $1::varchar(1024)
-;
+order by actions.name asc

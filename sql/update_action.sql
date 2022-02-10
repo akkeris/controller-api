@@ -1,7 +1,6 @@
 update actions set
-    name = coalesce($2, name),
-    description = coalesce($3, description),
-    events = coalesce($4, events)
+    description = coalesce($2, description),
+    events = coalesce($3, events)
 where
     action = $1 and
     deleted = false

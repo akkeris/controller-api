@@ -670,8 +670,7 @@ begin
     created_by varchar(1024) not null default 'unknown',
     created timestamptz not null default now(),
     updated timestamptz not null default now(),
-    deleted boolean not null default false,
-    UNIQUE (action, app, name)
+    deleted boolean not null default false
   );
 
   create table if not exists action_runs

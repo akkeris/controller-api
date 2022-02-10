@@ -1,5 +1,29 @@
-const { expect } = require('chai');
+const {
+  expect
+} = require('chai');
 const http_helper = require('../lib/http_helper.js');
+
+/**
+ * Try to fetch the status of a completed pod every half second for up to 30 seconds
+ * @param {string} url URL of the pod status endpoint of the region-api
+ * @returns Status information of the pod in an object, if the pod exists and was complete
+ */
+const watch = async (url) => {
+  for (let i = 0; i < 60; i++) {
+    const pod_status_url = url;
+    const pod_status_after_finish = await http_helper.request('get', pod_status_url, null); // eslint-disable-line
+    if (pod_status_after_finish && pod_status_after_finish !== 'null') {
+      const status = JSON.parse(pod_status_after_finish)[0];
+      // Pod is done
+      if (status.output === 'Completed' || status.output === 'Failed') {
+        return status;
+      }
+    }
+    // Wait half of a second
+    await (new Promise((res) => setTimeout(res, 500))); // eslint-disable-line
+  }
+  return null;
+};
 
 describe('actions:', function () {
   this.timeout(64000);
@@ -136,8 +160,20 @@ describe('actions:', function () {
     it('covers updating an action', async () => {
       // stub
       expect(created_action).to.equal(true);
+      const payload = {
+        description: '',
+        command: 'sleep 10',
+        options: {
+          image: 'busybox:1.34',
+        },
+      };
       // Test updating fields
       // Test removing fields
+      const update_action_response = await http_helper.request('patch', `http://localhost:5000/apps/${testapp.name}/actions/${test_action.name}`, akkeris_headers, payload);
+      const action_update = JSON.parse(update_action_response);
+
+      expect(action_update.description).to.equal('');
+      expect(action_update.formation.options.image).to.equal('busybox:1.34');
     });
 
     it('covers triggering an action on an event', () => {
@@ -148,11 +184,32 @@ describe('actions:', function () {
       // Make sure that the action fired and completed
     });
 
-    it('covers actions that fail during execution', async () => {
-      // stub
-      expect(created_action).to.equal(true);
+    it.only('covers actions that fail during execution', async () => {
       // Create and trigger an action run that is expected to fail
       // Make sure that the result is "failure" and the exit code is expected
+      const payload = {
+        name: 'badtestaction',
+        description: 'This action tries to run a Docker container, but it fails.',
+        command: 'filenotfound',
+        options: {
+          image: 'busybox:latest',
+        },
+      };
+      try {
+        // Create action
+        await http_helper.request('post', `http://localhost:5000/apps/${testapp.name}/actions`, akkeris_headers, payload);
+
+        // Trigger run
+        await http_helper.request('post', `http://localhost:5000/apps/${testapp.name}/actions/badtestaction/runs`, akkeris_headers);
+
+        // Watch for the pod to be done
+        const pod_status = await watch(`${process.env.MARU_STACK_API}/v1/kube/podstatus/${testapp.space.name}/${testapp.simple_name}--actionsbadtestaction`);
+        expect(pod_status).to.not.equal(null);
+        expect(pod_status.output).to.equal('Failed');
+      } catch (err) {
+        console.error(err);
+        expect(err).to.equal(null);
+      }
     });
   });
 });

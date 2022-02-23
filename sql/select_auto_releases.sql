@@ -26,7 +26,11 @@ where
   builds.build = (
     select b.build
     from apps a join builds b on a.app = b.app
-    where a.app = apps.app and a.deleted = false and b.deleted = false
+    where 
+      a.app = apps.app
+      and a.deleted = false
+      and b.deleted = false
+      and b.created > (current_date - interval '1 day')
     order by b.created desc offset 0 limit 1
   )
   and apps.deleted = false

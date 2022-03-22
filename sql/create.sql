@@ -678,7 +678,7 @@ alter table recommendations add column if not exists deleted bool not null defau
 
   -- create default cluster for topics
   if (select count(*) from clusters where deleted = false) = 0 then
-    insert into clusters (cluster, region, name, topic_name_regex) values ('606ece73-4b9a-4454-8848-c33faadc3121', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'nonprod', '^(qa|dev|stg|test)(-[a-z0-9]+)+$');
+    insert into clusters (cluster, region, name, topic_name_regex) values ('606ece73-4b9a-4454-8848-c33faadc3121', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'nonprod', '^(qa|dev|stg|test|sbx)(-[a-z0-9]+)+$');
     insert into clusters (cluster, region, name, tags, topic_name_regex) values ('97ab5c4a-044b-47f8-a7dc-46ad02aec5ce', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'prod', 'prod', '^(?!(qa|dev|stg|test)-)[a-z0-9]+(-[a-z0-9]+)+$');
     insert into clusters (cluster, region, name, topic_name_regex) values ('222b5c4e-011b-34a8-ab9c-123402aec5ff', 'f5f1d4d9-aa4a-12aa-bec3-d44af53b59e3', 'maru', '^(qa|dev|stg|test)(-[a-z0-9]+)+$');
   end if;

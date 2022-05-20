@@ -60,6 +60,8 @@ const alamo = {
   recommendations: require('./lib/recommendations.js'),
 };
 
+const PORT = process.env.PORT || 5000;
+
 const db_url = new url.URL(config.database_url);
 const db_conf = {
   user: db_url.username ? db_url.username : '',
@@ -855,10 +857,8 @@ const server = http.createServer((req, res) => {
   const path = parsedURL.pathname + parsedURL.search;
 
   routes.process(method, path, req, res).catch((e) => { console.error('Uncaught error:', e); });
-}).listen(process.env.PORT || 5000, () => {
-  if (!process.env.TEST_MODE) {
-    console.log(`Server started and listening on port ${process.env.PORT || 5000}`);
-  }
+}).listen(PORT, () => {
+  console.log('Server started and listening on port:', PORT);
 });
 
 server.keepAliveTimeout = 1000 * (60 * 6); // 6 minutes

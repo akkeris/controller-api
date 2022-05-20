@@ -113,7 +113,7 @@ $ export JWT_RS256_PRIVATE_KEY=`cat ./test/support/sample-jwt-private-key.pem`
 3. Run the entire test suite:
 
 ```
-npm run tests
+npm test
 ```
 
 OR, run an individual test manually:

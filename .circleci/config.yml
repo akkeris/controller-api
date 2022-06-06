@@ -17,8 +17,8 @@ jobs:
             if [ "${CIRCLE_BRANCH}" != "release" ]; then
               if [ "${CIRCLE_PROJECT_USERNAME}" == "akkeris" ]; then 
                 docker login -u $DOCKER_LOGIN -p $DOCKER_PASS
-                docker tag controller-api "docker.io/akkeris/controller-api:${CIRCLE_BRANCH/\//-}-${CIRCLE_BUILD_NUM}"
-                docker push "docker.io/akkeris/controller-api:${CIRCLE_BRANCH/\//-}-${CIRCLE_BUILD_NUM}"
+                docker tag controller-api "docker.io/akkeris/controller-api:${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
+                docker push "docker.io/akkeris/controller-api:${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
                 if [ "${CIRCLE_BRANCH}" == "master" ]; then
                   docker tag controller-api "docker.io/akkeris/controller-api:release-${CIRCLE_BUILD_NUM}"
                   docker tag controller-api "docker.io/akkeris/controller-api:latest"

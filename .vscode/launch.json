@@ -26,6 +26,18 @@
         "<node_internals>/**"
       ],
       "type": "pwa-node"
-    }
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "port": 9220,
+      "name": "Attach debugger",
+      "restart": true,
+      "skipFiles": [
+        "${workspaceFolder}/node_modules/**/*",
+        "<node_internals>/**/*"
+      ],
+      "timeout": 1000
+    },
   ]
 }

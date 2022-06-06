@@ -4,8 +4,9 @@
   "description": "Central API for controlling apps in akkeris",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node index",
+    "dev": "nodemon",
+    "debug": "nodemon --inspect=0.0.0.0:9220",
     "test": "./node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors --reporter mocha-multi-reporters --reporter-options configFile=./test/mocha_config.json  --exit",
     "cover": "bash -c './node_modules/.bin/nyc --reporter=text --reporter=lcov mocha --colors --reporter mocha-multi-reporters --reporter-options configFile=./test/mocha_config.json --exit && bash <(curl -Ls https://coverage.codacy.com/get.sh) report --coverage-reports ./coverage/lcov.info -t $CODACY_PROJECT_TOKEN'"
   },

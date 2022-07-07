@@ -659,6 +659,14 @@ begin
     primary key (app, service, resource_type, action) -- We only store the latest recommendation for the app, service, resource_type, and action
   );
 
+  create table if not exists app_owner
+  (
+    id uuid not null primary key,
+    owner_name text not null,
+    owner_email text not null,
+    app uuid not null references apps(app)
+  );
+
 alter table recommendations add column if not exists deleted bool not null default false;
 
   -- create default regions and stacks

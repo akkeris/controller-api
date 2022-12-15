@@ -659,6 +659,34 @@ begin
     primary key (app, service, resource_type, action) -- We only store the latest recommendation for the app, service, resource_type, and action
   );
 
+  create table if not exists actions
+  (
+    action uuid not null primary key,
+    app uuid not null references apps("app"),
+    formation uuid not null references formations("formation"),
+    name alpha_numeric not null,
+    description varchar(1024) not null default '',
+    events text,                                                      -- Comma separated list of events that will trigger the action
+    created_by varchar(1024) not null default 'unknown',
+    created timestamptz not null default now(),
+    updated timestamptz not null default now(),
+    deleted boolean not null default false
+  );
+
+  create table if not exists action_runs
+  (
+    action_run uuid not null primary key,
+    action uuid not null references actions("action"),
+    run_number integer not null default 1,
+    status varchar(128) not null default 'starting',
+    exit_code integer null,
+    source varchar(1024),
+    started_at timestamptz,
+    finished_at timestamptz,
+    created_by varchar(1024) not null default 'unknown',
+    created timestamptz not null default now(),
+    UNIQUE (action, run_number)
+  );
 alter table recommendations add column if not exists deleted bool not null default false;
 
   -- create default regions and stacks

@@ -7,10 +7,11 @@ select
   formations.quantity,
   formations.size,
   formations.type,
-  formations.command,
   formations.port,
   formations.updated,
-  formations.healthcheck
+  formations.healthcheck,
+  formations.oneoff,
+  formations.options
 from 
   formations 
     join apps on formations.app = apps.app
